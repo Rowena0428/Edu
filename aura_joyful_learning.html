@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-HK" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rowena | DSE 快樂學習平台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pure-white': '#FFFFFF',
+                        'off-white': '#F8F9FA',
+                        'deep-blue': '#0A192F',
+                        'slate-gray': '#64748B',
+                        'joyful-amber': '#F59E0B',
+                        'calm-mint': '#10B981',
+                        'sayo-gray': '#F4F4F3'
+                    },
+                    fontFamily: {
+                        sans: ['SF Pro Display', 'Inter', 'PingFang TC', 'Source Han Sans', 'sans-serif'],
+                    },
+                    animation: {
+                        'breathe': 'breathe 8s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        breathe: {
+                            '0%, 100%': { transform: 'scale(1)', opacity: '0.6' },
+                            '50%': { transform: 'scale(1.5)', opacity: '0.1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #FFFFFF; color: #0A192F; -webkit-font-smoothing: antialiased; }
+        .chart-container { position: relative; width: 100%; max-width: 100%; margin: 0 auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .sayo-border { border: 1px solid #E2E8F0; }
+    </style>
+</head>
+<body class="font-sans antialiased bg-pure-white selection:bg-deep-blue selection:text-white">
+
+<!-- Chosen Palette: Sayo Minimalist (Pure White, Deep Space Blue, Slate Gray, Joyful Amber, Calm Mint) -->
+<!-- Application Structure Plan: The SPA is structured into four main functional zones prioritizing focus and interaction. 1. Navigation & Hero (Minimalist entry point setting the tone). 2. Performance Dashboard (Combines quantitative Focus Chart and tabular Leaderboard side-by-side to provide a clean, modern, and aligned status overview without overwhelming the user). 3. Curated Subjects & Tools (Grid-based access to core study materials (now streamlined to 3 core subjects) and digital tools). 4. Mindfulness Break (Interactive breathing exercise to enforce the 'joyful/stress-free' learning ethos, keeping it completely minimalist and clutter-free). This structure guides the user from inspiration -> action -> deep work -> recovery. -->
+<!-- Visualization & Content Choices: 1. Focus Trend -> Goal: Inform/Change -> Line Chart (Chart.js) -> Hover tooltips -> Shows progress objectively without judgment. 2. Leaderboard -> Goal: Compare/Organize -> Styled HTML List -> Tab switching via JS -> Promotes healthy competition based on effort (time), not just scores. 3. Breathing Exercise -> Goal: Relieve Stress -> CSS/JS animated geometric circle -> Click to start/stop -> Tangible mindfulness tool. Confirming NO SVG/Mermaid used. -->
+<!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <nav class="fixed top-0 w-full bg-pure-white/90 backdrop-blur-md z-50 sayo-border border-t-0 border-l-0 border-r-0">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-8">
+                <span class="text-xl font-bold tracking-widest text-deep-blue">Rowena</span>
+                <span class="text-xs text-slate-gray tracking-widest hidden md:inline-block">|&nbsp;&nbsp;&nbsp;DSE 快樂學習空間</span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm tracking-wide text-slate-gray">
+                <a href="#dashboard" class="hover:text-deep-blue transition-colors duration-300">專注數據</a>
+                <a href="#subjects" class="hover:text-deep-blue transition-colors duration-300">核心科目</a>
+                <a href="#tools" class="hover:text-deep-blue transition-colors duration-300">數字工具箱</a>
+                <a href="#mindfulness" class="hover:text-deep-blue transition-colors duration-300">減壓角落</a>
+            </div>
+            <div class="flex items-center gap-4 md:gap-6">
+                <div id="rowena-header-user" class="flex items-center"></div>
+                <a href="aura_workspace.html" class="text-xs px-5 py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all inline-block shrink-0">進入學習台</a>
+            </div>
+        </div>
+    </nav>
+
+    <section id="hero" class="min-h-screen flex flex-col justify-center relative px-6 max-w-7xl mx-auto pt-20">
+        <div class="absolute left-6 top-1/3 hidden lg:block">
+            <p class="text-[11px] text-slate-gray tracking-widest transform -rotate-90 origin-left">Rowena SPATIAL DESIGN</p>
+        </div>
+        
+        <div class="text-center max-w-3xl mx-auto space-y-8">
+            <h1 class="text-3xl md:text-5xl font-medium tracking-widest text-deep-blue leading-tight opacity-0 transition-opacity duration-1000" id="hero-title">
+                學習，是與自己和解的過程。
+            </h1>
+            <p class="text-sm md:text-base text-slate-gray tracking-wider font-light opacity-0 transition-opacity duration-1000 delay-300" id="hero-sub">
+                Study with clarity, perform with joy.
+            </p>
+            <a href="aura_workspace.html" class="inline-block opacity-0 transition-opacity duration-1000 delay-500 text-xs px-8 py-3 bg-deep-blue text-white rounded-full tracking-widest hover:bg-slate-800 transition-all" id="hero-cta">開始專注學習</a>
+        </div>
+
+        <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-4 cursor-pointer" onclick="document.getElementById('dashboard').scrollIntoView()">
+            <div class="w-10 h-10 rounded-full border border-slate-200 flex items-center justify-center hover:border-deep-blue transition-colors duration-500">
+                <span class="text-slate-400 text-xs">↓</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="dashboard" class="py-24 px-6 max-w-7xl mx-auto">
+        <div class="mb-16 max-w-2xl">
+            <h2 class="text-sm text-slate-gray tracking-widest mb-4">01. 專注數據 (PERFORMANCE)</h2>
+            <p class="text-2xl text-deep-blue font-light leading-relaxed">每一分鐘的累積，都值得被看見。透過直觀的專注數據反饋，幫助你建立高質感的自律備考節奏。</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-stretch">
+            <div class="lg:col-span-2 sayo-border rounded-xl p-8 bg-off-white/50 relative overflow-hidden group flex flex-col justify-between">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h3 class="text-lg text-deep-blue tracking-wider mb-1">本週專注軌跡</h3>
+                        <p class="text-xs text-slate-gray">Focus Trend (Hours)</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-2xl text-deep-blue">24.5<span class="text-xs text-slate-gray ml-1">hrs</span></p>
+                        <p class="text-xs text-calm-mint">↑ 12% vs 上週</p>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="focusChart"></canvas>
+                </div>
+            </div>
+
+            <div class="sayo-border rounded-xl p-8 bg-pure-white flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-6 border-b border-gray-100 pb-2">
+                        <h3 class="text-sm text-deep-blue tracking-widest">榮譽殿堂</h3>
+                        <div class="flex gap-4 text-xs">
+                            <button class="text-deep-blue border-b-2 border-deep-blue pb-1" id="tab-time" onclick="switchTab('time')">時長</button>
+                            <button class="text-slate-gray pb-1" id="tab-streak" onclick="switchTab('streak')">連續</button>
+                        </div>
+                    </div>
+                    
+                    <div id="list-time" class="flex flex-col gap-6 text-sm text-deep-blue mt-4">
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">01</span>
+                            <span class="w-16">Alex L.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.6</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs font-mono">4.2h</span>
+                        </div>
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">02</span>
+                            <span class="w-16">Chloe W.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.6</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs font-mono">3.8h</span>
+                        </div>
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">03</span>
+                            <span class="w-16">Matt C.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.5</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs font-mono">3.5h</span>
+                        </div>
+                    </div>
+
+                    <div id="list-streak" class="flex flex-col gap-6 text-sm text-deep-blue mt-4 hidden">
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">01</span>
+                            <span class="w-16">Matt C.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.5</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs text-joyful-amber font-mono">30 Days</span>
+                        </div>
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">02</span>
+                            <span class="w-16">Alex L.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.6</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs text-joyful-amber font-mono">21 Days</span>
+                        </div>
+                        <div class="flex items-center gap-4 group">
+                            <span class="text-xs text-slate-gray w-4">03</span>
+                            <span class="w-16">Chloe W.</span>
+                            <span class="text-[10px] text-slate-gray border border-gray-200 px-1 rounded">F.6</span>
+                            <div class="flex-1 border-t border-dashed border-gray-200 mt-1"></div>
+                            <span class="text-xs text-joyful-amber font-mono">15 Days</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-8 pt-4 border-t border-gray-100 text-center">
+                    <p class="text-[10px] text-slate-gray leading-relaxed">
+                        你今天已累計專注 <span class="text-deep-blue font-medium">45 分鐘</span>，超越了全港 72% 的同級考生。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="subjects" class="py-24 px-6 max-w-7xl mx-auto bg-pure-white border-t border-gray-100">
+        <div class="mb-16 max-w-2xl">
+            <h2 class="text-sm text-slate-gray tracking-widest mb-4">02. 系統化課程 (CURATED SUBJECTS)</h2>
+            <p class="text-2xl text-deep-blue font-light leading-relaxed">重構知識體系，不靠死記硬背。以極簡邏輯拆解繁複考綱，尋找隱藏在文字與數字背後的規律。</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-[1px] bg-gray-200 sayo-border">
+            <div class="bg-pure-white p-10 hover:bg-sayo-gray transition-colors duration-700 group cursor-pointer h-80 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl tracking-widest text-deep-blue mb-2">中文科</h3>
+                    <p class="text-xs text-slate-gray font-mono">CHINESE LANG.</p>
+                </div>
+                <div>
+                    <div class="w-8 h-[1px] bg-deep-blue mb-6 group-hover:w-full transition-all duration-700"></div>
+                    <p class="text-sm text-slate-gray tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                        「文言字詞不再是密碼，用邏輯破解古人思維。」
+                    </p>
+                </div>
+            </div>
+            
+            <div class="bg-pure-white p-10 hover:bg-sayo-gray transition-colors duration-700 group cursor-pointer h-80 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl tracking-widest text-deep-blue mb-2">英文科</h3>
+                    <p class="text-xs text-slate-gray font-mono">ENGLISH LANG.</p>
+                </div>
+                <div>
+                    <div class="w-8 h-[1px] bg-deep-blue mb-6 group-hover:w-full transition-all duration-700"></div>
+                    <p class="text-sm text-slate-gray tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                        「擺脫港式英語，掌握高分句型與流暢度。」
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-pure-white p-10 hover:bg-sayo-gray transition-colors duration-700 group cursor-pointer h-80 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-xl tracking-widest text-deep-blue mb-2">數學科</h3>
+                    <p class="text-xs text-slate-gray font-mono">MATHEMATICS</p>
+                </div>
+                <div>
+                    <div class="w-8 h-[1px] bg-deep-blue mb-6 group-hover:w-full transition-all duration-700"></div>
+                    <p class="text-sm text-slate-gray tracking-wide opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
+                        「不靠死記公式，用聯想力秒殺 Paper 2 MC。」
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="tools" class="py-24 px-6 max-w-7xl mx-auto border-t border-gray-100">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-16 gap-8">
+            <div class="max-w-2xl">
+                <h2 class="text-sm text-slate-gray tracking-widest mb-4">03. 數字工具箱 (SMART SUITE)</h2>
+                <p class="text-2xl text-deep-blue font-light leading-relaxed">專為備考量身打造。將雜亂無章的錯題、筆記與練習，收斂為極致高效的數字工作流。</p>
+            </div>
+            <p class="text-xs text-slate-gray border border-gray-200 px-4 py-2 rounded-full cursor-default">點擊探索功能模塊</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="sayo-border p-8 rounded-xl bg-pure-white hover:border-slate-400 transition-colors cursor-pointer" onclick="toggleToolDetail('tool1')">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-base tracking-widest text-deep-blue">AI 錯題整理</h4>
+                    <span class="text-xs text-slate-gray font-mono">01</span>
+                </div>
+                <p class="text-sm text-slate-gray leading-relaxed" id="tool1-desc">拍照上傳錯題，AI 自動分類並解析背後知識點，拒絕在同一個地方跌倒第二次。</p>
+                <div id="tool1-detail" class="hidden mt-6 pt-6 border-t border-gray-100 text-xs text-deep-blue">
+                    支援格式：JPG, PNG, PDF.<br>自動提取考綱關鍵字，生成專屬複習卷。
+                </div>
+            </div>
+
+            <div class="sayo-border p-8 rounded-xl bg-pure-white hover:border-slate-400 transition-colors cursor-pointer" onclick="toggleToolDetail('tool2')">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-base tracking-widest text-deep-blue">精煉筆記</h4>
+                    <span class="text-xs text-slate-gray font-mono">02</span>
+                </div>
+                <p class="text-sm text-slate-gray leading-relaxed" id="tool2-desc">由滿分導師團隊撰寫，提煉最精簡考點，支援一鍵導出至 Notion / Goodnotes。</p>
+                <div id="tool2-detail" class="hidden mt-6 pt-6 border-t border-gray-100 text-xs text-deep-blue">
+                    支援暗黑模式閱讀，自帶重點螢光筆標記功能，跨裝置即時同步。
+                </div>
+            </div>
+
+            <div class="sayo-border p-8 rounded-xl bg-pure-white hover:border-slate-400 transition-colors cursor-pointer" onclick="toggleToolDetail('tool3')">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-base tracking-widest text-deep-blue">智能練習</h4>
+                    <span class="text-xs text-slate-gray font-mono">03</span>
+                </div>
+                <p class="text-sm text-slate-gray leading-relaxed" id="tool3-desc">根據你目前的水平動態調整難度，不再浪費時間做過於簡單或過難的題目。</p>
+                <div id="tool3-detail" class="hidden mt-6 pt-6 border-t border-gray-100 text-xs text-deep-blue">
+                    自適應演算法分析你的弱點，精準推送同類型題型進行定點突破。
+                </div>
+            </div>
+
+            <div class="sayo-border p-8 rounded-xl bg-pure-white hover:border-slate-400 transition-colors cursor-pointer" onclick="toggleToolDetail('tool4')">
+                <div class="flex justify-between items-center mb-6">
+                    <h4 class="text-base tracking-widest text-deep-blue">模擬考場</h4>
+                    <span class="text-xs text-slate-gray font-mono">04</span>
+                </div>
+                <p class="text-sm text-slate-gray leading-relaxed" id="tool4-desc">完美模擬真實考場計時與答題卡界面，培養肌肉記憶，消除考場焦慮。</p>
+                <div id="tool4-detail" class="hidden mt-6 pt-6 border-t border-gray-100 text-xs text-deep-blue">
+                    包含白噪音背景、嚴格倒計時機制及考後即時評分報告生成。
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="mindfulness" class="py-32 px-6 bg-off-white">
+        <div class="max-w-4xl mx-auto text-center flex flex-col items-center">
+            <h2 class="text-sm text-slate-gray tracking-widest mb-6">04. 在呼吸之間，穩步前行</h2>
+            <p class="text-xl text-deep-blue font-light leading-relaxed mb-16 max-w-2xl">
+                備考感到疲倦？點擊下方圓環，跟隨幾何的律動進行一分鐘深呼吸，讓大腦重獲清晰。
+            </p>
+
+            <div class="relative w-64 h-64 flex items-center justify-center mb-12 cursor-pointer group" id="breathe-container" onclick="toggleBreathing()">
+                <div id="breathe-circle" class="absolute w-32 h-32 rounded-full border border-slate-300 transition-all duration-[4000ms] ease-in-out group-hover:border-calm-mint"></div>
+                <span id="breathe-text" class="text-xs tracking-widest text-slate-gray z-10 transition-colors group-hover:text-deep-blue">點擊開始呼吸</span>
+            </div>
+
+            <div class="flex flex-wrap justify-center gap-4 text-xs mt-12">
+                <span class="px-4 py-2 border border-gray-200 rounded text-slate-gray">今日任務：閱讀一篇英文 5** 範文 (0/1)</span>
+                <span class="px-4 py-2 border border-gray-200 rounded text-slate-gray">解鎖：無壓自律者勳章</span>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-pure-white border-t border-gray-100 py-12 px-6">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+            <span class="text-lg font-bold tracking-widest text-deep-blue">Rowena</span>
+            <div class="text-[10px] text-slate-gray tracking-widest flex gap-6">
+                <span>© 2026 Rowena EDUCATION. ALL RIGHTS RESERVED.</span>
+                <a href="#" class="hover:text-deep-blue">PRIVACY</a>
+                <a href="#" class="hover:text-deep-blue">TERMS</a>
+            </div>
+        </div>
+    </footer>
+
+    <div id="focus-overlay" class="fixed inset-0 bg-pure-white z-[100] flex flex-col items-center justify-center opacity-0 pointer-events-none transition-opacity duration-1000">
+        <div class="w-64 h-64 rounded-full border-[0.5px] border-slate-300 flex items-center justify-center relative">
+            <div class="absolute inset-0 rounded-full bg-slate-50 opacity-50 animate-pulse"></div>
+            <div class="text-center z-10">
+                <div class="text-4xl font-light text-deep-blue tracking-widest mb-2" id="focus-timer">25:00</div>
+                <div class="text-[10px] text-slate-gray tracking-widest cursor-pointer hover:text-deep-blue" onclick="stopFocus()">結束專注 (ESC)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Elegant custom modal/message box to replace browser alerts -->
+    <div id="custom-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300">
+        <div class="bg-pure-white sayo-border rounded-xl p-8 max-w-md w-full mx-4 space-y-4">
+            <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                <span id="modal-title" class="text-xs tracking-widest text-deep-blue uppercase">提示</span>
+                <button onclick="closeModal()" class="text-slate-gray text-xs hover:text-deep-blue">✕</button>
+            </div>
+            <p id="modal-message" class="text-sm text-slate-gray leading-relaxed"></p>
+            <div class="text-right">
+                <button onclick="closeModal()" class="px-4 py-2 bg-deep-blue text-white rounded text-xs tracking-widest hover:bg-slate-800 transition-all">確認</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="rowena_user.js"></script>
+    <script>
+        // Custom Modal Utility
+        function showModal(title, msg) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = msg;
+            const modal = document.getElementById('custom-modal');
+            modal.classList.remove('opacity-0', 'pointer-events-none');
+        }
+        function closeModal() {
+            const modal = document.getElementById('custom-modal');
+            modal.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (typeof RowenaUser !== 'undefined') RowenaUser.init('#rowena-header-user');
+            setTimeout(() => {
+                document.getElementById('hero-title').classList.remove('opacity-0');
+            }, 100);
+            setTimeout(() => {
+                document.getElementById('hero-sub').classList.remove('opacity-0');
+            }, 600);
+            setTimeout(() => {
+                const cta = document.getElementById('hero-cta');
+                if (cta) cta.classList.remove('opacity-0');
+            }, 900);
+        });
+
+        const ctx = document.getElementById('focusChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Focus Hours',
+                    data: [2.5, 3.2, 2.8, 4.1, 3.5, 5.0, 3.4],
+                    borderColor: '#0A192F',
+                    backgroundColor: 'transparent',
+                    borderWidth: 1.5,
+                    pointBackgroundColor: '#FFFFFF',
+                    pointBorderColor: '#0A192F',
+                    pointBorderWidth: 1.5,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: '#FFFFFF',
+                        titleColor: '#64748B',
+                        bodyColor: '#0A192F',
+                        borderColor: '#E2E8F0',
+                        borderWidth: 1,
+                        padding: 10,
+                        displayColors: false,
+                        callbacks: {
+                            label: function(context) {
+                                return context.parsed.y + ' hrs';
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#F8F9FA', drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: '#64748B', font: { size: 10 } }
+                    },
+                    x: {
+                        grid: { display: false, drawBorder: false },
+                        border: { display: false },
+                        ticks: { color: '#64748B', font: { size: 10 } }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'index',
+                },
+            }
+        });
+
+        function switchTab(tab) {
+            document.getElementById('list-time').classList.add('hidden');
+            document.getElementById('list-streak').classList.add('hidden');
+            
+            document.getElementById('tab-time').className = 'text-slate-gray pb-1';
+            document.getElementById('tab-streak').className = 'text-slate-gray pb-1';
+            
+            document.getElementById(`list-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = 'text-deep-blue border-b-2 border-deep-blue pb-1';
+        }
+
+        function toggleToolDetail(toolId) {
+            const detailElement = document.getElementById(`${toolId}-detail`);
+            if (detailElement.classList.contains('hidden')) {
+                detailElement.classList.remove('hidden');
+            } else {
+                detailElement.classList.add('hidden');
+            }
+        }
+
+        let isBreathing = false;
+        let breatheInterval;
+        const circle = document.getElementById('breathe-circle');
+        const text = document.getElementById('breathe-text');
+
+        function toggleBreathing() {
+            isBreathing = !isBreathing;
+            if (isBreathing) {
+                text.innerText = '吸氣...';
+                circle.style.transform = 'scale(2.5)';
+                circle.style.opacity = '0.1';
+                
+                let inPhase = true;
+                breatheInterval = setInterval(() => {
+                    inPhase = !inPhase;
+                    if (inPhase) {
+                        text.innerText = '吸氣...';
+                        circle.style.transform = 'scale(2.5)';
+                        circle.style.opacity = '0.1';
+                    } else {
+                        text.innerText = '呼氣...';
+                        circle.style.transform = 'scale(1)';
+                        circle.style.opacity = '1';
+                    }
+                }, 4000);
+            } else {
+                clearInterval(breatheInterval);
+                text.innerText = '點擊開始呼吸';
+                circle.style.transform = 'scale(1)';
+                circle.style.opacity = '1';
+            }
+        }
+
+        const focusBtn = document.getElementById('focus-btn');
+        const focusOverlay = document.getElementById('focus-overlay');
+        
+        focusBtn.addEventListener('click', () => {
+            focusOverlay.classList.remove('opacity-0', 'pointer-events-none');
+        });
+
+        function stopFocus() {
+            focusOverlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && !focusOverlay.classList.contains('opacity-0')) {
+                stopFocus();
+            }
+        });
+    </script>
+</body>
+</html>

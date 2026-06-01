@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rowena | HKDSE AI 學習工作台</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pure-white': '#FFFFFF',
+                        'off-white': '#F8F9FA',
+                        'deep-blue': '#0A192F',
+                        'slate-gray': '#64748B',
+                        'joyful-amber': '#F59E0B',
+                        'calm-mint': '#10B981',
+                        'pvp-accent': '#1E3A5F',
+                    },
+                    fontFamily: {
+                        sans: ['SF Pro Display', 'Inter', 'PingFang TC', 'Source Han Sans', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F8F9FA; color: #0A192F; -webkit-font-smoothing: antialiased; }
+        .sayo-border { border: 1px solid #E2E8F0; }
+        .tool-card { transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s; }
+        .tool-card.active { border-color: #0A192F; background: #FFFFFF; box-shadow: 0 1px 3px rgba(10,25,47,0.06); }
+        .tool-card:not(.active):hover { border-color: #94A3B8; background: #FFFFFF; }
+        .workspace-panel { animation: fadeIn 0.35s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pvp-pulse { animation: pvpPulse 2s ease-in-out infinite; }
+        @keyframes pvpPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(30,58,95,0.15); } 50% { box-shadow: 0 0 0 8px rgba(30,58,95,0); } }
+        .chat-bubble-user { background: #0A192F; color: #fff; }
+        .chat-bubble-ai { background: #FFFFFF; border: 1px solid #E2E8F0; }
+        #layout-shell { --sidebar-width: 320px; }
+        @media (min-width: 1024px) {
+            #layout-sidebar { width: var(--sidebar-width); flex: 0 0 var(--sidebar-width); max-width: 55%; }
+            #layout-main { flex: 1; min-width: 0; }
+        }
+        #layout-resize-handle {
+            width: 6px; flex-shrink: 0; cursor: col-resize;
+            background: transparent; position: relative; z-index: 10;
+            transition: background 0.15s;
+        }
+        #layout-resize-handle:hover,
+        #layout-resize-handle.is-dragging { background: #E2E8F0; }
+        #layout-resize-handle::after {
+            content: ''; position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 2px; height: 32px; background: #94A3B8; border-radius: 1px;
+            opacity: 0; transition: opacity 0.15s;
+        }
+        #layout-resize-handle:hover::after,
+        #layout-resize-handle.is-dragging::after { opacity: 1; }
+        @media (max-width: 1023px) {
+            #layout-resize-handle { display: none; }
+        }
+        #report-ai-modal { display: none; }
+        #report-ai-modal.is-open { display: flex; animation: modalOverlayIn 0.3s ease-out; }
+        #report-ai-modal .report-modal-dialog { animation: modalDialogIn 0.38s cubic-bezier(0.22, 1, 0.36, 1); }
+        @keyframes modalOverlayIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes modalDialogIn { from { opacity: 0; transform: scale(0.94) translateY(12px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+        .lb-medal { font-size: 1.35rem; }
+        .lb-row-gold { background: linear-gradient(90deg, rgba(245,158,11,.12), transparent 55%); }
+        .lb-row-silver { background: linear-gradient(90deg, rgba(148,163,184,.14), transparent 55%); }
+        .lb-row-bronze { background: linear-gradient(90deg, rgba(180,83,9,.1), transparent 55%); }
+        .lb-row-you { background: rgba(10,25,47,.04); }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen flex flex-col">
+
+    <!-- 頂欄：極簡，無註冊流程 -->
+    <header class="h-14 bg-pure-white sayo-border border-t-0 border-l-0 border-r-0 flex items-center px-4 md:px-6 shrink-0 z-50">
+        <div class="flex items-center gap-4 flex-1 min-w-0">
+            <a href="aura_joyful_learning.html" class="text-lg font-bold tracking-widest text-deep-blue shrink-0">Rowena</a>
+            <span class="text-[10px] text-slate-gray tracking-widest hidden sm:inline truncate">HKDSE · AI 學習工作台</span>
+        </div>
+        <div id="rowena-header-user" class="flex items-center gap-4 text-xs text-slate-gray"></div>
+    </header>
+
+    <!-- 主版面：可拖曳調整 Sidebar / Main -->
+    <div id="layout-shell" class="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
+
+        <!-- 左側功能庫 / Rowena AI 助手（編輯模式） -->
+        <aside id="layout-sidebar" class="flex flex-col bg-pure-white sayo-border border-t-0 border-b-0 border-l-0 min-h-0 max-h-[40vh] lg:max-h-none w-full lg:w-auto shrink-0">
+            <div id="sidebar-assistant-panel" class="hidden flex flex-col flex-1 min-h-0"></div>
+            <div id="sidebar-tools-panel" class="flex flex-col flex-1 min-h-0">
+                <div class="p-4 md:p-5 border-b border-gray-100 shrink-0">
+                    <h2 class="text-xs tracking-widest text-slate-gray mb-1">功能中心</h2>
+                    <p class="text-sm text-deep-blue font-light">選擇工具，右側即時開始</p>
+                </div>
+                <div class="px-4 md:px-5 py-3 border-b border-gray-50 shrink-0">
+                    <p class="text-[10px] text-slate-gray tracking-widest mb-2">最近使用</p>
+                    <div class="flex gap-2 flex-wrap" id="recent-chips"></div>
+                </div>
+                <div class="px-4 md:px-5 py-2 shrink-0">
+                    <p class="text-[10px] text-slate-gray tracking-widest mb-2">推薦</p>
+                </div>
+                <nav class="flex-1 overflow-y-auto hide-scrollbar px-3 md:px-4 pb-4 space-y-2" id="tool-list" aria-label="功能庫"></nav>
+                <div class="p-4 border-t border-gray-100 shrink-0">
+                    <p class="text-[10px] text-slate-gray leading-relaxed" id="onboarding-hint">
+                        已為你開啟「中文模擬 AI」。點擊「生成 Mock 卷」即可出題。
+                    </p>
+                </div>
+            </div>
+        </aside>
+
+        <div id="layout-resize-handle" role="separator" aria-orientation="vertical" aria-label="拖曳調整側邊欄寬度" title="拖曳調整寬度"></div>
+
+        <!-- 右側工作區 -->
+        <main id="layout-main" class="flex flex-col min-h-0 bg-off-white/80 overflow-hidden flex-1 w-full">
+            <div class="workspace-panel flex-1 flex flex-col min-h-0 p-4 md:p-6 lg:p-8 overflow-y-auto hide-scrollbar" id="workspace-root">
+                <!-- 由 JS 渲染 -->
+            </div>
+        </main>
+    </div>
+
+    <!-- 報告 AI：Check 卷完成後自動彈出 -->
+    <div id="report-ai-modal" class="report-modal fixed inset-0 z-[220] items-center justify-center p-4 md:p-6" role="dialog" aria-modal="true" aria-labelledby="report-ai-modal-title" aria-hidden="true">
+        <div class="absolute inset-0 bg-deep-blue/50 backdrop-blur-sm" data-report-modal-close></div>
+        <div class="report-modal-dialog relative w-full max-w-2xl max-h-[min(90vh,820px)] bg-pure-white rounded-2xl shadow-2xl flex flex-col overflow-hidden sayo-border">
+            <header class="shrink-0 px-5 py-4 border-b border-gray-100 flex justify-between gap-3">
+                <div>
+                    <p class="text-[10px] text-slate-gray tracking-widest mb-1">📊 報告 AI</p>
+                    <h2 id="report-ai-modal-title" class="text-lg text-deep-blue font-light">DSE 學習診斷報告</h2>
+                    <p id="report-ai-modal-subtitle" class="text-[10px] text-slate-gray mt-1">—</p>
+                </div>
+                <button type="button" data-report-modal-close class="text-2xl text-slate-gray hover:text-deep-blue" aria-label="關閉">×</button>
+            </header>
+            <div id="report-ai-modal-body" class="flex-1 overflow-y-auto p-5 md:p-6 hide-scrollbar min-h-[200px]"></div>
+            <footer class="shrink-0 p-4 border-t border-gray-100 flex flex-col sm:flex-row gap-2">
+                <button type="button" id="btn-report-practice-mock" class="flex-1 text-xs py-3 bg-deep-blue text-white rounded-full">依據建議重新練習</button>
+                <button type="button" id="btn-report-goto-panel" class="text-xs py-3 px-5 sayo-border rounded-full">前往報告 AI 面板</button>
+                <button type="button" data-report-modal-close class="text-xs py-3 px-5 sayo-border rounded-full text-slate-gray">關閉</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="rowena_user.js"></script>
+    <script src="rowena_layout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true,
+            },
+            options: {
+                skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+            },
+            startup: {
+                typeset: false,
+            },
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="rowena_rag.js?v=20260523-vector-fallback"></script>
+    <script src="rowena_leaderboard.js"></script>
+    <script src="rowena_mock_paper.js"></script>
+    <script>
+        const TOOLS = [
+            { id: 'zh-mock', name: '中文模擬 AI', desc: 'GEM 驅動 · DSE 中文 Mock 卷出題與編輯', tag: '推薦', category: 'mock' },
+            { id: 'en-mock', name: '英文模擬 AI', desc: 'GEM · English mock papers & editing', tag: null, category: 'mock' },
+            { id: 'math-zh', name: '中文版數學 AI', desc: 'GEM · 數學 Mock 卷（繁中排版）', tag: null, category: 'mock' },
+            { id: 'math-en', name: '英文版數學 AI', desc: 'GEM · Mathematics mock (EN)', tag: null, category: 'mock' },
+            { id: 'math-zh-mc', name: '中文數學 MC', desc: 'GEM · DSE 數學 MC Mock 卷（繁中）', tag: null, category: 'mock' },
+            { id: 'math-en-mc', name: '英文數學 MC', desc: 'GEM · DSE Mathematics MC Mock Paper (EN)', tag: null, category: 'mock' },
+            { id: 'check-paper', name: 'Check 卷 AI（智能批改）', desc: '上傳 PDF/PNG/JPG · RAG 評分 + 多模態批改', tag: '推薦', category: 'check' },
+            { id: 'report-ai', name: '📊 報告 AI (Report AI)', desc: '深度學習診斷 · 錯因分析與提分行動建議', tag: '推薦', category: 'report' },
+            { id: 'pvp', name: 'PVP', desc: '同級考生即時對戰，限時答題', tag: '競技', category: 'pvp' },
+            { id: 'dse-leaderboard', name: '📊 榮譽排行榜', desc: '全港 DSE · Mock 卷數 × 官方認證平均分', tag: '競技', category: 'leaderboard' },
+            { id: 'rank', name: '排名', desc: '全港學習榜、勝場與連勝紀錄', tag: null, category: 'rank' },
+        ];
+
+        let activeId = 'zh-mock';
+        const STORAGE_KEY = 'rowena_recent_tools';
+
+        function getRecent() {
+            try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '["zh-mock"]'); }
+            catch { return ['zh-mock']; }
+        }
+        function pushRecent(id) {
+            let r = getRecent().filter(x => x !== id);
+            r.unshift(id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(r.slice(0, 4)));
+            renderRecentChips();
+        }
+
+        function renderToolList() {
+            const nav = document.getElementById('tool-list');
+            nav.innerHTML = TOOLS.map(t => `
+                <button type="button" data-tool="${t.id}"
+                    class="tool-card w-full text-left p-4 rounded-xl sayo-border ${t.id === activeId ? 'active' : 'bg-off-white/30'}"
+                    aria-current="${t.id === activeId}">
+                    <div class="flex justify-between items-start gap-2">
+                        <span class="text-sm font-medium text-deep-blue tracking-wide">${t.name}</span>
+                        ${t.tag ? `<span class="text-[9px] px-1.5 py-0.5 rounded ${t.tag === '競技' ? 'bg-pvp-accent/10 text-pvp-accent' : 'bg-calm-mint/10 text-calm-mint'}">${t.tag}</span>` : ''}
+                    </div>
+                    <p class="text-xs text-slate-gray mt-1.5 leading-relaxed">${t.desc}</p>
+                </button>
+            `).join('');
+            nav.querySelectorAll('[data-tool]').forEach(btn => {
+                btn.addEventListener('click', () => selectTool(btn.dataset.tool));
+            });
+        }
+
+        function renderRecentChips() {
+            const recent = getRecent();
+            const el = document.getElementById('recent-chips');
+            el.innerHTML = recent.map(id => {
+                const t = TOOLS.find(x => x.id === id);
+                if (!t) return '';
+                return `<button type="button" data-recent="${id}" class="text-[10px] px-2.5 py-1 rounded-full sayo-border transition-colors ${id === activeId ? 'bg-deep-blue text-white border-deep-blue' : 'bg-off-white text-slate-gray hover:border-deep-blue'}">${t.name.replace(' AI','').replace('版','')}</button>`;
+            }).join('');
+            el.querySelectorAll('[data-recent]').forEach(btn => {
+                btn.addEventListener('click', () => selectTool(btn.dataset.recent));
+            });
+        }
+
+        function selectTool(id, skipSubjectSync) {
+            if (typeof RowenaMockPaper !== 'undefined' && RowenaMockPaper.isGenerating?.()) return;
+            if (typeof RowenaCheckPaper !== 'undefined' && RowenaCheckPaper.isGrading?.()) return;
+            if (typeof RowenaReportAI !== 'undefined' && RowenaReportAI.isBusy?.()) return;
+            const prev = activeId;
+            activeId = id;
+            const tool = TOOLS.find(t => t.id === id);
+            if (tool.category !== 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                RowenaMockPaper.resetForToolSwitch();
+            } else if (prev !== id && tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                RowenaMockPaper.resetForToolSwitch();
+            }
+            if (tool.category !== 'check' && typeof RowenaCheckPaper !== 'undefined') RowenaCheckPaper.resetForToolSwitch();
+            if (tool.category !== 'report' && typeof RowenaReportAI !== 'undefined') RowenaReportAI.resetForToolSwitch();
+            pushRecent(id);
+            renderToolList();
+            renderRecentChips();
+            updateOnboardingHint(tool);
+            renderWorkspace(tool);
+            if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined' && !skipSubjectSync) {
+                RowenaMockPaper.setSubjectFromTool(id);
+            }
+        }
+
+        function updateOnboardingHint(tool) {
+            const hints = {
+                'zh-mock': '選擇「中文」標籤後點「生成 Mock 卷」；編輯時左側會切換為 Rowena AI 助手。',
+                'en-mock': 'Select 英文 tab → Generate Mock Paper. Edit mode switches the sidebar to Rowena AI (EN).',
+                'math-zh': '中文數學卷含公式排版；可全畫面編輯並下載 PDF / 文字檔。',
+                'math-en': 'English maths mock with formatted questions. Full screen edit & download available.',
+                'check-paper': '上傳試卷 →「🚀 開始 AI 批改」；完成後自動彈出診斷報告。',
+                'report-ai': '檢視最新 DSE 學習診斷報告；尚無資料請先使用 Check 卷 AI。',
+                'pvp': '可選「挑戰 AI 智能導師」體驗 RAG 對戰；限時 90 秒作答。',
+                'dse-leaderboard': 'Top 10：平均分優先，同分以提交 Mock 卷數量排名。',
+                'rank': '查看你的名次與學習時長，設定下週小目標。',
+            };
+            const el = document.getElementById('onboarding-hint');
+            if (el && (tool.category !== 'mock' || !RowenaMockPaper?.isEditMode?.())) {
+                el.textContent = hints[tool.id] || '';
+            }
+        }
+
+        window.onMockPaperSubjectChange = function (subject) {
+            const map = RowenaMockPaper.TOOL_TO_SUBJECT || {};
+            const toolId = Object.keys(map).find((k) => map[k] === subject);
+            if (toolId && toolId !== activeId) selectTool(toolId, true);
+        };
+
+        window.onMockPaperExitEdit = function () {
+            const tool = TOOLS.find(t => t.id === activeId);
+            if (tool) updateOnboardingHint(tool);
+        };
+
+        function rankPanel(tool) {
+            const me = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6 };
+            const rows = [
+                { rank: 1, name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7 },
+                { rank: 2, name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5 },
+                { rank: 3, name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3 },
+                { rank: 4, name: me.name, form: me.form, hours: '24.5h', wins: 15, streak: 2, you: true },
+                { rank: 12, name: '…', form: '', hours: '', wins: '', streak: '', sep: true },
+            ];
+            return `
+                <header class="mb-6">
+                    <p class="text-[10px] text-slate-gray tracking-widest mb-1">學習成就</p>
+                    <h1 class="text-2xl text-deep-blue font-light tracking-wide">${tool.name}</h1>
+                    <p class="text-sm text-slate-gray mt-2">以學習時長與 PVP 勝場綜合排名。持續參與即可穩步上升。</p>
+                </header>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="sayo-border rounded-xl bg-pure-white p-5">
+                        <p class="text-[10px] text-slate-gray">你的名次</p>
+                        <p class="text-3xl text-deep-blue font-light mt-1">#4</p>
+                        <p class="text-xs text-calm-mint mt-1">↑ 2 名（本週）</p>
+                    </div>
+                    <div class="sayo-border rounded-xl bg-pure-white p-5">
+                        <p class="text-[10px] text-slate-gray">本週學習時長</p>
+                        <p class="text-3xl text-deep-blue font-light mt-1">24.5<span class="text-sm text-slate-gray">h</span></p>
+                    </div>
+                    <div class="sayo-border rounded-xl bg-pure-white p-5">
+                        <p class="text-[10px] text-slate-gray">勝場 / 連勝</p>
+                        <p class="text-3xl text-deep-blue font-light mt-1">15 <span class="text-sm text-joyful-amber">· 2 連勝</span></p>
+                    </div>
+                </div>
+                <section class="sayo-border rounded-xl bg-pure-white overflow-hidden">
+                    <div class="flex border-b border-gray-100 text-xs">
+                        <button type="button" class="flex-1 py-3 text-deep-blue border-b-2 border-deep-blue" id="rank-tab-time">學習時長</button>
+                        <button type="button" class="flex-1 py-3 text-slate-gray" id="rank-tab-wins" onclick="switchRankTab('wins')">勝場數</button>
+                    </div>
+                    <div class="p-4" id="rank-table-time">
+                        <div class="grid grid-cols-12 gap-2 text-[10px] text-slate-gray pb-2 border-b border-gray-50 mb-2">
+                            <span class="col-span-1">#</span>
+                            <span class="col-span-4">考生</span>
+                            <span class="col-span-2">年級</span>
+                            <span class="col-span-3 text-right">時長</span>
+                            <span class="col-span-2 text-right">連勝</span>
+                        </div>
+                        ${rows.filter(r => !r.sep).map(r => `
+                            <div class="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-0 ${r.you ? 'bg-off-white/80 -mx-4 px-4 rounded' : ''}">
+                                <span class="col-span-1 text-slate-gray font-mono text-xs">${String(r.rank).padStart(2,'0')}</span>
+                                <span class="col-span-4 text-deep-blue">${r.name}</span>
+                                <span class="col-span-2 text-[10px] text-slate-gray">${r.form ? 'Form ' + r.form : '—'}</span>
+                                <span class="col-span-3 text-right font-mono text-xs">${r.hours}</span>
+                                <span class="col-span-2 text-right text-xs ${r.streak >= 5 ? 'text-joyful-amber' : 'text-slate-gray'}">${r.streak ? r.streak + ' 場' : '—'}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="p-4 hidden" id="rank-table-wins">
+                        <p class="text-xs text-slate-gray text-center py-8">勝場榜：你目前 15 勝，距離 Top 3 還差 7 場。再完成 2 局 PVP 即可解鎖「連勝挑戰」徽章。</p>
+                    </div>
+                </section>
+                <p class="text-[10px] text-slate-gray mt-6 text-center">下週目標：進入 Top 3 · 再累積 8 小時專注學習</p>
+            `;
+        }
+
+        function switchRankTab(tab) {
+            document.getElementById('rank-table-time').classList.toggle('hidden', tab === 'wins');
+            document.getElementById('rank-table-wins').classList.toggle('hidden', tab !== 'wins');
+            document.getElementById('rank-tab-time').className = tab === 'time' ? 'flex-1 py-3 text-deep-blue border-b-2 border-deep-blue' : 'flex-1 py-3 text-slate-gray';
+            document.getElementById('rank-tab-wins').className = tab === 'wins' ? 'flex-1 py-3 text-deep-blue border-b-2 border-deep-blue' : 'flex-1 py-3 text-slate-gray';
+        }
+        window.switchRankTab = switchRankTab;
+
+        function renderWorkspace(tool) {
+            const root = document.getElementById('workspace-root');
+            root.classList.remove('workspace-panel');
+            void root.offsetWidth;
+            root.classList.add('workspace-panel');
+            if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                root.innerHTML = RowenaMockPaper.mount(tool);
+                RowenaMockPaper.afterMount();
+            } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
+                root.innerHTML = RowenaPvp.mount(tool);
+                RowenaPvp.afterMount();
+            } else if (tool.category === 'pvp') {
+                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js 以使用 PvP 對戰。</p>';
+            } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
+                root.innerHTML = RowenaCheckPaper.mount(tool);
+                RowenaCheckPaper.afterMount();
+            } else if (tool.category === 'check') {
+                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
+            } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
+                root.innerHTML = RowenaReportAI.mount(tool);
+                RowenaReportAI.afterMount();
+            } else if (tool.category === 'report') {
+                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
+            } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
+                root.innerHTML = RowenaLeaderboard.mount(tool);
+                RowenaLeaderboard.afterMount();
+            } else if (tool.category === 'leaderboard') {
+                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_leaderboard.js。</p>';
+            }
+            else if (tool.category === 'rank') root.innerHTML = rankPanel(tool);
+        }
+
+        window.onRowenaProfileUpdated = function () {
+            if (activeId === 'rank') {
+                renderWorkspace(TOOLS.find(t => t.id === 'rank'));
+            }
+        };
+
+        window.rowenaSelectTool = selectTool;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            RowenaUser.init('#rowena-header-user');
+            RowenaLayout.init({
+                shellId: 'layout-shell',
+                sidebarId: 'layout-sidebar',
+                handleId: 'layout-resize-handle',
+                mainId: 'layout-main',
+            });
+            renderToolList();
+            renderRecentChips();
+            if (typeof RowenaReportAI !== 'undefined') RowenaReportAI.bindModal?.();
+            selectTool(activeId);
+        });
+    </script>
+</body>
+</html>
