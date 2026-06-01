@@ -243,11 +243,10 @@ Guidelines:
     function sanitizeAiMessageHtml(text) {
         if (text == null) return '';
         let normalized = String(text)
+            .replace(/<br\s*\/?>/gi, '\n')
             .replace(/©/g, '(c)')
             .replace(/\r\n/g, '\n')
             .replace(/\r/g, '\n');
-        const brPlaceholder = '___ROWENA_BR___';
-        normalized = normalized.replace(/<br\s*\/?>/gi, brPlaceholder);
         const parts = normalized.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
         const html = parts.map((part, i) => {
             if (i % 2 === 1) {
@@ -257,7 +256,7 @@ Guidelines:
             d.textContent = part;
             return d.innerHTML.replace(/\n/g, '<br>');
         }).join('');
-        return html.replace(new RegExp(brPlaceholder, 'g'), '<br>');
+        return html;
     }
 
     function wrapPaperHtml(text) {
@@ -490,7 +489,7 @@ Guidelines:
                 <div class="flex-1 overflow-y-auto hide-scrollbar px-4 py-3 space-y-3" id="sidebar-assistant-messages">
                     ${assistantMessages && assistantMessages.length > 0 ? assistantMessages.map((m) => `
                         <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
-                            <div class="max-w-[92%] px-3 py-2 rounded-lg text-xs leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}">${sanitizeAiMessageHtml(m.text)}</div>
+                            <div class="max-w-[92%] px-3 py-2 rounded-lg text-xs leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}" style="white-space: pre-wrap;">${sanitizeAiMessageHtml(m.text)}</div>
                         </div>
                     `).join('') : `
                         <div class="flex justify-start">
@@ -743,7 +742,7 @@ Guidelines:
         if (panel) {
             panel.innerHTML = assistantMessages.map((m) => `
                 <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
-                    <div class="max-w-[85%] px-3 py-2 rounded-lg text-[10px] leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}">${sanitizeAiMessageHtml(m.text)}</div>
+                    <div class="max-w-[85%] px-3 py-2 rounded-lg text-[10px] leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}" style="white-space: pre-wrap;">${sanitizeAiMessageHtml(m.text)}</div>
                 </div>
             `).join('');
             typesetMath(panel);
@@ -773,7 +772,7 @@ Guidelines:
         if (panel) {
             panel.innerHTML = assistantMessages.map((m) => `
                 <div class="flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}">
-                    <div class="max-w-[85%] px-3 py-2 rounded-lg text-[10px] leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}">${sanitizeAiMessageHtml(m.text)}</div>
+                    <div class="max-w-[85%] px-3 py-2 rounded-lg text-[10px] leading-relaxed whitespace-pre-wrap ${m.role === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'}" style="white-space: pre-wrap;">${sanitizeAiMessageHtml(m.text)}</div>
                 </div>
             `).join('');
             typesetMath(panel);
