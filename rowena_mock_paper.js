@@ -74,7 +74,7 @@ Guidelines:
     function initRowenaMarkdownParser() {
         if (rowenaMarkdownParser) return rowenaMarkdownParser;
         if (typeof window.markdownit !== 'function') return null;
-        const md = window.markdownit({ html: false, linkify: true, typographer: true });
+        const md = window.markdownit({ html: true, linkify: true, typographer: false });
         rowenaMarkdownParser = md;
         return rowenaMarkdownParser;
     }
@@ -88,7 +88,11 @@ Guidelines:
 
     function normalizeRowenaMarkdown(text) {
         if (!text) return '';
-        let normalized = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+        let normalized = String(text)
+            .replace(/<br\s*\/?>/gi, '\n')
+            .replace(/©/g, '(c)')
+            .replace(/\r\n/g, '\n')
+            .replace(/\r/g, '\n');
         const lines = normalized.split('\n');
         const outLines = [];
 
@@ -259,7 +263,7 @@ Guidelines:
     }
 
     function wrapPaperHtml(text) {
-        return `<div id="mock-paper-content" class="mock-paper-body text-sm text-deep-blue leading-relaxed">
+        return `<div id="mock-paper-content" class="mock-paper-body text-sm text-deep-blue leading-relaxed" style="white-space: pre-wrap; word-break: break-word;">
                     <style>ol{list-style-type:decimal;list-style-position:inside;margin-left:1.5rem;}ul{list-style-position:inside;margin-left:1.5rem;}li{margin-bottom:0.45rem;}</style>
                     ${renderMarkdownToHtml(text)}
                 </div>`;
@@ -433,8 +437,6 @@ Guidelines:
 
     function renderAssistantPanel() {
         const en = isEnglishSubject(activeSubject);
-        // 前端不再依賴本地 Gemini 金鑰顯示或阻擋，改由後端處理金鑰路由與安全性
-        const hasApiKey = true;
         
         if (showSettingsPanel) {
             return `
@@ -477,7 +479,7 @@ Guidelines:
                         <div class="flex items-center gap-2">
                             <h2 class="text-xs tracking-widest text-deep-blue">Rowena AI</h2>
                             <span class="text-[9px] px-1.5 py-0.5 sayo-border text-slate-gray rounded">GEM</span>
-                            <span class="text-[8px] px-1.5 py-0.5 rounded ${hasApiKey ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'}">${hasApiKey ? '✓ 已連接' : '⚠ 未設定'}</span>
+                            <span class="text-[8px] px-1.5 py-0.5 rounded bg-green-100 text-green-700">✓ 已連接</span>
                         </div>
                         <button type="button" id="sidebar-settings-btn" class="text-[10px] px-2 py-1 sayo-border rounded hover:border-deep-blue">⚙</button>
                     </div>
@@ -497,9 +499,8 @@ Guidelines:
                     `}
                 </div>
                 <div class="p-4 border-t border-gray-100 shrink-0">
-                    ${!hasApiKey ? `<div class="mb-2 p-2 bg-orange-100 rounded text-[10px] text-orange-800">⚠ ${en ? 'Please configure Gemini API first' : '請先設定 Gemini API'}</div>` : ''}
                     <textarea id="sidebar-assistant-input" rows="2" class="w-full text-xs p-3 rounded-lg bg-off-white sayo-border resize-none focus:outline-none focus:border-deep-blue" placeholder="${en ? 'Ask Rowena...' : '詢問 Rowena...'}"></textarea>
-                    <button type="button" id="sidebar-assistant-send" class="mt-2 w-full text-xs py-2 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all ${!hasApiKey ? 'opacity-50 cursor-not-allowed' : ''}" ${!hasApiKey ? 'disabled' : ''}>${en ? 'Send' : '送出'}</button>
+                    <button type="button" id="sidebar-assistant-send" class="mt-2 w-full text-xs py-2 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all">${en ? 'Send' : '送出'}</button>
                 </div>
             </div>
         `;
