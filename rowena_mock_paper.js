@@ -91,6 +91,7 @@ Guidelines:
         let normalized = String(text)
             .replace(/<br\s*\/?>/gi, '\n')
             .replace(/©/g, '(c)')
+            .replace(/(_{10,}(\r?\n|<br\s*\/?>|\s)*){2,}/gi, '______________________________________________________________________\n')
             .replace(/\r\n/g, '\n')
             .replace(/\r/g, '\n');
         const lines = normalized.split('\n');
@@ -249,6 +250,7 @@ Guidelines:
         let finalOutput = String(text);
         finalOutput = finalOutput.replace(/<br\s*\/?>/gi, '\n');
         finalOutput = finalOutput.replace(/©/g, '(c)');
+        finalOutput = finalOutput.replace(/(_{10,}(\r?\n|<br\s*\/?>|\s)*){2,}/gi, '______________________________________________________________________\n');
         finalOutput = finalOutput.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
 
         const parts = finalOutput.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
