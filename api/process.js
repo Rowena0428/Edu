@@ -5,9 +5,6 @@ export default async function handler(req, res) {
     }
 
     // 📥 1. 接收從前端傳送過來的資料
-    // 支援兩種用途：
-    // - AI 生成（前端只會送 { text, chatRoomId } 或 action: 'generate'）
-    // - PDF 上傳轉向量（會包含 fileName / docType / paper 等欄位）
     const { text, subject, paper, docType, fileName, chatRoomId, action } = req.body;
 
     // 基本防錯檢查：text 與 chatRoomId 為共用必要欄位
@@ -46,15 +43,28 @@ export default async function handler(req, res) {
             // ----- AI 生成流程（不儲存向量） -----
             // 使用 gemini-2.5-flash 與 generateContent
             const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${selectedKey}`;
+            
+            // 🛡️ 格式安全防禦：強制注入系統級限制，避免 LaTeX 區塊排版和換行造成前端解析崩潰
+            const safetyInstruction = 
+                "\n\n【系統除錯重要補充指令（優先度最高）】:\n" +
+                "1. 必須一次性完整輸出所有試卷題目，切勿中斷。\n" +
+                "2. 數學公式與變數請務必使用最基礎、簡單的單行 LaTeX 格式（例如使用單錢字號 $x^2 + y^2 = r^2$），【絕對禁止】使用雙錢字號 $$ 的獨立區塊型排版，否則會破壞前端渲染。\n" +
+                "3. 請輸出純文字與標準的 HTML 換行標籤 <br>，避免過於複雜的 Markdown 符號與轉義字元夾雜。";
+
             const genBody = {
-                contents: [{ parts: [{ text: text }] }],
-                generationConfig: { temperature: 0.6, maxOutputTokens: 2048 }
+                contents: [{ parts: [{ text: text + safetyInstruction }] }],
+                generationConfig: { 
+                    temperature: 0.5, // 稍微調低點，讓出題邏輯更嚴謹穩定
+                    maxOutputTokens: 8192 // 🚀 關鍵修改：從 2048 放寬到 8192，確保一整份長考卷不會吐到一半被截斷
+                }
             };
+
             const genRes = await fetch(genUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(genBody)
             });
+
             if (!genRes.ok) {
                 const genErrText = await genRes.text();
                 throw new Error(`Gemini generateContent 失敗: ${genErrText}`);
