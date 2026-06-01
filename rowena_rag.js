@@ -35,7 +35,7 @@
             `   - 【甲部致命限制：絕對禁止印出文章】：甲部考核的是香港教育局 (EDB) 指定的文言經典學習材料（即 12 篇範文）。你【絕對不要／禁止】在試卷中生成、提供或印出任何課文或文章原文！請直接輸出針對指定篇章（如《論仁、論孝、論君子》、《魚我所欲也》、《始得西山宴遊記》、《六國論》、《出師表》等）的測驗題目，要求考生根據對課文的記憶與理解直接作答。題型須包括文言字詞解釋、句意理解及寫作手法分析。\n` +
             `   - 乙部：提供兩篇課外考材（一篇白話文、一篇文言文），此部分【必須】提供完整的文章白話文與文言文考材，供考生閱讀後作答。\n` +
             `   - 【排版極度嚴格 - 選擇題與分題】：多項選擇題的 A、B、C、D 選項，以及所有題目的分題（務必使用加粗的 **(a)**, **(b)**, **(c)** 防止轉換為版權符號），【必須嚴格垂直排列】。【致命要求】：為了在 Markdown 中正確渲染垂直排版，你【必須在每個選項之間、每個分題之間「空一行」（使用雙換行 / Double Enter）】，絕對不能擠在同一行或只使用單次換行。\n` +
-            `   - 【排版極度嚴格 - 卷一作答線】：卷一的所有問答題、闡述題或長題目，必須確保題目考核內容精準簡練，並【必須在題目下方提供適當行數的空白底線（例如：\\n＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿\\n＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿）】供考生作答。【絕對不要】輸出「限寫兩行」等任何幕後提示文字。\n` +
+            `   - 【排版極度嚴格 - 卷一作答線】：卷一的所有問答題、闡述題或長題目，必須確保題目考核內容精準簡練。【致命要求】：無論題目佔多少分，每題下方【最多只能提供「單一行」的空白底線】（例如：\n＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿＿\n），【絕對禁止】產生連續多行的橫線供考生作答。【絕對不要】輸出「限寫兩行」等任何幕後提示文字。\n` +
             `   - 【表格優化】：使用標準且乾淨的 Markdown 表格語法，儲存格內的文字必須高度精簡以防排版錯亂。\n` +
             `2. 卷二（寫作能力）：必須分為「甲部：實用寫作 (30%)」及「乙部：命題寫作 (70%)」。\n` +
             `   - 甲部：設定一個情境並提供短小閱讀材料，要求撰寫實用文。必須列明「禁止使用真實姓名」，並提供指定名字（英秀、一心、幼羚、家寶、念慈、思賢、有容、向華、修端、允行）供選用。【致命要求：卷二絕對不要】提供任何作答底線。\n` +
@@ -58,10 +58,11 @@
             `【Structure Requirements】:\n` +
             `1. Paper 1 (Reading): Must include 'Part A' (Compulsory), 'Part B1' (Easier section), and 'Part B2' (More difficult section), each with its own reading passages. Question types MUST mimic official exams.\n` +
             `   - 【CRITICAL FORMATTING FOR MCQs & SUB-QUESTIONS】: Options A, B, C, D and sub-parts (use bolded **(a)**, **(b)**, **(c)** to prevent copyright symbol rendering) MUST be displayed strictly vertically. 【CRITICAL】: To ensure proper Markdown rendering, you MUST leave a BLANK LINE (use a double line break / double enter) between EVERY option and EVERY sub-part. Do not use single line breaks.\n` +
+            `   - 【CRITICAL FORMATTING FOR ANSWER LINES】: For any short-answer or open-ended questions, you MUST provide 【EXACTLY ONE SINGLE LINE of underscores】 (e.g., \n__________________________________________________\n) for student answers. 【CRITICAL】: NEVER generate multiple lines of underscores regardless of mark allocation.\n` +
             `   - 【CRITICAL FORMATTING FOR TABLES】: Use standard and clean Markdown table syntax. Keep text inside cells highly concise to prevent layout breaks.\n` +
             `2. Paper 2 (Writing): Must include 'Part A' (~200 words) and 'Part B' (~400 words). For Part B, provide 3 to 4 distinct choices (strictly numbered as Question 1, 2, 3, etc.). DO NOT provide detailed bullet points, hints, or long lists of instructions. Keep the prompts extremely concise. You MUST include the instruction: "Do not use your real name. If no name is provided, use 'Chris Wong'."\n` +
             `3. Mark Allocation: Use Markdown. For Paper 1, EVERY question MUST have exact marks (e.g., [1 mark]). For Paper 2, Part A and each question in Part B MUST be strictly labelled as [21 marks].\n` +
-            `【CRITICAL REQUIREMENT】: Generate ONLY the exam questions. Do NOT generate an answer key, hints, or Marking Scheme. Please start your output strictly from the following format:\n\n` +
+            `【CRITICAL REQUIREMENT】: Generate ONLY the exam questions. Do NOT generate an answer key, hints, or Marking Scheme. Please start your output strictly from the following header format:\n\n` +
             `# 202X-DSE-ENG LANG 1 & 2\n` +
             `## HONG KONG EXAMINATIONS AND ASSESSMENT AUTHORITY\n` +
             `## ENGLISH LANGUAGE PAPERS 1 & 2\n\n` +
@@ -103,7 +104,7 @@
             `- 甲部 (Section A)：共 30 題（必須嚴格編號為第 1 至 30 題），涵蓋必修部分的基礎課題。\n` +
             `- 乙部 (Section B)：共 15 題（必須嚴格連續編號為第 31 至 45 題，絕對不能重新從 1 開始數起！），涵蓋必修部分的進階課題。\n` +
             `【出題嚴格規範 - 參照 2023-2025 DSE 真題標準】：\n` +
-            `1. 語氣與用詞：必須完美模仿歷屆 DSE 真卷的精煉句型。請使用標準字眼，例如：「設...」、「若...，則...調」、「求...」、「下列何者必為正確？」。\n` +
+            `1. 語氣與用詞：必須完美模仿歷屆 DSE 真卷的精煉句型。請使用標準字眼，例如：「設...」、「若...，則...調開」、「求...」、「下列何者必為正確？」。\n` +
             `2. 【極度重要：數學排版】：所有的數學公式、變數、幾何符號和方程，必須嚴格使用 LaTeX 語法。行內公式使用單一錢字號（例如 $x^2+y^2=r^2$, $\\frac{a}{b}$, $\\angle ABC=90^{\\circ}$, $\\triangle ABC$）。絕對不能使用純文字表示平方或角度。\n` +
             `3. 【無圖表限制：致命純文字描述規範】：\n` +
             `   因為本系統無法生成任何圖片或幾何圖表，你【絕對禁止】使用「如圖所示」、「圖中所示為...」等字眼，亦【絕對不能】使用任何圖片佔位符。所有的多項選擇題（包括幾何、立體圖形、坐標幾何題），必須「百分之百改用純文字與數學條件」精確定義圖形（例如：原有的「求圖中陰影部分的面積」必須改寫為純文字題目「設圓 $C$ 的方程為...，直線 $L$ 與其相交於...，求由...圍成的區域面積」），確保考生不需要看圖就能直接作答。\n` +
@@ -128,7 +129,7 @@
             `2. Format & Content: Conventional questions only (NO MCQs).\n` +
             `   - 【CRITICAL FORMATTING】: Use bolded labels **(a)**, **(b)**, **(c)** for sub-questions. Every sub-question MUST be displayed strictly vertically. 【CRITICAL】: To ensure proper Markdown rendering, you MUST leave a BLANK LINE (use a double line break / double enter) between EVERY sub-question. Do not use single line breaks.\n` +
             `   - 【NO DIAGRAMS ALLOWED: CRITICAL PURE TEXT DESCRIPTION】:\n` +
-            `     Since this system CANNOT generate any images, diagrams, or charts, you are 【STRICTLY FORBIDDEN】 from using phrases like "In the figure...", "As shown in the diagram...", etc. You 【MUST NOT】 use placeholders like "[Imagine a diagram]" either. All geometry, coordinate geometry, trigonometry, or 3D problems MUST be completely and precisely described using pure mathematical words and algebraic constraints (e.g., instead of "In the figure, a triangle...", rewrite it as "Let $ABC$ be a triangle such that $AB=5 and \\angle ABC=90^{\\circ}$"). Ensure students can fully comprehend the setup and solve the problem using only the textual descriptions provided.\n` +
+            `     Since this system CANNOT generate any images, diagrams, or charts, you are 【STRICTLY FORBIDDEN】 from using phrases like "In the figure...", "As shown in the diagram...", etc. You 【MUST NOT】 use placeholders like "[Imagine a diagram]" either. All geometry, coordinate geometry, trigonometry, or 3D problems MUST be completely and precisely described using pure mathematical words and algebraic constraints (e.g., instead of "In the figure, a triangle...", rewrite it as "Let $ABC$ be a triangle such that $AB=5$ and \\angle ABC=90^{\\circ}$"). Ensure students can fully comprehend the setup and solve the problem using only the textual descriptions provided.\n` +
             `【CRITICAL REQUIREMENTS FOR QUESTION 19 (The last question)】:\n` +
             `   - MUST be an advanced comprehensive question combining 'Locus and Equations of Circles', 'Four Centers of a Triangle', 'Method of Completing the Square', and 'Coordinate Transformation'.\n` +
             `   - Part **(c)** or **(d)** MUST be a 'Proof' question.\n` +
