@@ -242,21 +242,20 @@ Guidelines:
 
     function sanitizeAiMessageHtml(text) {
         if (text == null) return '';
-        let normalized = String(text)
-            .replace(/<br\s*\/?>/gi, '\n')
-            .replace(/©/g, '(c)')
-            .replace(/\r\n/g, '\n')
-            .replace(/\r/g, '\n');
-        const parts = normalized.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
-        const html = parts.map((part, i) => {
-            if (i % 2 === 1) {
-                return part;
-            }
-            const d = document.createElement('div');
-            d.textContent = part;
-            return d.innerHTML.replace(/\n/g, '<br>');
-        }).join('');
-        return html;
+        let finalOutput = String(text);
+        finalOutput = finalOutput.replace(/<br\s*\/?>/gi, '\n');
+        finalOutput = finalOutput.replace(/©/g, '(c)');
+        finalOutput = finalOutput.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+
+        const parts = finalOutput.split(/(\$\$[\s\S]*?\$\$|\$[\s\S]*?\$)/g);
+        return parts
+            .map((part, i) => {
+                if (i % 2 === 1) return part;
+                const d = document.createElement('div');
+                d.textContent = part;
+                return d.innerHTML.replace(/\n/g, '<br>');
+            })
+            .join('');
     }
 
     function wrapPaperHtml(text) {
