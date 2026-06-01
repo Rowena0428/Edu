@@ -415,7 +415,8 @@ Guidelines:
 
     function renderAssistantPanel() {
         const en = isEnglishSubject(activeSubject);
-        const hasApiKey = geminiApiKey && geminiApiKey.length > 0;
+        // 前端不再依賴本地 Gemini 金鑰顯示或阻擋，改由後端處理金鑰路由與安全性
+        const hasApiKey = true;
         
         if (showSettingsPanel) {
             return `
@@ -543,10 +544,6 @@ Guidelines:
         const input = document.getElementById('sidebar-assistant-input');
         const text = input?.value.trim();
         if (!text) return;
-        if (!geminiApiKey) {
-            alert('Please configure Gemini API key first');
-            return;
-        }
         
         const en = isEnglishSubject(activeSubject);
         assistantMessages.push({ role: 'user', text });
@@ -564,28 +561,23 @@ Guidelines:
             }
         }
         
-        // 發送到 Gemini API
+        // 發送到後端，由後端安全附加金鑰並呼叫 Gemini
         try {
-            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + geminiApiKey, {
+            const resp = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`
-                        }]
-                    }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
+                    text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
+                    chatRoomId: activeSubject
                 })
             });
-            
-            if (!response.ok) throw new Error('API error');
-            const data = await response.json();
-            const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || (en ? 'Unable to get response' : '無法取得回應');
+            if (!resp.ok) throw new Error('API error');
+            const data = await resp.json();
+            const aiResponse = data.text || data.result || data.message || data.ai || (en ? 'Unable to get response' : '無法取得回應');
             assistantMessages.push({ role: 'ai', text: aiResponse });
         } catch (error) {
-            const errorMsg = en ? 'Error connecting to Gemini API' : 'Gemini API 連接錯誤';
-            assistantMessages.push({ role: 'ai', text: errorMsg + ': ' + error.message });
+            const errorMsg = en ? 'Error connecting to backend AI service' : '後端 AI 服務連接錯誤';
+            assistantMessages.push({ role: 'ai', text: errorMsg + ': ' + (error.message || error) });
         }
         
         // 更新 UI 顯示 AI 回應
@@ -722,11 +714,6 @@ Guidelines:
         const input = document.getElementById('mock-fs-input');
         const text = input?.value.trim();
         if (!text) return;
-        if (!geminiApiKey) {
-            alert('Please configure Gemini API key first');
-            return;
-        }
-        
         const en = isEnglishSubject(activeSubject);
         assistantMessages.push({ role: 'user', text });
         input.value = '';
@@ -743,28 +730,23 @@ Guidelines:
             panel.scrollTop = panel.scrollHeight;
         }
         
-        // 發送到 Gemini API
+        // 發送到後端，由後端安全附加金鑰並呼叫 Gemini
         try {
-            const response = await fetch('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' + geminiApiKey, {
+            const resp = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`
-                        }]
-                    }],
-                    generationConfig: { temperature: 0.7, maxOutputTokens: 500 }
+                    text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
+                    chatRoomId: activeSubject
                 })
             });
-            
-            if (!response.ok) throw new Error('API error');
-            const data = await response.json();
-            const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text || (en ? 'Unable to get response' : '無法取得回應');
+            if (!resp.ok) throw new Error('API error');
+            const data = await resp.json();
+            const aiResponse = data.text || data.result || data.message || data.ai || (en ? 'Unable to get response' : '無法取得回應');
             assistantMessages.push({ role: 'ai', text: aiResponse });
         } catch (error) {
-            const errorMsg = en ? 'Error connecting to Gemini API' : 'Gemini API 連接錯誤';
-            assistantMessages.push({ role: 'ai', text: errorMsg + ': ' + error.message });
+            const errorMsg = en ? 'Error connecting to backend AI service' : '後端 AI 服務連接錯誤';
+            assistantMessages.push({ role: 'ai', text: errorMsg + ': ' + (error.message || error) });
         }
         
         // 更新 UI 顯示 AI 回應
@@ -872,14 +854,6 @@ Guidelines:
         showLoadingPreview(requestSubject);
 
         try {
-            const apiKey = getApiKey(requestSubject);
-            if (!apiKey || apiKey.startsWith('YOUR_')) {
-                throw new Error('請在 rowena_mock_paper.js 的 SUBJECT_KEYS 設定此科目的 Gemini API 金鑰。');
-            }
-            if (typeof global.generateAIContentWithRAG !== 'function') {
-                throw new Error('未載入 rowena_rag.js（缺少 generateAIContentWithRAG），請檢查 script 順序。');
-            }
-
             const subjectName = SUBJECT_META[requestSubject]?.tab || '指定科目';
             const practicePrefix = consumePracticePrompt();
             const userPrompt = practicePrefix
@@ -887,12 +861,15 @@ Guidelines:
                 : `請根據以上指引，嚴格為我生成一份全新的【香港 DSE ${subjectName}】模擬試卷。` +
                   `內容必須完全符合該科目考試範圍與題型。以 Markdown 格式輸出，保留清晰分段與換行。`;
 
-            const markdownText = await global.generateAIContentWithRAG(
-                userPrompt,
-                requestSubject,
-                apiKey,
-                (msg) => updateLoadingStatus(msg)
-            );
+            updateLoadingStatus('正在向後端請求 AI 生成試卷...');
+            const resp = await fetch('/api/process', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: userPrompt, chatRoomId: requestSubject })
+            });
+            if (!resp.ok) throw new Error('API error');
+            const data = await resp.json();
+            const markdownText = data.text || data.result || data.markdown || data.message || '';
             renderPaperToPreview(markdownText, requestSubject);
         } catch (err) {
             console.error('[Rowena] generateMockPaper failed:', err);
@@ -1123,14 +1100,7 @@ Guidelines:
     /** 經 RAG 生成單道 PvP 選擇題 */
     async function pvpGenerateQuestionRAG(category) {
         const meta = PVP_SUBJECT_META[category] || PVP_SUBJECT_META.math_ch;
-        const apiKey = getApiKey(category);
-        if (!apiKey || apiKey.startsWith('YOUR_')) {
-            throw new Error('請在 rowena_mock_paper.js 的 SUBJECT_KEYS 設定此科目的 Gemini API 金鑰。');
-        }
-        if (typeof global.generateAIContentWithRAG !== 'function') {
-            throw new Error('未載入 rowena_rag.js（缺少 generateAIContentWithRAG）。');
-        }
-
+        // 前端不再檢查或直接使用金鑰，改由後端根據聊天室（category）決定
         const userPrompt =
             `請嚴格依 DSE 官方指引，為【${meta.label}】生成「一題」四選一（MC）練習題。\n` +
             `要求：\n` +
@@ -1139,7 +1109,14 @@ Guidelines:
             `3. 僅輸出 JSON，不要其他說明，格式如下：\n` +
             `{"question":"題幹文字","options":{"A":"選項A","B":"選項B","C":"選項C","D":"選項D"},"correct":"A"}`;
 
-        const raw = await global.generateAIContentWithRAG(userPrompt, category, apiKey);
+        const resp = await fetch('/api/process', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: userPrompt, chatRoomId: category })
+        });
+        if (!resp.ok) throw new Error('API error');
+        const respData = await resp.json();
+        const raw = respData.text || respData.result || respData.message || '';
         const parsed = pvpNormalizeQuestion(pvpExtractJson(raw), category);
         if (!parsed) {
             throw new Error('AI 回傳的題目格式無法解析，請再試一局。');
@@ -1185,12 +1162,21 @@ Guidelines:
 
         (async () => {
             try {
-                const apiKey = getApiKey(category);
-                const ragPromise = global.generateAIContentWithRAG(
-                    pvpBuildAiAnswerPrompt(pvpQuestion),
-                    category,
-                    apiKey
-                ).then((text) => pvpParseAiAnswerLetter(text));
+                // 向後端請求 AI 作答，後端會根據 chatRoomId 決定使用哪個 API 金鑰
+                const ragPromise = (async () => {
+                    try {
+                        const resp = await fetch('/api/process', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ text: pvpBuildAiAnswerPrompt(pvpQuestion), chatRoomId: category })
+                        });
+                        if (!resp.ok) return null;
+                        const d = await resp.json();
+                        return pvpParseAiAnswerLetter(d.text || d.result || d.message || '');
+                    } catch (e) {
+                        return null;
+                    }
+                })();
 
                 const delayPromise = pvpSleep(thinkMs);
                 const [letter] = await Promise.all([ragPromise, delayPromise]);
