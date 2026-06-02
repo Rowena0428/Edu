@@ -157,6 +157,20 @@ Guidelines:
 - Be encouraging and supportive`,
 };
 
+const ROWENA_CHAT_PROMPT = `
+你現在是 Rowena，一位充滿智慧、專業且親切的香港中學文憑考試 (HKDSE) 全科首席導師與 AI 學習助理。
+
+【你的核心任務】：
+1. 解答學生關於 HKDSE 各學科（如中文、英文、數學、通識/公社科、選修科等）的學術疑問、溫習方法或應試技巧。
+2. 用鼓勵且專業的語氣引導學生思考，建立他們的答題信心。
+
+【對話原則（最高指引）】：
+- 請始終以繁體中文（香港習慣用語，如：溫習、題目、思考、得分點）與學生對話。
+- 稱呼自己為「Rowena 老師」或「Rowena 助理」。
+- 當學生只是跟你打招呼（例如說 "hi"、"hello"、"你好"）時，請熱情、親切且簡短地回應（例如：「你好！我是 Rowena 老師。今天在準備 DSE 上遇到了什麼難題，或者有哪一科想跟我一起溫習嗎？」）。
+- 除非使用者的訊息明確要求你「請幫我出一份模擬試卷」，否則在日常對話中，絕對不要主動吐出整份試卷結構、考生須知或考卷題目。
+- 回答時結構要清晰，多使用點列式（Bullet points）來拆解複雜的知識點。`;
+
 function compileBackendPrompt(chatRoomId, text, subject, mode) {
     const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || mode === 'rowena';
     if (isRowenaMode && FALLBACK_DSE_GUIDANCE.rowena) {
@@ -232,7 +246,14 @@ export default async function handler(req, res) {
 - 避免在 Markdown 中使用 HTML 標籤或無效換行。`
 ;
 
-            const promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
+            let promptText;
+            // 如果是 Rowena 模式且不是生成長試卷的請求，強制使用 ROWENA_CHAT_PROMPT 作為系統指令前綴
+            const useRowenaChatPrompt = (isRowenaMode && !isGenerateRequest);
+            if (useRowenaChatPrompt) {
+                promptText = ROWENA_CHAT_PROMPT.replace(/\\n/g, '\n') + '\n\n' + text;
+            } else {
+                promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
+            }
             const genBody = {
                 contents: [{ parts: [{ text: promptText + safetyInstruction }] }],
                 generationConfig: { 
