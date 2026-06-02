@@ -197,7 +197,9 @@ export default async function handler(req, res) {
     }
 
     // 判斷請求類型：若前端明確傳入 action === 'generate'，或未包含 fileName/docType/paper，視為 AI 生成請求
-    const isGenerateRequest = (action === 'generate') || (!fileName && !docType && !paper);
+    const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || req.body.mode === 'rowena';
+    const isChatRequest = req.body.mode === 'rowena' || action === 'chat';
+    const isGenerateRequest = action === 'generate' || ((!fileName && !docType && !paper) && !isChatRequest);
 
     try {
         // 🔑 2. 從 Vercel 環境變數讀取並解析「金鑰對應 JSON 表」
@@ -216,7 +218,6 @@ export default async function handler(req, res) {
         const geminiApiKey = process.env.GEMINI_API_KEY;
         const defaultGeminiKey = process.env.DEFAULT_GEMINI_API_KEY || rowenaApiKey || geminiApiKey;
 
-        const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || req.body.mode === 'rowena';
         if (isRowenaMode && rowenaApiKey) {
             selectedKey = rowenaApiKey;
             console.log('[Rowena 模式] 使用 ROWENA_API_KEY 作為 Gemini API 金鑰。');
@@ -232,32 +233,33 @@ export default async function handler(req, res) {
             throw new Error(`無法為聊天室 ${chatRoomId} 配置任何有效的 Gemini API 金鑰，請檢查 Vercel 環境變數。`);
         }
 
-        if (isGenerateRequest) {
+        if (isChatRequest || isGenerateRequest) {
             // ----- AI 生成流程（不儲存向量） -----
             // 使用 gemini-2.5-flash 與 generateContent
             const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${selectedKey}`;
             
-            // 🛡️ 格式安全防禦：強制注入系統級限制，避免 LaTeX 區塊排版和換行造成前端解析崩潰
-            const safetyInstruction = `
+            let promptText = '';
+            let finalSafetyInstruction = '';
+            let temperature = 0.5;
+
+            if (isChatRequest) {
+                promptText = ROWENA_CHAT_PROMPT.replace(/\\n/g, '\n') + '\n\n' + text;
+                finalSafetyInstruction = '';
+                temperature = 0.7;
+                console.log('[路由成功] 偵測到 Rowena 聊天模式，已載入專屬對話人設。');
+            } else {
+                promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
+                finalSafetyInstruction = `
 
 【系統補充指令】：
 - 請僅輸出模擬試卷內容，不要包含 AI 自述、答題提示、答案或評分標準。
 - 所有空白答題區必須採用單行底線格式，不要輸出多行連續底線或額外空白行。
-- 避免在 Markdown 中使用 HTML 標籤或無效換行。`
-;
-
-            let promptText;
-            // 如果是 Rowena 模式且不是生成長試卷的請求，強制使用 ROWENA_CHAT_PROMPT 作為系統指令前綴
-            const useRowenaChatPrompt = (isRowenaMode && !isGenerateRequest);
-            if (useRowenaChatPrompt) {
-                promptText = ROWENA_CHAT_PROMPT.replace(/\\n/g, '\n') + '\n\n' + text;
-            } else {
-                promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
+- 避免在 Markdown 中使用 HTML 標籤或無效換行.`;
             }
             const genBody = {
-                contents: [{ parts: [{ text: promptText + safetyInstruction }] }],
+                contents: [{ parts: [{ text: promptText + finalSafetyInstruction }] }],
                 generationConfig: { 
-                    temperature: 0.5, // 稍微調低點，讓出題邏輯更嚴謹穩定
+                    temperature,
                     maxOutputTokens: 8192 // 🚀 關鍵修改：從 2048 放寬到 8192，確保一整份長考卷不會吐到一半被截斷
                 }
             };
