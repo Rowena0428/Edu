@@ -589,7 +589,8 @@ Guidelines:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
-                    chatRoomId: activeSubject
+                    chatRoomId: activeSubject,
+                    mode: 'rowena'
                 })
             });
             if (!resp.ok) throw new Error('API error');
@@ -758,7 +759,8 @@ Guidelines:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
-                    chatRoomId: activeSubject
+                    chatRoomId: activeSubject,
+                    mode: 'rowena'
                 })
             });
             if (!resp.ok) throw new Error('API error');

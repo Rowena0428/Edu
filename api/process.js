@@ -141,7 +141,28 @@ Your task is to generate a COMPLETE HKDSE Mathematics Paper 2 Mock Exam. The pap
 1. `
 };
 
-function compileBackendPrompt(chatRoomId, text) {
+const FALLBACK_DSE_GUIDANCE = {
+    systemPrompt: `You are Rowena, a helpful AI assistant for DSE (Hong Kong Diploma of Secondary Education) mock papers.
+
+Your role:
+- Answer student questions about the mock paper content
+- Explain difficult concepts clearly and concisely
+- Provide study tips and exam strategies
+- Support learning in both English and Chinese
+
+Guidelines:
+- Keep responses brief and focused
+- Use simple language
+- When answering math/science, show key steps
+- Be encouraging and supportive`,
+};
+
+function compileBackendPrompt(chatRoomId, text, subject, mode) {
+    const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || mode === 'rowena';
+    if (isRowenaMode && FALLBACK_DSE_GUIDANCE.rowena) {
+        return FALLBACK_DSE_GUIDANCE.rowena.replace(/\\n/g, '\n') + '\n\n' + text;
+    }
+
     const rawPrompt = ORIGINAL_PROMPTS[chatRoomId];
     if (!rawPrompt) return text;
     return rawPrompt.replace(/\\n/g, '\n') + '\n\n' + text;
@@ -177,10 +198,19 @@ export default async function handler(req, res) {
 
         // 🎯 3. 依據聊天室規則路由選擇 API 金鑰
         let selectedKey = roomKeyMap[chatRoomId];
-        // 後備機制：如果這個聊天室沒有專屬金鑰，使用預設的 DEFAULT_GEMINI_API_KEY
+        const rowenaApiKey = process.env.ROWENA_API_KEY;
+        const geminiApiKey = process.env.GEMINI_API_KEY;
+        const defaultGeminiKey = process.env.DEFAULT_GEMINI_API_KEY || rowenaApiKey || geminiApiKey;
+
+        const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || req.body.mode === 'rowena';
+        if (isRowenaMode && rowenaApiKey) {
+            selectedKey = rowenaApiKey;
+            console.log('[Rowena 模式] 使用 ROWENA_API_KEY 作為 Gemini API 金鑰。');
+        }
+
         if (!selectedKey) {
-            console.log(`[路由規則] 找不到聊天室 ${chatRoomId} 的特定金鑰，切換為 DEFAULT_GEMINI_API_KEY。`);
-            selectedKey = process.env.DEFAULT_GEMINI_API_KEY;
+            console.log(`[路由規則] 找不到聊天室 ${chatRoomId} 的特定金鑰，改用預設 Gemini API 金鑰。`);
+            selectedKey = defaultGeminiKey;
         } else {
             console.log(`[路由規則] 成功匹配！聊天室 ${chatRoomId} 正在使用獨立的專屬指定金鑰。`);
         }
@@ -202,7 +232,7 @@ export default async function handler(req, res) {
 - 避免在 Markdown 中使用 HTML 標籤或無效換行。`
 ;
 
-            const promptText = compileBackendPrompt(chatRoomId, text);
+            const promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
             const genBody = {
                 contents: [{ parts: [{ text: promptText + safetyInstruction }] }],
                 generationConfig: { 
