@@ -1530,21 +1530,23 @@ Guidelines:
 
         const questionSubject = PVP_SUBJECT_META[pvpQuestion?.category || pvpCategory]?.label || '';
         return `
-            <div class="flex flex-wrap justify-between items-center gap-2 text-xs text-slate-gray mb-4">
-                <span>${opponentLabel}</span>
-                <div class="flex items-center gap-2">
-                    ${aiStatus}
-                    <span class="font-mono text-joyful-amber" id="pvp-timer">${pvpFormatTimer(pvpPlaySecondsLeft)}</span>
+            <div id="pvp-question-container">
+                <div class="flex flex-wrap justify-between items-center gap-2 text-xs text-slate-gray mb-4">
+                    <span>${opponentLabel}</span>
+                    <div class="flex items-center gap-2">
+                        ${aiStatus}
+                        <span class="font-mono text-joyful-amber" id="pvp-timer">${pvpFormatTimer(pvpPlaySecondsLeft)}</span>
+                    </div>
                 </div>
-            </div>
-            ${questionSubject ? `<p class="text-xs text-slate-gray mb-2">題目科目：${pvpEscapeHtml(questionSubject)}</p>` : ''}
-            <p class="text-sm text-deep-blue mb-4 leading-relaxed">${pvpEscapeHtml(pvpQuestion.question)}</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">${optionsHtml}</div>
-            <button type="button" id="pvp-btn-submit"
-                class="w-full text-xs py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all disabled:opacity-50"
-                ${pvpUserSubmitted ? 'disabled' : ''}>
-                ${pvpUserSubmitted && pvpMode === 'ai' && !pvpAiReady ? '等待 AI 完成作答…' : '提交答案'}
-            </button>`;
+                ${questionSubject ? `<p class="text-xs text-slate-gray mb-2">題目科目：${pvpEscapeHtml(questionSubject)}</p>` : ''}
+                <p class="text-sm text-deep-blue mb-4 leading-relaxed">${pvpEscapeHtml(pvpQuestion.question)}</p>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">${optionsHtml}</div>
+                <button type="button" id="pvp-btn-submit"
+                    class="w-full text-xs py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all disabled:opacity-50"
+                    ${pvpUserSubmitted ? 'disabled' : ''}>
+                    ${pvpUserSubmitted && pvpMode === 'ai' && !pvpAiReady ? '等待 AI 完成作答…' : '提交答案'}
+                </button>
+            </div>`;
     }
 
     function pvpRenderPanel(tool) {
@@ -1636,6 +1638,12 @@ Guidelines:
         const tool = { name: 'PVP', id: 'pvp' };
         root.innerHTML = pvpRenderPanel(tool);
         pvpBindEvents();
+
+        const pvpContainer = document.getElementById('pvp-question-container');
+        if (pvpContainer && typeof window.MathJax === 'object' && typeof MathJax.typesetPromise === 'function') {
+            MathJax.typesetPromise([pvpContainer]).catch((err) => console.error('MathJax 渲染失敗:', err));
+        }
+
         if (pvpState === 'result' && pvpResultPayload) {
             pvpShowToast(pvpResultPayload.headline, pvpResultPayload.outcome);
         }
