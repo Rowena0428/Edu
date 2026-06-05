@@ -594,7 +594,7 @@ Guidelines:
                     action: 'chat'
                 })
             });
-            if (!resp.ok) throw new Error('API error');
+            if (!resp.ok) throw new Error('Google 伺服器訪問量過大，請稍後再試。');
             const data = await resp.json();
             const aiResponse = data.text || data.result || data.message || data.ai || (en ? 'Unable to get response' : '無法取得回應');
             assistantMessages.push({ role: 'ai', text: aiResponse });
@@ -765,7 +765,7 @@ Guidelines:
                     action: 'chat'
                 })
             });
-            if (!resp.ok) throw new Error('API error');
+            if (!resp.ok) throw new Error('Google 伺服器訪問量過大，請稍後再試。');
             const data = await resp.json();
             const aiResponse = data.text || data.result || data.message || data.ai || (en ? 'Unable to get response' : '無法取得回應');
             assistantMessages.push({ role: 'ai', text: aiResponse });
@@ -1204,7 +1204,7 @@ Guidelines:
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ text: promptText, chatRoomId: category, action: 'pvp' })
         });
-        if (!resp.ok) throw new Error('API error');
+        if (!resp.ok) throw new Error('Google 伺服器訪問量過大，請稍後再試。');
         const respData = await resp.json();
         const raw = respData.text || respData.result || respData.message || '';
         const parsed = pvpNormalizeQuestion(pvpExtractJson(raw), category);
