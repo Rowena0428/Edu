@@ -1,3 +1,25 @@
+const PVP_PROMPTS = {
+    chinese: `你現在是 DSE 中文科對戰題庫系統。請出一道適合快速搶答的中文科（範文或語文常識）單項選擇題。
+必須嚴格以 JSON 格式輸出，禁止任何 Markdown 語法、禁止 \`\`\`json 區塊、禁止任何前後前言。
+輸出格式範例：
+{"question": "題目敘述", "options": ["A選項","B選項","C選項","D選項"], "answer": "A"}`,
+
+    english: `You are now the DSE English language battle question bank system. Generate a single multiple-choice question suitable for quick competitive answering from the DSE English syllabus.
+Output STRICTLY in JSON format only. NO Markdown syntax, NO \`\`\`json blocks, NO preamble or explanations.
+Output format example:
+{"question": "question text", "options": ["Option A","Option B","Option C","Option D"], "answer": "A"}`,
+
+    math_ch: `你現在是 DSE 數學科對戰題庫系統。請出一道適合 1 分鐘內快速心算或簡單筆算完畢的數學選擇題（LaTeX公式請用 $ 格式）。
+必須嚴格以 JSON 格式輸出，禁止任何 Markdown 語法、禁止 \`\`\`json 區塊、禁止任何前後前言。
+輸出格式範例：
+{"question": "題目敘述", "options": ["A選項","B選項","C選項","D選項"], "answer": "B"}`,
+
+    math_en: `You are now the DSE Mathematics battle question bank system. Generate a single multiple-choice question solvable within 1 minute by quick mental or simple calculation (use $ format for LaTeX formulas).
+Output STRICTLY in JSON format only. NO Markdown syntax, NO \`\`\`json blocks, NO preamble or explanations.
+Output format example:
+{"question": "question text", "options": ["Option A","Option B","Option C","Option D"], "answer": "C"}`,
+};
+
 const ORIGINAL_PROMPTS = {
     chinese: String.raw`你現在是香港考評局 (HKEAA) 的中文科出卷專家。請生成一份高擬真度的 DSE 中文科模擬試卷（包含卷一及卷二），嚴格遵守官方最新排版與結構。
 【官方試卷編號與抬頭要求】：
@@ -171,7 +193,12 @@ const ROWENA_CHAT_PROMPT = `
 - 除非使用者的訊息明確要求你「請幫我出一份模擬試卷」，否則在日常對話中，絕對不要主動吐出整份試卷結構、考生須知或考卷題目。
 - 回答時結構要清晰，多使用點列式（Bullet points）來拆解複雜的知識點。`;
 
-function compileBackendPrompt(chatRoomId, text, subject, mode) {
+function compileBackendPrompt(chatRoomId, text, subject, mode, action) {
+    // 🚀 優先攔截：如果是 PvP 對戰模式，直接套用 PvP 專用 JSON 提示詞
+    if (action === 'pvp') {
+        return (PVP_PROMPTS[chatRoomId] || PVP_PROMPTS['math_ch']) + '\n\n' + text;
+    }
+
     const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || mode === 'rowena';
     if (isRowenaMode && FALLBACK_DSE_GUIDANCE.rowena) {
         return FALLBACK_DSE_GUIDANCE.rowena.replace(/\\n/g, '\n') + '\n\n' + text;
@@ -235,34 +262,41 @@ export default async function handler(req, res) {
 
         if (isChatRequest || isGenerateRequest) {
             // ----- AI 生成流程（不儲存向量） -----
-            // 使用 gemini-2.5-flash 與 generateContent
             const genUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${selectedKey}`;
             
-            let promptText = '';
-            let finalSafetyInstruction = '';
-            let temperature = 0.5;
-
-            if (isChatRequest) {
+            const isRowenaMode = chatRoomId === 'rowena' || subject === 'rowena' || req.body.mode === 'rowena';
+            
+            // 1. 編譯基礎提示詞內容
+            let promptText = "";
+            if (isRowenaMode && action !== 'pvp') {
                 promptText = ROWENA_CHAT_PROMPT.replace(/\\n/g, '\n') + '\n\n' + text;
-                finalSafetyInstruction = '';
-                temperature = 0.7;
-                console.log('[路由成功] 偵測到 Rowena 聊天模式，已載入專屬對話人設。');
             } else {
-                promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode);
+                promptText = compileBackendPrompt(chatRoomId, text, subject, req.body.mode, action);
+            }
+            
+            // 2. 條件式注入試卷防禦：只有在「既非 PvP」也「非 Rowena」的普通大考卷模式下才附加
+            let finalSafetyInstruction = "";
+            if (action !== 'pvp' && !isRowenaMode) {
                 finalSafetyInstruction = `
 
 【系統補充指令】：
 - 請僅輸出模擬試卷內容，不要包含 AI 自述、答題提示、答案或評分標準。
 - 所有空白答題區必須採用單行底線格式，不要輸出多行連續底線或額外空白行。
-- 避免在 Markdown 中使用 HTML 標籤或無效換行.`;
+- 避免在 Markdown 中使用 HTML 標籤或無效換行。`;
             }
+
+            // 3. 配置傳送給 Gemini 的 Payload
             const genBody = {
                 contents: [{ parts: [{ text: promptText + finalSafetyInstruction }] }],
                 generationConfig: { 
-                    temperature,
-                    maxOutputTokens: 8192 // 🚀 關鍵修改：從 2048 放寬到 8192，確保一整份長考卷不會吐到一半被截斷
+                    temperature: action === 'pvp' ? 0.1 : (isRowenaMode ? 0.7 : 0.5), 
+                    maxOutputTokens: action === 'pvp' ? 1024 : 8192,
+                    // 🌟 核心關鍵：如果是 PvP 模式，開啟 Gemini 原生 JSON 強制模式
+                    responseMimeType: action === 'pvp' ? "application/json" : "text/plain"
                 }
             };
+
+            console.log(`[路由偵測] Action: ${action || 'none'}, Room: ${chatRoomId}, 輸出格式模式: ${action === 'pvp' ? 'JSON' : 'TEXT'}`);
 
             const genRes = await fetch(genUrl, {
                 method: 'POST',
@@ -276,6 +310,10 @@ export default async function handler(req, res) {
             }
             const genData = await genRes.json();
             const aiText = genData.candidates?.[0]?.content?.parts?.[0]?.text || genData.outputText || JSON.stringify(genData);
+            
+            // 🔍 後端偵錯日誌：確保能看到真正的 AI 回傳內容
+            console.log(`【AI 實際回傳內容 (${action || '常規'})】:`, aiText.substring(0, 200) + "...");
+            
             return res.status(200).json({ success: true, text: aiText });
         }
 
