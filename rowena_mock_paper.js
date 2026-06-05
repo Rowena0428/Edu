@@ -588,7 +588,7 @@ Guidelines:
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
+                    text: text,
                     chatRoomId: activeSubject,
                     mode: 'rowena',
                     action: 'chat'
@@ -759,7 +759,7 @@ Guidelines:
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    text: `${rowenaSystemPrompt}\n\nStudent question: ${text}\n\nContext from mock paper:\n${paperText.substring(0, 2000)}`,
+                    text: text,
                     chatRoomId: activeSubject,
                     mode: 'rowena',
                     action: 'chat'
@@ -890,7 +890,7 @@ Guidelines:
             const resp = await fetch('/api/process', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ text: userPrompt, chatRoomId: requestSubject,action: 'generate' })
+                body: JSON.stringify({ text: userPrompt, chatRoomId: requestSubject, mode: 'generate', action: 'generate' })
             });
             if (!resp.ok) throw new Error('API error');
             const data = await resp.json();
@@ -1202,7 +1202,7 @@ Guidelines:
         const resp = await fetch('/api/process', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: promptText, chatRoomId: category })
+            body: JSON.stringify({ text: promptText, chatRoomId: category, action: 'pvp' })
         });
         if (!resp.ok) throw new Error('API error');
         const respData = await resp.json();
@@ -1247,7 +1247,7 @@ Guidelines:
                         const resp = await fetch('/api/process', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ text: pvpBuildAiAnswerPrompt(pvpQuestion), chatRoomId: category })
+                            body: JSON.stringify({ text: pvpBuildAiAnswerPrompt(pvpQuestion), chatRoomId: category, action: 'pvp' })
                         });
                         if (!resp.ok) return null;
                         const d = await resp.json();
