@@ -892,7 +892,7 @@ Guidelines:
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ text: userPrompt, chatRoomId: requestSubject, mode: 'generate', action: 'generate' })
             });
-            if (!resp.ok) throw new Error('API error');
+            if (!resp.ok) throw new Error('Google 伺服器訪問量過大，請稍後再試。');
             const data = await resp.json();
             const markdownText = data.text || data.result || data.markdown || data.message || '';
             renderPaperToPreview(markdownText, requestSubject);
