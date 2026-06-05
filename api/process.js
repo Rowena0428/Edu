@@ -9,13 +9,15 @@ Output STRICTLY in JSON format only. NO Markdown syntax, NO \`\`\`json blocks, N
 Output format example:
 {"question": "question text", "options": ["Option A","Option B","Option C","Option D"], "answer": "A"}`,
 
-    math_ch: `你現在是 DSE 數學科對戰題庫系統。請出一道適合 1 分鐘內快速心算或簡單筆算完畢的數學選擇題（LaTeX公式請用 $ 格式）。
-必須嚴格以 JSON 格式輸出，禁止任何 Markdown 語法、禁止 \`\`\`json 區塊、禁止任何前後前言。
+    math_ch: `你現在是 DSE 數學科對戰題庫系統。請出一道適合 1 分鐘內快速心算的數學單項選擇題。
+必須嚴格以 JSON 格式輸出，禁止任何 Markdown 語法、禁止 \`\`\`json 區塊。
+【致命格式要求】：因為輸出是 JSON，所有 LaTeX 公式的反斜線必須「雙重轉義」（例如：必須寫成 $\\\\frac{1}{2}$ 或是 $\\\\angle ABC$，絕對不能只寫單個反斜線）。公式請用 $ 符號包住。
 輸出格式範例：
-{"question": "題目敘述", "options": ["A選項","B選項","C選項","D選項"], "answer": "B"}`,
+{"question": "題目", "options": ["A","B","C","D"], "answer": "B"}`,
 
-    math_en: `You are now the DSE Mathematics battle question bank system. Generate a single multiple-choice question solvable within 1 minute by quick mental or simple calculation (use $ format for LaTeX formulas).
-Output STRICTLY in JSON format only. NO Markdown syntax, NO \`\`\`json blocks, NO preamble or explanations.
+    math_en: `You are the DSE Mathematics battle question bank system. Generate a single multiple-choice question solvable within 1 minute.
+Output STRICTLY in JSON format only. NO Markdown syntax, NO \`\`\`json blocks.
+【CRITICAL FORMATTING】: Because the output is JSON, all backslashes in LaTeX formulas MUST be double-escaped (e.g., write $\\\\frac{1}{2}$ instead of $\\frac{1}{2}$). Wrap formulas in $ signs.
 Output format example:
 {"question": "question text", "options": ["Option A","Option B","Option C","Option D"], "answer": "C"}`,
 };
