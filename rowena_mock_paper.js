@@ -997,11 +997,84 @@ Guidelines:
     // ─────────────────────────────────────────────────────────────────────────
 
     const PVP_SUBJECT_META = {
-        chinese: { tab: '中文', label: 'DSE 中文' },
-        english: { tab: '英文', label: 'DSE English' },
-        math_ch: { tab: '中文數學', label: 'DSE 數學（中）' },
-        math_en: { tab: '英文數學', label: 'DSE Math (EN)' },
+        chinese: { tab: '中文', label: 'DSE 中文', promptLabel: '中文科', promptLocale: 'zh' },
+        english: { tab: '英文', label: 'DSE English', promptLabel: 'English', promptLocale: 'en' },
+        math_ch: { tab: '中文數學', label: 'DSE 數學（中）', promptLabel: '中文數學', promptLocale: 'zh' },
+        math_en: { tab: '英文數學', label: 'DSE Math (EN)', promptLabel: 'Math (EN)', promptLocale: 'en' },
     };
+
+    const PVP_PROMPTS = {
+        chinese: {
+            questionTemplate:
+                `請嚴格依 DSE 官方指引，為【DSE 中文】生成一題四選一（MC）練習題。\n` +
+                `要求：\n` +
+                `1. 題幹清晰，四個選項標示 A、B、C、D，且僅有一個正確答案。\n` +
+                `2. 難度符合 DSE 考生水平，勿偏離考綱。\n` +
+                `3. 僅輸出 JSON，不要其他說明，格式如下：\n` +
+                `{"question":"題幹文字","options":{"A":"選項A","B":"選項B","C":"選項C","D":"選項D"},"correct":"A"}`,
+            answerTemplate:
+                `你正在參加 DSE 限時對戰，請根據官方評分與學科指引，選出下列選擇題的唯一正確答案。\n` +
+                `科目：DSE 中文\n` +
+                `題目：{question}\n選項：\n{options}\n\n` +
+                `請僅回覆一個大寫字母 A、B、C 或 D，不要附加解釋。`,
+        },
+        english: {
+            questionTemplate:
+                `Please strictly follow DSE official guidance and generate one multiple-choice practice question for 【DSE English】.\n` +
+                `Requirements:\n` +
+                `1. Write a clear question stem with four answer choices labeled A, B, C, D, and ensure exactly one correct answer.\n` +
+                `2. Keep the difficulty appropriate for DSE candidates and stay within the syllabus.\n` +
+                `3. Output JSON only with no extra explanation, using this format:\n` +
+                `{"question":"question text","options":{"A":"option A","B":"option B","C":"option C","D":"option D"},"correct":"A"}`,
+            answerTemplate:
+                `You are participating in a timed DSE battle. Choose the single correct answer for the following question based on official DSE scoring and subject guidance.\n` +
+                `Subject: DSE English\n` +
+                `Question: {question}\nOptions:\n{options}\n\n` +
+                `Reply with only one uppercase letter A, B, C, or D. Do not include any explanation.`,
+        },
+        math_ch: {
+            questionTemplate:
+                `請嚴格依 DSE 官方指引，為【DSE 數學（中）】生成一題四選一（MC）練習題。\n` +
+                `要求：\n` +
+                `1. 題幹清晰，四個選項標示 A、B、C、D，且僅有一個正確答案。\n` +
+                `2. 難度符合 DSE 考生水平，勿偏離考綱。\n` +
+                `3. 僅輸出 JSON，不要其他說明，格式如下：\n` +
+                `{"question":"題幹文字","options":{"A":"選項A","B":"選項B","C":"選項C","D":"選項D"},"correct":"A"}`,
+            answerTemplate:
+                `你正在參加 DSE 限時對戰，請根據官方評分與學科指引，選出下列選擇題的唯一正確答案。\n` +
+                `科目：DSE 數學（中）\n` +
+                `題目：{question}\n選項：\n{options}\n\n` +
+                `請僅回覆一個大寫字母 A、B、C 或 D，不要附加解釋。`,
+        },
+        math_en: {
+            questionTemplate:
+                `Please strictly follow DSE official guidance and generate one multiple-choice practice question for 【DSE Math (EN)】.\n` +
+                `Requirements:\n` +
+                `1. Write a clear question stem with four answer choices labeled A, B, C, D, and ensure exactly one correct answer.\n` +
+                `2. Keep the difficulty appropriate for DSE candidates and stay within the syllabus.\n` +
+                `3. Output JSON only with no extra explanation, using this format:\n` +
+                `{"question":"question text","options":{"A":"option A","B":"option B","C":"option C","D":"option D"},"correct":"A"}`,
+            answerTemplate:
+                `You are participating in a timed DSE battle. Choose the single correct answer for the following question based on official DSE scoring and subject guidance.\n` +
+                `Subject: DSE Math (EN)\n` +
+                `Question: {question}\nOptions:\n{options}\n\n` +
+                `Reply with only one uppercase letter A, B, C, or D. Do not include any explanation.`,
+        },
+    };
+
+    function pvpBuildQuestionPrompt(category) {
+        return PVP_PROMPTS[category]?.questionTemplate || PVP_PROMPTS.math_ch.questionTemplate;
+    }
+
+    function pvpBuildAiAnswerPrompt(q) {
+        const prompt = PVP_PROMPTS[q.category] || PVP_PROMPTS[pvpCategory] || PVP_PROMPTS.math_ch;
+        const optionsText = ['A', 'B', 'C', 'D']
+            .map((L) => `${L}. ${q.options[L]}`)
+            .join('\n');
+        return prompt.answerTemplate
+            .replace('{question}', q.question)
+            .replace('{options}', optionsText);
+    }
 
     /** PvP 狀態：idle → matching → countdown → playing → result */
     let pvpState = 'idle';
@@ -1122,20 +1195,12 @@ Guidelines:
 
     /** 經 RAG 生成單道 PvP 選擇題 */
     async function pvpGenerateQuestionRAG(category) {
-        const meta = PVP_SUBJECT_META[category] || PVP_SUBJECT_META.math_ch;
+        const promptText = pvpBuildQuestionPrompt(category);
         // 前端不再檢查或直接使用金鑰，改由後端根據聊天室（category）決定
-        const userPrompt =
-            `請嚴格依 DSE 官方指引，為【${meta.label}】生成「一題」四選一（MC）練習題。\n` +
-            `要求：\n` +
-            `1. 題幹清晰，四個選項標示 A、B、C、D，且僅有一個正確答案。\n` +
-            `2. 難度符合 DSE 考生水平，勿偏離考綱。\n` +
-            `3. 僅輸出 JSON，不要其他說明，格式如下：\n` +
-            `{"question":"題幹文字","options":{"A":"選項A","B":"選項B","C":"選項C","D":"選項D"},"correct":"A"}`;
-
         const resp = await fetch('/api/process', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ text: userPrompt, chatRoomId: category })
+            body: JSON.stringify({ text: promptText, chatRoomId: category })
         });
         if (!resp.ok) throw new Error('API error');
         const respData = await resp.json();
@@ -1145,17 +1210,6 @@ Guidelines:
             throw new Error('AI 回傳的題目格式無法解析，請再試一局。');
         }
         return parsed;
-    }
-
-    function pvpBuildAiAnswerPrompt(q) {
-        const opts = ['A', 'B', 'C', 'D']
-            .map((L) => `${L}. ${q.options[L]}`)
-            .join('\n');
-        return (
-            `你正在參加 DSE 限時對戰，請根據官方評分與學科指引，選出下列選擇題的唯一正確答案。\n` +
-            `題目：${q.question}\n選項：\n${opts}\n\n` +
-            `請僅回覆一個大寫字母 A、B、C 或 D，不要附加解釋。`
-        );
     }
 
     function pvpParseAiAnswerLetter(text) {
@@ -1472,6 +1526,7 @@ Guidelines:
             )
             .join('');
 
+        const questionSubject = PVP_SUBJECT_META[pvpQuestion?.category || pvpCategory]?.label || '';
         return `
             <div class="flex flex-wrap justify-between items-center gap-2 text-xs text-slate-gray mb-4">
                 <span>${opponentLabel}</span>
@@ -1480,6 +1535,7 @@ Guidelines:
                     <span class="font-mono text-joyful-amber" id="pvp-timer">${pvpFormatTimer(pvpPlaySecondsLeft)}</span>
                 </div>
             </div>
+            ${questionSubject ? `<p class="text-xs text-slate-gray mb-2">題目科目：${pvpEscapeHtml(questionSubject)}</p>` : ''}
             <p class="text-sm text-deep-blue mb-4 leading-relaxed">${pvpEscapeHtml(pvpQuestion.question)}</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">${optionsHtml}</div>
             <button type="button" id="pvp-btn-submit"
@@ -1491,6 +1547,7 @@ Guidelines:
 
     function pvpRenderPanel(tool) {
         const myForm = typeof global.RowenaUser !== 'undefined' ? global.RowenaUser.getProfile().form : 6;
+        const currentSubjectLabel = PVP_SUBJECT_META[pvpCategory]?.label || 'DSE 科目';
         const statusMap = {
             idle: {
                 label: '待機',
@@ -1527,6 +1584,7 @@ Guidelines:
                 <p class="text-[10px] text-slate-gray tracking-widest mb-1">競技模式</p>
                 <h1 class="text-2xl text-deep-blue font-light tracking-wide">${tool.name}</h1>
                 <p class="text-sm text-slate-gray mt-2">與同級考生或 Rowena AI 導師限時答題。AI 模式將透過 RAG 檢索 DSE 官方指引後出題與作答。</p>
+                <p class="text-xs text-slate-gray mt-2">本局科目：${currentSubjectLabel}</p>
             </header>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-1 sayo-border rounded-xl bg-pure-white p-6 flex flex-col items-center justify-center min-h-[240px] ${pvpState === 'matching' ? 'pvp-pulse' : ''}">
