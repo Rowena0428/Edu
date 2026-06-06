@@ -1321,33 +1321,46 @@ Guidelines:
         let outcome = 'draw';
         let headline = '本局平手';
         let detail = '雙方表現接近，再接再厲！';
+        let scoreChange = 0;
 
         if (userCorrect && !aiCorrect) {
             outcome = 'win';
             headline = '恭喜你擊敗 AI！';
             detail = '你答對了，Rowena Bot 答錯。';
+            scoreChange = Math.floor(Math.random() * 4) + 32; // 32-35
         } else if (!userCorrect && aiCorrect) {
             outcome = 'lose';
             headline = '很遺憾，AI 導師答對了';
             detail = '本題 AI 正確，請再接再厲。';
+            scoreChange = -(Math.floor(Math.random() * 4) + 23); // -23 to -26
         } else if (userCorrect && aiCorrect) {
             if (userSec < aiSec - 0.05) {
                 outcome = 'win';
                 headline = '恭喜你擊敗 AI！';
                 detail = `雙方皆答對，你的用時 ${userSec.toFixed(1)} 秒快於 AI 的 ${aiSec.toFixed(1)} 秒。`;
+                scoreChange = Math.floor(Math.random() * 4) + 32;
             } else if (aiSec < userSec - 0.05) {
                 outcome = 'lose';
                 headline = '很遺憾，AI 導師答題速度比你快！';
                 detail = `雙方皆答對，AI 用時 ${aiSec.toFixed(1)} 秒，你用時 ${userSec.toFixed(1)} 秒。`;
+                scoreChange = -(Math.floor(Math.random() * 4) + 23);
             } else {
                 outcome = 'draw';
                 headline = '勢均力敵！';
                 detail = '雙方皆答對且用時相近。';
+                scoreChange = 0;
             }
         } else {
             outcome = 'lose';
             headline = '本局 AI 略勝一籌';
             detail = '雙方皆未答對，請複習考點後再戰。';
+            scoreChange = -(Math.floor(Math.random() * 4) + 23);
+        }
+
+        // 計算新分數
+        let newScore = 0;
+        if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
+            newScore = RowenaUser.addPvpScore(scoreChange);
         }
 
         return {
@@ -1361,6 +1374,8 @@ Guidelines:
             userAnswer: pvpUserAnswer,
             aiAnswer: pvpAiAnswer,
             correct,
+            scoreChange,
+            newScore,
         };
     }
 
@@ -1372,15 +1387,6 @@ Guidelines:
         pvpClearPlayTimer();
         pvpResultPayload = pvpComputeResult();
         pvpState = 'result';
-        
-        // 若玩家贏得對戰，加分
-        if (pvpResultPayload.outcome === 'win') {
-            const pointsToAdd = 10; // 每場勝利 10 分
-            if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
-                RowenaUser.addPvpScore(pointsToAdd);
-            }
-        }
-        
         pvpRefreshUi();
     }
 
@@ -1413,9 +1419,17 @@ Guidelines:
         }
 
         pvpClearPlayTimer();
+        
+        // 示範對戰的計分邏輯
+        let scoreChange = pvpUserAnswer === pvpQuestion?.correct ? Math.floor(Math.random() * 4) + 32 : -(Math.floor(Math.random() * 4) + 23);
+        let newScore = 0;
+        if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
+            newScore = RowenaUser.addPvpScore(scoreChange);
+        }
+        
         pvpResultPayload = {
-            outcome: 'win',
-            headline: '本局勝利（示範）',
+            outcome: pvpUserAnswer === pvpQuestion?.correct ? 'win' : 'lose',
+            headline: pvpUserAnswer === pvpQuestion?.correct ? '本局勝利（示範）' : '本局敗場（示範）',
             detail: '真人配對為示範流程，請使用「挑戰 AI 智能導師」體驗完整 RAG 對戰。',
             userCorrect: pvpUserAnswer === pvpQuestion?.correct,
             aiCorrect: false,
@@ -1424,15 +1438,9 @@ Guidelines:
             userAnswer: pvpUserAnswer,
             aiAnswer: '—',
             correct: pvpQuestion?.correct,
+            scoreChange,
+            newScore,
         };
-        
-        // 示範對戰也加分（即使只是示範）
-        if (pvpResultPayload.outcome === 'win') {
-            const pointsToAdd = 5; // 示範對戰 5 分
-            if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
-                RowenaUser.addPvpScore(pointsToAdd);
-            }
-        }
         
         pvpState = 'result';
         pvpRefreshUi();
@@ -1474,8 +1482,14 @@ Guidelines:
                 : r.outcome === 'lose'
                   ? 'border-joyful-amber/40 bg-joyful-amber/10'
                   : 'border-deep-blue/20 bg-off-white';
+        const scoreDiff = r.scoreChange || 0;
+        const scoreColor = scoreDiff > 0 ? 'text-calm-mint' : scoreDiff < 0 ? 'text-joyful-amber' : 'text-deep-blue';
         const scoreLabel =
-            r.outcome === 'win' ? '勝利 +18 分' : r.outcome === 'lose' ? '敗場 +3 分' : '平手 +8 分';
+            scoreDiff > 0
+                ? `勝利 +${scoreDiff} 分`
+                : scoreDiff < 0
+                  ? `敗場 ${scoreDiff} 分`
+                  : '平手 ±0 分';
 
         return `
             <div class="mb-4 p-4 rounded-xl border ${bannerClass} text-center animate-[fadeIn_0.4s_ease-out]">
@@ -1485,7 +1499,11 @@ Guidelines:
             <div class="space-y-4 text-sm">
                 <div class="flex justify-between items-center p-4 bg-off-white rounded-lg">
                     <span>本局結果</span>
-                    <span class="${r.outcome === 'win' ? 'text-calm-mint' : r.outcome === 'lose' ? 'text-joyful-amber' : 'text-deep-blue'} font-medium">${scoreLabel}</span>
+                    <span class="${scoreColor} font-medium">${scoreLabel}</span>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-calm-mint/10 rounded-lg border border-calm-mint/30">
+                    <span>你的總分</span>
+                    <span class="text-lg font-medium text-deep-blue">🏆 ${r.newScore || 0}</span>
                 </div>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
                     <div class="p-3 sayo-border rounded-lg">
