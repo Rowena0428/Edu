@@ -1848,7 +1848,7 @@ Guidelines:
     const CHECK_LOADING = 'Rowena 正在辨識試卷並批改中…';
     let checkSubject = 'chinese', checkFileDataUrl = '', checkMimeType = '', checkFileName = '', checkFileObject = null;
     let checkReportMarkdown = '', checkIsGrading = false, checkError = '';
-    let checkUserPromptText = '請幫我批改這張考卷，嚴格依照 DSE 官方評分標準逐題給分，並列出改進建議。';
+    let checkUserPromptText = '如果你要批改選擇題，可以把答案貼在這裡，然後把考卷上傳到上面的方格。';
     let checkIsDiagnosing = false, checkDiagnosticError = '', checkDiagnosticProgressPct = 8;
 
     async function checkSyncLeaderboard(md) {

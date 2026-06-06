@@ -24,19 +24,30 @@ Output format example:
 
 const GRADE_PROMPT = `你是一位資深且嚴格的香港 DSE 專業閱卷員與補習名師。請仔細檢視使用者上傳的考卷或作業圖片/PDF。
 
-【你的批改任務與輸出格式】：
-1. 仔細辨識題目內容與使用者的作答過程。
-2. 針對「錯誤的答案」或「步驟不完整的答案」，請明確指出錯誤，並提供：
-   - 💡 題目分析：你是如何拆解與分析這道題目的。
-   - 📝 正確解題步驟：一步步詳細列出正確的計算或推導過程。
-   - ✅ 正確答案。
-3. 對於答對的題目，給予簡短的鼓勵即可。
-4. 最後，請在結尾總結給出【總體回饋】：
-   - 💯 預估得分（例如：8/10 分）。
-   - 🌟 優點分析：學生做得好的地方。
-   - ⚠️ 弱點分析與改善建議：需要加強的觀念或粗心的地方。
+【計分與批改最高準則】：
+系統或使用者可能會在「補充備註」中提供選擇題 (MC) 的標準答案。請根據以下兩種題型切換你的批改邏輯：
 
-請使用繁體中文，並以清晰的 Markdown 格式（如標題、列表、加粗）排版輸出。數學公式請使用 LaTeX 格式（使用 $ 包裹）。`;
+📍 1. 選擇題 (MCQs)：
+- 每題固定為 1 分。
+- 請嚴格比對學生的答案與提供的標準答案。
+- 清楚列出答錯的題號、學生的錯誤選項，以及正確答案。
+- 結算選擇題總得分（例如：MC 得分 38/45）。
+
+📍 2. 非選擇題 (長題目、問答題、計算題)：
+- 【關鍵】：所有非選擇題的「滿分」都已經標記在題目旁（例如：[2 marks], (3分) 等）。請務必用視覺讀取該題的滿分標記！
+- 針對錯誤或不完整的答案，請明確指出錯誤，並提供：
+  💡 題目分析：你是如何拆解這題的。
+  📝 正確解題步驟：一步步詳細列出正確的計算或推導過程。
+  ✅ 正確答案。
+- 根據學生寫出的步驟，嚴格給予具體的得分（例如：步驟錯一半，滿分 4 分給 2 分，標記為 2/4 分）。
+
+【最終輸出格式】：
+批改完所有題目後，請在結尾總結給出【總體回饋】：
+- 💯 卷面總得分：(計算所有 MC 與非 MC 的加總得分)
+- 🌟 優點分析：學生做得好的地方。
+- ⚠️ 弱點分析與改善建議：需要加強的觀念或粗心的地方。
+
+請使用繁體中文，並以清晰的 Markdown 格式排版輸出。數學公式請使用 LaTeX 格式（使用 $ 包裹）。`;
 
 const ORIGINAL_PROMPTS = {
     chinese: String.raw`你現在是香港考評局 (HKEAA) 的中文科出卷專家。請生成一份高擬真度的 DSE 中文科模擬試卷（包含卷一及卷二），嚴格遵守官方最新排版與結構。
@@ -261,10 +272,19 @@ export default async function handler(req, res) {
         }
 
         // 🎯 3. 依據聊天室規則路由選擇 API 金鑰
-        let selectedKey = roomKeyMap[chatRoomId];
+        const graderApiKey = process.env.GEMINI_API_KEY_GRADER;
         const rowenaApiKey = process.env.ROWENA_API_KEY;
         const geminiApiKey = process.env.GEMINI_API_KEY;
         const defaultGeminiKey = process.env.DEFAULT_GEMINI_API_KEY || rowenaApiKey || geminiApiKey;
+
+        // 優先判斷：若為閱卷請求 (action === 'grade')，且已設定專屬閱卷金鑰，則直接使用之
+        let selectedKey;
+        if (action === 'grade' && graderApiKey) {
+            selectedKey = graderApiKey;
+            console.log('[Grade 模式] 使用 GEMINI_API_KEY_GRADER 作為 Gemini API 金鑰。');
+        } else {
+            selectedKey = roomKeyMap[chatRoomId];
+        }
 
         if (isRowenaMode && rowenaApiKey) {
             selectedKey = rowenaApiKey;
