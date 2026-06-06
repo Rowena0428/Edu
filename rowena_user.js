@@ -10,6 +10,7 @@
         name: 'Learner',
         form: 6,
         avatar: null,
+        pvpScore: 0,
     };
 
     function loadProfile() {
@@ -78,7 +79,7 @@
         if (!container) return;
         const formLabel = `Form ${profile.form}`;
         container.innerHTML = `
-            <span class="hidden md:inline text-xs text-slate-gray">${escapeHtml(formLabel)} · 今日已學 <span class="text-deep-blue font-medium">1h 12m</span></span>
+            <span class="hidden md:inline text-xs text-slate-gray">${escapeHtml(formLabel)} · 🏆 <span data-rowena-pvp-score>${profile.pvpScore || 0}</span> · 今日已學 <span class="text-deep-blue font-medium">1h 12m</span></span>
             <button type="button" id="rowena-user-btn" class="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-off-white transition-colors sayo-border border-transparent hover:border-gray-200" aria-label="開啟個人主頁">
                 ${avatarHtml(profile, 'w-8 h-8')}
                 <span class="text-xs text-deep-blue font-medium max-w-[96px] truncate hidden sm:inline" id="rowena-user-name">${escapeHtml(profile.name)}</span>
@@ -240,6 +241,9 @@
         document.querySelectorAll('[data-rowena-form-label]').forEach((el) => {
             el.textContent = `Form ${profile.form}`;
         });
+        document.querySelectorAll('[data-rowena-pvp-score]').forEach((el) => {
+            el.textContent = profile.pvpScore || 0;
+        });
         if (typeof global.onRowenaProfileUpdated === 'function') {
             global.onRowenaProfileUpdated(profile);
         }
@@ -270,5 +274,18 @@
         isValidName,
         avatarHtml,
         escapeHtml,
+        addPvpScore: function (scoreToAdd) {
+            try {
+                const current = loadProfile();
+                const newScore = Math.max(0, (current.pvpScore || 0) + (scoreToAdd || 0));
+                current.pvpScore = newScore;
+                saveProfile(current);
+                syncAllHeaders();
+                return newScore;
+            } catch (e) {
+                console.error('Error adding PvP score:', e);
+                return (loadProfile().pvpScore || 0);
+            }
+        },
     };
 })(window);

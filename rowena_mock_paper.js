@@ -1372,6 +1372,15 @@ Guidelines:
         pvpClearPlayTimer();
         pvpResultPayload = pvpComputeResult();
         pvpState = 'result';
+        
+        // 若玩家贏得對戰，加分
+        if (pvpResultPayload.outcome === 'win') {
+            const pointsToAdd = 10; // 每場勝利 10 分
+            if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
+                RowenaUser.addPvpScore(pointsToAdd);
+            }
+        }
+        
         pvpRefreshUi();
     }
 
@@ -1416,6 +1425,15 @@ Guidelines:
             aiAnswer: '—',
             correct: pvpQuestion?.correct,
         };
+        
+        // 示範對戰也加分（即使只是示範）
+        if (pvpResultPayload.outcome === 'win') {
+            const pointsToAdd = 5; // 示範對戰 5 分
+            if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
+                RowenaUser.addPvpScore(pointsToAdd);
+            }
+        }
+        
         pvpState = 'result';
         pvpRefreshUi();
     }

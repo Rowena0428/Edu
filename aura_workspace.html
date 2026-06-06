@@ -289,25 +289,31 @@
         };
 
         function rankPanel(tool) {
-            const me = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6 };
-            const rows = [
-                { rank: 1, name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7 },
-                { rank: 2, name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5 },
-                { rank: 3, name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3 },
-                { rank: 4, name: me.name, form: me.form, hours: '24.5h', wins: 15, streak: 2, you: true },
-                { rank: 12, name: '…', form: '', hours: '', wins: '', streak: '', sep: true },
+            const me = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6, pvpScore: 0 };
+            const opponents = [
+                { name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7, pvpScore: 850 },
+                { name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5, pvpScore: 720 },
+                { name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3, pvpScore: 680 },
             ];
+            const allRows = [
+                ...opponents.map(o => ({ ...o, you: false })),
+                { name: me.name, form: me.form, hours: '24.5h', wins: 15, streak: 2, pvpScore: me.pvpScore || 0, you: true },
+            ];
+            const sorted = allRows.sort((a, b) => (b.pvpScore || 0) - (a.pvpScore || 0));
+            const userRankIndex = sorted.findIndex(r => r.you);
+            const userRank = userRankIndex >= 0 ? userRankIndex + 1 : '—';
+            const userScore = me.pvpScore || 0;
             return `
                 <header class="mb-6">
                     <p class="text-[10px] text-slate-gray tracking-widest mb-1">學習成就</p>
                     <h1 class="text-2xl text-deep-blue font-light tracking-wide">${tool.name}</h1>
-                    <p class="text-sm text-slate-gray mt-2">以學習時長與 PVP 勝場綜合排名。持續參與即可穩步上升。</p>
+                    <p class="text-sm text-slate-gray mt-2">以 PvP 對戰分數排名。挑戰對手，提升排名。</p>
                 </header>
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="sayo-border rounded-xl bg-pure-white p-5">
-                        <p class="text-[10px] text-slate-gray">你的名次</p>
-                        <p class="text-3xl text-deep-blue font-light mt-1">#4</p>
-                        <p class="text-xs text-calm-mint mt-1">↑ 2 名（本週）</p>
+                        <p class="text-[10px] text-slate-gray">你的排名</p>
+                        <p class="text-3xl text-deep-blue font-light mt-1">#${userRank}</p>
+                        <p class="text-xs text-calm-mint mt-1">🏆 ${userScore} 分</p>
                     </div>
                     <div class="sayo-border rounded-xl bg-pure-white p-5">
                         <p class="text-[10px] text-slate-gray">本週學習時長</p>
@@ -320,7 +326,7 @@
                 </div>
                 <section class="sayo-border rounded-xl bg-pure-white overflow-hidden">
                     <div class="flex border-b border-gray-100 text-xs">
-                        <button type="button" class="flex-1 py-3 text-deep-blue border-b-2 border-deep-blue" id="rank-tab-time">學習時長</button>
+                        <button type="button" class="flex-1 py-3 text-deep-blue border-b-2 border-deep-blue" id="rank-tab-time">排名榜</button>
                         <button type="button" class="flex-1 py-3 text-slate-gray" id="rank-tab-wins" onclick="switchRankTab('wins')">勝場數</button>
                     </div>
                     <div class="p-4" id="rank-table-time">
@@ -328,15 +334,15 @@
                             <span class="col-span-1">#</span>
                             <span class="col-span-4">考生</span>
                             <span class="col-span-2">年級</span>
-                            <span class="col-span-3 text-right">時長</span>
+                            <span class="col-span-3 text-right">🏆 分數</span>
                             <span class="col-span-2 text-right">連勝</span>
                         </div>
-                        ${rows.filter(r => !r.sep).map(r => `
+                        ${sorted.map((r, idx) => `
                             <div class="grid grid-cols-12 gap-2 py-3 text-sm border-b border-gray-50 last:border-0 ${r.you ? 'bg-off-white/80 -mx-4 px-4 rounded' : ''}">
-                                <span class="col-span-1 text-slate-gray font-mono text-xs">${String(r.rank).padStart(2,'0')}</span>
+                                <span class="col-span-1 text-slate-gray font-mono text-xs">${String(idx + 1).padStart(2,'0')}</span>
                                 <span class="col-span-4 text-deep-blue">${r.name}</span>
                                 <span class="col-span-2 text-[10px] text-slate-gray">${r.form ? 'Form ' + r.form : '—'}</span>
-                                <span class="col-span-3 text-right font-mono text-xs">${r.hours}</span>
+                                <span class="col-span-3 text-right font-mono text-xs">${r.pvpScore || 0}</span>
                                 <span class="col-span-2 text-right text-xs ${r.streak >= 5 ? 'text-joyful-amber' : 'text-slate-gray'}">${r.streak ? r.streak + ' 場' : '—'}</span>
                             </div>
                         `).join('')}
