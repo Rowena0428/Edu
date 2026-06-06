@@ -91,7 +91,12 @@
         if (document.getElementById('rowena-profile-modal')) return;
         const wrap = document.createElement('div');
         wrap.id = 'rowena-profile-modal';
-        wrap.className = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300';
+        const persistedOpen = localStorage.getItem(PROFILE_MODAL_STATE_KEY) === '1';
+        const params = new URLSearchParams(window.location.search);
+        const shouldOpen = params.get('profileOpen') === '1';
+        const isInitiallyOpen = persistedOpen || shouldOpen;
+        const baseClass = 'fixed inset-0 bg-black/40 backdrop-blur-sm z-[200] flex items-center justify-center transition-opacity duration-300';
+        wrap.className = isInitiallyOpen ? baseClass : `${baseClass} opacity-0 pointer-events-none`;
         wrap.innerHTML = `
             <div class="bg-pure-white sayo-border rounded-xl p-6 md:p-8 max-w-md w-full mx-4 shadow-sm" role="dialog" aria-labelledby="profile-modal-title">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-6">
@@ -190,7 +195,7 @@
         if (removeBtn) removeBtn.classList.toggle('hidden', !profile.avatar);
     }
 
-    function openProfileModal() {
+    function openProfileModal(isInstant = false) {
         injectModal();
         profile = loadProfile();
         const nameInput = document.getElementById('profile-name-input');
@@ -202,7 +207,17 @@
         if (formSelect) formSelect.value = String(profile.form);
         document.getElementById('profile-name-error')?.classList.add('hidden');
         updateModalAvatarPreview();
+
+        if (isInstant) {
+            modalEl?.classList.remove('duration-300');
+        }
+
         modalEl?.classList.remove('opacity-0', 'pointer-events-none');
+
+        if (isInstant) {
+            setTimeout(() => modalEl?.classList.add('duration-300'), 50);
+        }
+
         try {
             localStorage.setItem(PROFILE_MODAL_STATE_KEY, '1');
         } catch (e) {
@@ -243,7 +258,7 @@
         const shouldOpen = params.get('profileOpen') === '1';
         const persistedOpen = localStorage.getItem(PROFILE_MODAL_STATE_KEY) === '1';
         if (shouldOpen || persistedOpen) {
-            openProfileModal();
+            openProfileModal(true); // instant open on initialization
         }
     }
 
