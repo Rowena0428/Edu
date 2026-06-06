@@ -1846,33 +1846,19 @@ Guidelines:
 
     // ── Check 卷 AI（智能批改）────────────────────────────────────────────
     const CHECK_LOADING = 'Rowena 正在辨識試卷並批改中…';
-    let checkSubject = 'chinese', checkFileDataUrl = '', checkMimeType = '', checkFileName = '', checkFileObject = null;
+    let checkSubject = 'chinese', checkFileDataUrl = '', checkMimeType = '', checkFileName = '';
     let checkReportMarkdown = '', checkIsGrading = false, checkError = '';
-    let checkUserPromptText = '如果你要批改選擇題，可以把答案貼在這裡，然後把考卷上傳到上面的方格。';
+    let checkUserPromptText = '請幫我批改這張考卷，嚴格依照 DSE 官方評分標準逐題給分，並列出改進建議。';
     let checkIsDiagnosing = false, checkDiagnosticError = '', checkDiagnosticProgressPct = 8;
 
     async function checkSyncLeaderboard(md) {
         const ex = global.RowenaLeaderboard?.extractScoreFromCheckReport;
         const score = typeof ex === 'function' ? ex(md) : null;
-        if (score == null) return;
-        // 儲存到本地 examScores
+        if (score == null || typeof global.updateUserStats !== 'function') return;
         try {
-            if (typeof global.RowenaUser?.setExamScore === 'function') {
-                // 使用目前的檢查科目作為 key
-                global.RowenaUser.setExamScore(checkSubject || 'general', score);
-            }
-        } catch (e) { console.warn('[Check] save local exam score', e); }
-
-        // 仍然嘗試更新 Supabase 全域排行榜（若可用）
-        if (typeof global.updateUserStats === 'function') {
-            try {
-                await global.updateUserStats(score);
-                if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
-            } catch (e) { console.warn('[Check] leaderboard', e); }
-        }
-
-        // 觸發本地界面更新（排行榜/頭像等）
-        try { if (typeof window.onRowenaProfileUpdated === 'function') window.onRowenaProfileUpdated(); } catch (e) {}
+            await global.updateUserStats(score);
+            if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
+        } catch (e) { console.warn('[Check] leaderboard', e); }
     }
     function checkRenderPanel(tool) {
         const meta = SUBJECT_META[checkSubject];
@@ -1901,42 +1887,6 @@ Guidelines:
         const w = document.getElementById('workspace-root');
         if (w) { w.innerHTML = checkRenderPanel({ name: 'Check 卷 AI（智能批改）', id: 'check-paper' }); checkBindEvents(); }
     }
-    async function fileToBase64(file) {
-        return new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => {
-                const base64String = String(reader.result).split(',')[1] || '';
-                resolve({ base64: base64String, mimeType: file.type });
-            };
-            reader.onerror = (error) => reject(error);
-        });
-    }
-
-    async function submitPaperForGrading(file, userNote = '', subjectCategory = 'general') {
-        const fileData = await fileToBase64(file);
-        const response = await fetch('/api/process', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                action: 'grade',
-                chatRoomId: subjectCategory || 'general',
-                text: userNote,
-                fileBase64: fileData.base64,
-                fileMimeType: fileData.mimeType,
-            }),
-        });
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(errorText || '閱卷 API 呼叫失敗');
-        }
-        const data = await response.json();
-        if (!data.success) {
-            throw new Error(data.error || 'AI 閱卷回傳失敗');
-        }
-        return data.text;
-    }
-
     async function checkRunDiagnostic(apiKey) {
         if (!checkReportMarkdown) return;
         reportBindModal();
@@ -1956,13 +1906,15 @@ Guidelines:
         finally { clearInterval(timer); checkIsDiagnosing = false; checkReRender(); }
     }
     async function checkStartGrading() {
-        if (checkIsGrading || checkIsDiagnosing || !checkFileObject) return;
+        if (checkIsGrading || checkIsDiagnosing || !checkFileDataUrl) return;
         const apiKey = getApiKey(checkSubject);
         if (!apiKey?.startsWith('AIza')) { checkError = '請設定 API 金鑰'; checkReRender(); return; }
         checkUserPromptText = document.getElementById('check-user-prompt')?.value?.trim() || checkUserPromptText;
         checkIsGrading = true; checkError = ''; checkReportMarkdown = ''; reportCloseModal(); checkReRender();
         try {
-            checkReportMarkdown = await submitPaperForGrading(checkFileObject, checkUserPromptText, checkSubject);
+            checkReportMarkdown = await global.analyzeUploadedPaper(checkFileDataUrl, checkMimeType, checkSubject, checkUserPromptText, apiKey, (m) => {
+                const el = document.getElementById('check-loading-message'); if (el) el.textContent = m;
+            });
             await checkSyncLeaderboard(checkReportMarkdown);
         } catch (e) { checkError = e.message; checkIsGrading = false; checkReRender(); return; }
         checkIsGrading = false; checkReRender();
@@ -1974,7 +1926,7 @@ Guidelines:
             const f = e.target.files?.[0]; if (!f) return;
             if (f.size > 12 * 1024 * 1024) { checkError = '檔案需小於 12MB'; checkReRender(); return; }
             const r = new FileReader();
-            r.onload = () => { checkFileDataUrl = r.result; checkMimeType = f.type || 'image/jpeg'; checkFileName = f.name; checkFileObject = f; checkReportMarkdown = ''; checkReRender(); };
+            r.onload = () => { checkFileDataUrl = r.result; checkMimeType = f.type || 'image/jpeg'; checkFileName = f.name; checkReportMarkdown = ''; checkReRender(); };
             r.readAsDataURL(f);
         });
         document.getElementById('btn-check-grade')?.addEventListener('click', checkStartGrading);

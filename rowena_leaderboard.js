@@ -17,7 +17,7 @@
         if (supabaseClient) return supabaseClient;
         const cfg = global.RowenaRAG?.SUPABASE_CONFIG;
         if (!cfg?.url || cfg.url.startsWith('YOUR_')) {
-            throw new Error('沒有範例數據');
+            throw new Error('請在 rowena_rag.js 設定 SUPABASE_CONFIG。');
         }
         if (!global.supabase?.createClient) throw new Error('未載入 Supabase SDK。');
         supabaseClient = global.supabase.createClient(cfg.url, cfg.anonKey);

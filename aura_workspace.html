@@ -289,21 +289,20 @@
         };
 
         function rankPanel(tool) {
-            const profile = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6 };
-            const userAvg = typeof RowenaUser?.computeAverageExamScore === 'function' ? RowenaUser.computeAverageExamScore() : null;
+            const me = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6, pvpScore: 0 };
             const opponents = [
-                { name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7, average: 92.0 },
-                { name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5, average: 85.0 },
-                { name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3, average: 78.0 },
+                { name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7, pvpScore: 850 },
+                { name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5, pvpScore: 720 },
+                { name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3, pvpScore: 680 },
             ];
             const allRows = [
                 ...opponents.map(o => ({ ...o, you: false })),
-                { name: profile.name, form: profile.form, hours: '24.5h', wins: 15, streak: 2, average: userAvg != null ? userAvg : 0, you: true },
+                { name: me.name, form: me.form, hours: '24.5h', wins: 15, streak: 2, pvpScore: me.pvpScore || 0, you: true },
             ];
-            const sorted = allRows.sort((a, b) => (Number(b.average) || 0) - (Number(a.average) || 0));
+            const sorted = allRows.sort((a, b) => (b.pvpScore || 0) - (a.pvpScore || 0));
             const userRankIndex = sorted.findIndex(r => r.you);
             const userRank = userRankIndex >= 0 ? userRankIndex + 1 : '—';
-            const userAvgDisplay = userAvg != null ? userAvg.toFixed(1) : '—';
+            const userScore = me.pvpScore || 0;
             return `
                 <header class="mb-6">
                     <p class="text-[10px] text-slate-gray tracking-widest mb-1">學習成就</p>
@@ -314,7 +313,7 @@
                     <div class="sayo-border rounded-xl bg-pure-white p-5">
                         <p class="text-[10px] text-slate-gray">你的排名</p>
                         <p class="text-3xl text-deep-blue font-light mt-1">#${userRank}</p>
-                        <p class="text-xs text-calm-mint mt-1">🏆 ${userAvgDisplay} /100</p>
+                        <p class="text-xs text-calm-mint mt-1">🏆 ${userScore} 分</p>
                     </div>
                     <div class="sayo-border rounded-xl bg-pure-white p-5">
                         <p class="text-[10px] text-slate-gray">本週學習時長</p>
@@ -343,7 +342,7 @@
                                 <span class="col-span-1 text-slate-gray font-mono text-xs">${String(idx + 1).padStart(2,'0')}</span>
                                 <span class="col-span-4 text-deep-blue">${r.name}</span>
                                 <span class="col-span-2 text-[10px] text-slate-gray">${r.form ? 'Form ' + r.form : '—'}</span>
-                                <span class="col-span-3 text-right font-mono text-xs">${(Number(r.average) || 0).toFixed(1)}</span>
+                                <span class="col-span-3 text-right font-mono text-xs">${r.pvpScore || 0}</span>
                                 <span class="col-span-2 text-right text-xs ${r.streak >= 5 ? 'text-joyful-amber' : 'text-slate-gray'}">${r.streak ? r.streak + ' 場' : '—'}</span>
                             </div>
                         `).join('')}
