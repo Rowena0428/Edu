@@ -4,6 +4,7 @@
  */
 (function (global) {
     const PROFILE_KEY = 'rowena_user_profile';
+    const PROFILE_MODAL_STATE_KEY = 'rowena_profile_modal_open';
 
     const DEFAULT_PROFILE = {
         name: 'Learner',
@@ -179,7 +180,6 @@
             profile.form = parseInt(formSelect?.value || '6', 10);
             saveProfile(profile);
             syncAllHeaders();
-            closeProfileModal();
         });
     }
 
@@ -203,10 +203,20 @@
         document.getElementById('profile-name-error')?.classList.add('hidden');
         updateModalAvatarPreview();
         modalEl?.classList.remove('opacity-0', 'pointer-events-none');
+        try {
+            localStorage.setItem(PROFILE_MODAL_STATE_KEY, '1');
+        } catch (e) {
+            /* ignore storage errors */
+        }
     }
 
     function closeProfileModal() {
         modalEl?.classList.add('opacity-0', 'pointer-events-none');
+        try {
+            localStorage.removeItem(PROFILE_MODAL_STATE_KEY);
+        } catch (e) {
+            /* ignore storage errors */
+        }
     }
 
     function syncAllHeaders() {
@@ -227,6 +237,13 @@
         if (container) {
             container.setAttribute('data-rowena-user-header', '1');
             renderHeaderChip(container);
+        }
+
+        const params = new URLSearchParams(window.location.search);
+        const shouldOpen = params.get('profileOpen') === '1';
+        const persistedOpen = localStorage.getItem(PROFILE_MODAL_STATE_KEY) === '1';
+        if (shouldOpen || persistedOpen) {
+            openProfileModal();
         }
     }
 
