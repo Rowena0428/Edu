@@ -22,6 +22,22 @@ Output format example:
 {"question": "question text", "options": ["Option A","Option B","Option C","Option D"], "answer": "C"}`,
 };
 
+const GRADE_PROMPT = `你是一位資深且嚴格的香港 DSE 專業閱卷員與補習名師。請仔細檢視使用者上傳的考卷或作業圖片/PDF。
+
+【你的批改任務與輸出格式】：
+1. 仔細辨識題目內容與使用者的作答過程。
+2. 針對「錯誤的答案」或「步驟不完整的答案」，請明確指出錯誤，並提供：
+   - 💡 題目分析：你是如何拆解與分析這道題目的。
+   - 📝 正確解題步驟：一步步詳細列出正確的計算或推導過程。
+   - ✅ 正確答案。
+3. 對於答對的題目，給予簡短的鼓勵即可。
+4. 最後，請在結尾總結給出【總體回饋】：
+   - 💯 預估得分（例如：8/10 分）。
+   - 🌟 優點分析：學生做得好的地方。
+   - ⚠️ 弱點分析與改善建議：需要加強的觀念或粗心的地方。
+
+請使用繁體中文，並以清晰的 Markdown 格式（如標題、列表、加粗）排版輸出。數學公式請使用 LaTeX 格式（使用 $ 包裹）。`;
+
 const ORIGINAL_PROMPTS = {
     chinese: String.raw`你現在是香港考評局 (HKEAA) 的中文科出卷專家。請生成一份高擬真度的 DSE 中文科模擬試卷（包含卷一及卷二），嚴格遵守官方最新排版與結構。
 【官方試卷編號與抬頭要求】：
@@ -218,11 +234,14 @@ export default async function handler(req, res) {
     }
 
     // 📥 1. 接收從前端傳送過來的資料
-    const { text, subject, paper, docType, fileName, chatRoomId, action } = req.body;
+    const { text, subject, paper, docType, fileName, chatRoomId, action, fileBase64, fileMimeType } = req.body;
 
-    // 基本防錯檢查：text 與 chatRoomId 為共用必要欄位
-    if (!text || !chatRoomId) {
-        return res.status(400).json({ error: '遺失必要的參數：text 或 chatRoomId' });
+    // 基本防錯檢查：chatRoomId 必須存在；grade 模式允許無 text
+    if (!chatRoomId || (!text && action !== 'grade')) {
+        return res.status(400).json({ error: '遺失必要的參數：chatRoomId 或 text' });
+    }
+    if (action === 'grade' && (!fileBase64 || !fileMimeType)) {
+        return res.status(400).json({ error: 'grade 模式需要 fileBase64 與 fileMimeType' });
     }
 
     // 判斷請求類型：若前端明確傳入 action === 'generate'，或未包含 fileName/docType/paper，視為 AI 生成請求
@@ -288,12 +307,26 @@ export default async function handler(req, res) {
             }
 
             // 3. 配置傳送給 Gemini 的 Payload
+            let partsArray = [];
+            if (action === 'grade') {
+                partsArray.push({ text: GRADE_PROMPT + '\n\n學生的補充備註：' + (text || '無') });
+                if (fileBase64 && fileMimeType) {
+                    partsArray.push({
+                        inlineData: {
+                            mimeType: fileMimeType,
+                            data: fileBase64,
+                        }
+                    });
+                }
+            } else {
+                partsArray.push({ text: promptText + finalSafetyInstruction });
+            }
+
             const genBody = {
-                contents: [{ parts: [{ text: promptText + finalSafetyInstruction }] }],
-                generationConfig: { 
-                    temperature: action === 'pvp' ? 0.1 : (isRowenaMode ? 0.7 : 0.5), 
+                contents: [{ parts: partsArray }],
+                generationConfig: {
+                    temperature: action === 'pvp' ? 0.1 : (isRowenaMode ? 0.7 : 0.5),
                     maxOutputTokens: action === 'pvp' ? 1024 : 8192,
-                    // 🌟 核心關鍵：如果是 PvP 模式，開啟 Gemini 原生 JSON 強制模式
                     responseMimeType: action === 'pvp' ? "application/json" : "text/plain"
                 }
             };
