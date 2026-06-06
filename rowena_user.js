@@ -95,7 +95,6 @@
             <div class="bg-pure-white sayo-border rounded-xl p-6 md:p-8 max-w-md w-full mx-4 shadow-sm" role="dialog" aria-labelledby="profile-modal-title">
                 <div class="flex justify-between items-center border-b border-gray-100 pb-3 mb-6">
                     <h2 id="profile-modal-title" class="text-sm tracking-widest text-deep-blue">個人主頁</h2>
-                    <button type="button" id="rowena-profile-close" class="text-slate-gray text-xs hover:text-deep-blue w-8 h-8">✕</button>
                 </div>
                 <div class="flex flex-col items-center mb-6">
                     <div id="profile-avatar-preview" class="mb-3"></div>
@@ -122,7 +121,7 @@
                     </div>
                 </div>
                 <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
-                    <button type="button" id="profile-cancel-btn" class="flex-1 text-xs py-2.5 sayo-border rounded-full text-slate-gray hover:border-deep-blue transition-colors">取消</button>
+                    <button type="button" id="profile-leave-btn" class="flex-1 text-xs py-2.5 sayo-border rounded-full text-slate-gray hover:border-deep-blue transition-colors">離開</button>
                     <button type="button" id="profile-save-btn" class="flex-1 text-xs py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all">儲存</button>
                 </div>
             </div>
@@ -130,11 +129,7 @@
         document.body.appendChild(wrap);
         modalEl = wrap;
 
-        wrap.addEventListener('click', (e) => {
-            if (e.target === wrap) closeProfileModal();
-        });
-        document.getElementById('rowena-profile-close')?.addEventListener('click', closeProfileModal);
-        document.getElementById('profile-cancel-btn')?.addEventListener('click', closeProfileModal);
+        document.getElementById('profile-leave-btn')?.addEventListener('click', closeProfileModal);
 
         const nameInput = document.getElementById('profile-name-input');
         nameInput?.addEventListener('input', () => {
@@ -233,11 +228,6 @@
             container.setAttribute('data-rowena-user-header', '1');
             renderHeaderChip(container);
         }
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modalEl && !modalEl.classList.contains('opacity-0')) {
-                closeProfileModal();
-            }
-        });
     }
 
     global.RowenaUser = {
