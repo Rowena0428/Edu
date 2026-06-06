@@ -5,6 +5,7 @@
 (function (global) {
     const PROFILE_KEY = 'rowena_user_profile';
     const PROFILE_MODAL_STATE_KEY = 'rowena_profile_modal_open';
+    const EXAM_SCORES_KEY = 'rowena_exam_scores';
 
     const DEFAULT_PROFILE = {
         name: 'Learner',
@@ -21,6 +22,52 @@
         } catch {
             return { ...DEFAULT_PROFILE };
         }
+    }
+
+    // ===== Exam scores (local storage) =====
+    function loadExamScores() {
+        try {
+            const raw = localStorage.getItem(EXAM_SCORES_KEY);
+            if (!raw) return {};
+            return JSON.parse(raw);
+        } catch {
+            return {};
+        }
+    }
+
+    function saveExamScores(obj) {
+        try {
+            localStorage.setItem(EXAM_SCORES_KEY, JSON.stringify(obj || {}));
+        } catch (e) {
+            /* ignore */
+        }
+    }
+
+    function setExamScore(subjectCode, percentScore) {
+        if (!subjectCode) return;
+        const scores = loadExamScores();
+        const v = Number(percentScore);
+        if (!Number.isFinite(v) || v < 0) return;
+        scores[subjectCode] = Math.min(100, Math.max(0, Math.round(v * 10) / 10));
+        saveExamScores(scores);
+        return scores[subjectCode];
+    }
+
+    function getExamScore(subjectCode) {
+        const scores = loadExamScores();
+        return scores[subjectCode] == null ? null : Number(scores[subjectCode]);
+    }
+
+    function getAllExamScores() {
+        return loadExamScores();
+    }
+
+    function computeAverageExamScore() {
+        const scores = loadExamScores();
+        const keys = Object.keys(scores || {}).filter(k => scores[k] != null && scores[k] !== '');
+        if (!keys.length) return null;
+        const sum = keys.reduce((s, k) => s + Number(scores[k] || 0), 0);
+        return Math.round((sum / keys.length) * 10) / 10;
     }
 
     function saveProfile(profile) {
@@ -274,6 +321,11 @@
         isValidName,
         avatarHtml,
         escapeHtml,
+        // exam scores API
+        setExamScore,
+        getExamScore,
+        getAllExamScores,
+        computeAverageExamScore,
         addPvpScore: function (scoreToAdd) {
             try {
                 const current = loadProfile();

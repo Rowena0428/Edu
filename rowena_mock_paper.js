@@ -1854,11 +1854,25 @@ Guidelines:
     async function checkSyncLeaderboard(md) {
         const ex = global.RowenaLeaderboard?.extractScoreFromCheckReport;
         const score = typeof ex === 'function' ? ex(md) : null;
-        if (score == null || typeof global.updateUserStats !== 'function') return;
+        if (score == null) return;
+        // 儲存到本地 examScores
         try {
-            await global.updateUserStats(score);
-            if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
-        } catch (e) { console.warn('[Check] leaderboard', e); }
+            if (typeof global.RowenaUser?.setExamScore === 'function') {
+                // 使用目前的檢查科目作為 key
+                global.RowenaUser.setExamScore(checkSubject || 'general', score);
+            }
+        } catch (e) { console.warn('[Check] save local exam score', e); }
+
+        // 仍然嘗試更新 Supabase 全域排行榜（若可用）
+        if (typeof global.updateUserStats === 'function') {
+            try {
+                await global.updateUserStats(score);
+                if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
+            } catch (e) { console.warn('[Check] leaderboard', e); }
+        }
+
+        // 觸發本地界面更新（排行榜/頭像等）
+        try { if (typeof window.onRowenaProfileUpdated === 'function') window.onRowenaProfileUpdated(); } catch (e) {}
     }
     function checkRenderPanel(tool) {
         const meta = SUBJECT_META[checkSubject];
