@@ -85,6 +85,14 @@
         <div id="rowena-header-user" class="flex items-center gap-4 text-xs text-slate-gray"></div>
     </header>
 
+    <div id="data-collection-panel" class="bg-pure-white sayo-border border-b border-gray-100 px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-3 text-sm text-deep-blue">
+        <div class="space-y-1">
+            <p class="font-medium">📋 資料收集介面</p>
+            <p class="text-xs text-slate-gray">此介面會在工作台中保持顯示，直到你點擊「離開」按鈕。</p>
+        </div>
+        <button id="btn-data-collection-leave" type="button" class="text-xs px-4 py-2 bg-deep-blue text-white rounded-full hover:bg-slate-800 transition-colors">離開</button>
+    </div>
+
     <!-- 主版面：可拖曳調整 Sidebar / Main -->
     <div id="layout-shell" class="flex-1 flex flex-col lg:flex-row min-h-0 overflow-hidden">
 
@@ -389,7 +397,30 @@
 
         window.rowenaSelectTool = selectTool;
 
+        function updateDataCollectionPanelState() {
+            const panel = document.getElementById('data-collection-panel');
+            if (!panel) return;
+            const closed = localStorage.getItem('rowena_data_collection_closed') === '1';
+            panel.classList.toggle('hidden', closed);
+        }
+
+        function closeDataCollectionPanel() {
+            localStorage.setItem('rowena_data_collection_closed', '1');
+            const panel = document.getElementById('data-collection-panel');
+            if (panel) panel.classList.add('hidden');
+        }
+
+        function initDataCollectionPanel() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('showDataCollection')) {
+                localStorage.removeItem('rowena_data_collection_closed');
+            }
+            updateDataCollectionPanelState();
+            document.getElementById('btn-data-collection-leave')?.addEventListener('click', closeDataCollectionPanel);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
+            initDataCollectionPanel();
             RowenaUser.init('#rowena-header-user');
             RowenaLayout.init({
                 shellId: 'layout-shell',
