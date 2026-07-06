@@ -166,8 +166,8 @@
     <script src="rowena_layout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const SUPABASE_URL = '';
-        const SUPABASE_ANON_KEY = '';
+        const SUPABASE_URL = 'https://zhcmekhhiilnygiayslq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoY21la2hoaWlsbnlnaWF5c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTg3NzQsImV4cCI6MjA5NTA3NDc3NH0.W-XFurvr4leag2xBv2s3hFoZgmVAo_RtfUgdqRIqbWA';
         let rowenaSupabaseClient = null;
 
         function initRowenaSupabase() {
@@ -204,10 +204,39 @@
             return result;
         }
 
+        async function persistProfileToSupabase(profile) {
+            const client = initRowenaSupabase();
+            if (!client) return { ok: false, reason: 'missing-config' };
+            const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
+            const payload = {
+                email: profile.email || '',
+                name: profile.name || 'Learner',
+                grade: profile.form || 6,
+                dse_pre_grade_zh: preGrades.chinese || '未評估',
+                dse_pre_grade_ma: preGrades.math || '未評估',
+                dse_pre_grade_en: preGrades.english || '未評估',
+                updated_at: new Date().toISOString(),
+            };
+            // Use a dummy subject for profile-only updates
+            payload.subject = 'profile';
+            payload.score = 0;
+            let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+            if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
+                result = await client.from('student_scores').upsert([payload]);
+            }
+            if (result.error) {
+                console.warn('[Supabase] 個人資訊寫入失敗:', result.error);
+            } else {
+                console.log('[Supabase] 個人資訊已保存');
+            }
+            return result;
+        }
+
         window.RowenaSupabase = {
             init: initRowenaSupabase,
             getClient: initRowenaSupabase,
             persistScoreToSupabase: persistStudentScoreToSupabase,
+            persistProfileToSupabase: persistProfileToSupabase,
         };
     </script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>

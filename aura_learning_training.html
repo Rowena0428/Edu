@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>學習進度 | Aura Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'pure-white': '#FFFFFF',
+                        'off-white': '#F8F9FA',
+                        'deep-blue': '#0A192F',
+                        'slate-gray': '#64748B',
+                        'joyful-amber': '#F59E0B',
+                        'calm-mint': '#10B981',
+                        'soft-red': '#EF4444',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'PingFang TC', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background: #F8F9FA; color: #0A192F; }
+        .sayo-border { border: 1px solid #E2E8F0; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #E2E8F0; border-radius: 20px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #CBD5E1; }
+    </style>
+</head>
+<body class="font-sans antialiased min-h-screen">
+
+    <header class="bg-pure-white sayo-border border-t-0 border-l-0 border-r-0 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+        <div>
+            <p class="text-[10px] tracking-widest text-slate-gray mb-0.5">PROGRESS</p>
+            <div class="flex items-center">
+                <div class="relative inline-block text-left">
+                    <button type="button" id="subject-dropdown-btn" class="inline-flex items-center gap-1.5 text-lg font-semibold text-deep-blue hover:text-slate-gray transition-colors">
+                        <span id="current-subject-name">中文科</span>
+                        <svg class="w-4 h-4 text-slate-gray transition-transform duration-200" id="subject-dropdown-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <div id="subject-dropdown-menu" class="hidden absolute left-0 mt-2 w-32 rounded-2xl bg-pure-white sayo-border shadow-xl py-2 z-50">
+                        <button onclick="changeSubject('中文科', '十二篇範文')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">中文科</button>
+                        <button onclick="changeSubject('英文科', '閱讀理解')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">英文科</button>
+                        <button onclick="changeSubject('數學科', '代數運算')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">數學科</button>
+                    </div>
+                </div>
+                <span id="subtitle-separator" class="text-lg font-semibold text-gray-300 mx-2">|</span>
+                <h1 id="chapter-subtitle" class="text-lg font-semibold text-deep-blue">十二篇範文</h1>
+            </div>
+        </div>
+        <div class="flex gap-4">
+            <span class="text-xs text-slate-gray flex items-center">學習進度：75%</span>
+            <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden self-center">
+                <div class="h-full bg-calm-mint w-[75%]"></div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-[1440px] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-[240px,1fr,280px] xl:grid-cols-[260px,1fr,320px] gap-6 xl:gap-8 items-start">
+        
+        <aside class="space-y-6 sticky top-24 z-10 order-1">
+            <div class="bg-pure-white rounded-3xl p-6 sayo-border shadow-sm">
+                <h2 class="text-sm font-semibold text-deep-blue mb-4">章節導覽</h2>
+                <div id="guide-list" class="space-y-2"></div>
+            </div>
+            <div class="bg-deep-blue rounded-3xl p-6 text-white shadow-md">
+                <p class="text-xs text-blue-200 mb-2">💡 今日小貼士</p>
+                <p class="text-sm leading-relaxed">保持專注，每完成一個小單元，記得休息 5 分鐘。</p>
+            </div>
+        </aside>
+
+        <section class="bg-pure-white rounded-3xl p-6 md:p-10 sayo-border shadow-sm flex flex-col z-10 order-3 lg:order-2">
+            <div class="mb-8 border-b border-gray-100 pb-6">
+                <span class="inline-block text-[10px] tracking-wider font-semibold text-joyful-amber bg-yellow-50 border border-yellow-100 px-3 py-1 rounded-full mb-3">閱讀進行中</span>
+                <h2 class="text-2xl md:text-3xl font-semibold text-deep-blue" id="main-title">內容載入中...</h2>
+                <p class="text-sm text-slate-gray mt-2" id="main-author"></p>
+            </div>
+            
+            <div id="content-body" class="prose prose-sm md:prose-base text-slate-gray leading-loose mb-12"></div>
+
+            <div class="space-y-6" id="questions-area">
+                <h3 class="text-xl font-semibold text-deep-blue mb-6 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-joyful-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                    隨堂測驗
+                </h3>
+                <div id="questions-list"></div>
+            </div>
+        </section>
+
+        <aside class="sticky top-24 z-10 order-2 lg:order-3 w-full">
+            <div class="bg-pure-white rounded-3xl p-6 md:p-8 sayo-border shadow-sm">
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+                    <h3 class="text-base font-semibold text-deep-blue">答題進度</h3>
+                    <span id="total-questions-count" class="text-xs px-2.5 py-1 bg-off-white rounded-md text-slate-gray font-medium border border-gray-200"></span>
+                </div>
+                <div id="bulb-container" class="grid grid-cols-6 sm:grid-cols-8 lg:grid-cols-4 xl:grid-cols-5 gap-3"></div>
+            </div>
+        </aside>
+    </main>
+
+    <script>
+        const subjectContent = {
+            '中文科': {
+                subtitle: '十二篇範文',
+                title: '廉頗藺相如列傳 (節錄)',
+                author: '司馬遷',
+                content: '<p class="mb-4">廉頗者，趙之良將也...</p>',
+                questions: 24
+            },
+            '英文科': {
+                subtitle: '閱讀理解',
+                title: 'Global Warming & Climate Change',
+                author: 'Environmental Science Dept.',
+                content: '<p class="mb-4">Climate change is causing global shifts in temperature...</p>',
+                questions: 10
+            },
+            '數學科': {
+                subtitle: '代數運算',
+                title: '二次方程求解',
+                author: 'Mathematics Unit',
+                content: '<p class="mb-4">二次方程 ax² + bx + c = 0...</p>',
+                questions: 8
+            }
+        };
+
+        function changeSubject(subject, subtitle) {
+            const data = subjectContent[subject];
+            if (!data) return;
+
+            document.getElementById('current-subject-name').textContent = subject;
+            const subtitleEl = document.getElementById('chapter-subtitle');
+            const separator = document.getElementById('subtitle-separator');
+            
+            subtitleEl.textContent = subtitle;
+            subtitleEl.style.display = 'block';
+            separator.style.display = 'inline-block';
+
+            document.getElementById('main-title').textContent = data.title;
+            document.getElementById('main-author').textContent = data.author;
+            document.getElementById('content-body').innerHTML = data.content;
+            document.getElementById('total-questions-count').textContent = `共 ${data.questions} 題`;
+
+            renderQuestions(data.questions);
+            renderBulbs(data.questions);
+            closeMenu();
+        }
+
+        function renderQuestions(count) {
+            const container = document.getElementById('questions-list');
+            container.innerHTML = '';
+            for(let i=1; i<=count; i++) {
+                container.innerHTML += `
+                    <div class="bg-pure-white rounded-2xl p-6 sayo-border shadow-sm mb-6 scroll-mt-32" id="q-${i}">
+                        <p class="font-medium text-deep-blue mb-4">題目 ${i}</p>
+                        <textarea class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-joyful-amber outline-none" rows="3"></textarea>
+                    </div>
+                `;
+            }
+        }
+
+        function renderBulbs(count) {
+            const container = document.getElementById('bulb-container');
+            container.innerHTML = '';
+            for(let i=1; i<=count; i++) {
+                container.innerHTML += `<div class="w-8 h-8 rounded-full bg-soft-red flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('q-${i}').scrollIntoView({behavior:'smooth'})">${i}</div>`;
+            }
+        }
+
+        function closeMenu() {
+            document.getElementById('subject-dropdown-menu').classList.add('hidden');
+            document.getElementById('subject-dropdown-arrow').style.transform = 'rotate(0deg)';
+        }
+
+        window.onload = () => {
+            changeSubject('中文科', '十二篇範文');
+        };
+
+        document.getElementById('subject-dropdown-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('subject-dropdown-menu').classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', closeMenu);
+    </script>
+</body>
+</html>

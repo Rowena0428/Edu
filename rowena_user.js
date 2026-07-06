@@ -294,6 +294,12 @@
             profile.dsePreGrade = profile.dsePreGrades.chinese;
             saveProfile(profile);
             syncAllHeaders();
+            // Persist profile to Supabase
+            if (typeof window.RowenaSupabase?.persistProfileToSupabase === 'function') {
+                window.RowenaSupabase.persistProfileToSupabase(profile).catch(err => {
+                    console.error('[Profile] Supabase 同步失敗:', err);
+                });
+            }
         });
     }
 
