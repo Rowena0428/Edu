@@ -79,7 +79,14 @@
     <!-- 頂欄：極簡，無註冊流程 -->
     <header class="h-14 bg-pure-white sayo-border border-t-0 border-l-0 border-r-0 flex items-center px-4 md:px-6 shrink-0 z-50">
         <div class="flex items-center gap-4 flex-1 min-w-0">
-            <a href="aura_joyful_learning.html" class="text-lg font-bold tracking-widest text-deep-blue shrink-0">Rowena</a>
+            <div class="flex items-center gap-2">
+                <a href="aura_joyful_learning.html" class="text-lg font-bold tracking-widest text-deep-blue shrink-0">Rowena</a>
+                <button id="btn-toggle-sidebar" type="button" onclick="toggleSidebar()" class="p-1.5 hover:bg-slate-200 text-slate-gray rounded-lg transition-colors ml-2 flex items-center justify-center" aria-label="切換側邊欄">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+                    </svg>
+                </button>
+            </div>
             <span class="text-[10px] text-slate-gray tracking-widest hidden sm:inline truncate">HKDSE · AI 學習工作台</span>
         </div>
         <div id="rowena-header-user" class="flex items-center gap-4 text-xs text-slate-gray"></div>
@@ -402,6 +409,18 @@
         };
 
         window.rowenaSelectTool = selectTool;
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('layout-sidebar');
+            if (sidebar) {
+                sidebar.classList.toggle('hidden');
+                const handle = document.getElementById('layout-resize-handle');
+                if (handle) {
+                    handle.classList.toggle('hidden');
+                }
+            }
+        }
+        window.toggleSidebar = toggleSidebar;
 
         function updateDataCollectionPanelState() {
             const panel = document.getElementById('data-collection-panel');

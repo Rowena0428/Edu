@@ -1,3 +1,6 @@
+import fs from 'fs';
+import path from 'path';
+
 const PVP_PROMPTS = {
     chinese: `你現在是 DSE 中文科對戰題庫系統。請出一道適合快速搶答的中文科（範文或語文常識）單項選擇題。
 必須嚴格以 JSON 格式輸出，禁止任何 Markdown 語法、禁止 \`\`\`json 區塊、禁止任何前後前言。
@@ -222,6 +225,35 @@ const ROWENA_CHAT_PROMPT = `
 - 除非使用者的訊息明確要求你「請幫我出一份模擬試卷」，否則在日常對話中，絕對不要主動吐出整份試卷結構、考生須知或考卷題目。
 - 回答時結構要清晰，多使用點列式（Bullet points）來拆解複雜的知識點。`;
 
+function loadLocalEnv() {
+    const projectRoot = process.cwd();
+    const envFiles = [path.join(projectRoot, '.env.local'), path.join(projectRoot, '.env')];
+
+    for (const envFile of envFiles) {
+        if (!fs.existsSync(envFile)) continue;
+
+        const content = fs.readFileSync(envFile, 'utf8');
+        for (const rawLine of content.split(/\r?\n/)) {
+            const line = rawLine.trim();
+            if (!line || line.startsWith('#')) continue;
+
+            const separatorIndex = line.indexOf('=');
+            if (separatorIndex === -1) continue;
+
+            const key = line.slice(0, separatorIndex).trim();
+            let value = line.slice(separatorIndex + 1).trim();
+
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                value = value.slice(1, -1);
+            }
+
+            if (!process.env[key] && value) {
+                process.env[key] = value;
+            }
+        }
+    }
+}
+
 function compileBackendPrompt(chatRoomId, text, subject, mode, action) {
     // 🚀 優先攔截：如果是 PvP 對戰模式，直接套用 PvP 專用 JSON 提示詞
     if (action === 'pvp') {
@@ -261,6 +293,8 @@ export default async function handler(req, res) {
     const isGenerateRequest = action === 'generate' || ((!fileName && !docType && !paper) && !isChatRequest);
 
     try {
+        loadLocalEnv();
+
         // 🔑 2. 從 Vercel 環境變數讀取並解析「金鑰對應 JSON 表」
         const roomMapEnv = process.env.ROOM_KEY_MAP || '{}';
         let roomKeyMap = {};
