@@ -31,6 +31,10 @@
         .tool-card { transition: border-color 0.2s, background-color 0.2s, box-shadow 0.2s; }
         .tool-card.active { border-color: #0A192F; background: #FFFFFF; box-shadow: 0 1px 3px rgba(10,25,47,0.06); }
         .tool-card:not(.active):hover { border-color: #94A3B8; background: #FFFFFF; }
+        .tool-card.training-card { background: #0A192F; border-color: #0A192F; }
+        .tool-card.training-card:hover { background: #111827; border-color: #111827; box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16); }
+        .tool-card.training-card .card-title { color: #FFFFFF; }
+        .tool-card.training-card .card-desc { color: #E5E7EB; }
         .workspace-panel { animation: fadeIn 0.35s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
@@ -161,6 +165,51 @@
     <script src="rowena_user.js"></script>
     <script src="rowena_layout.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const SUPABASE_URL = '';
+        const SUPABASE_ANON_KEY = '';
+        let rowenaSupabaseClient = null;
+
+        function initRowenaSupabase() {
+            if (rowenaSupabaseClient) return rowenaSupabaseClient;
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes('YOUR_') || SUPABASE_ANON_KEY.includes('YOUR_')) return null;
+            rowenaSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            return rowenaSupabaseClient;
+        }
+
+        async function persistStudentScoreToSupabase(score, subject) {
+            const client = initRowenaSupabase();
+            if (!client) return { ok: false, reason: 'missing-config' };
+            const profile = window.RowenaUser?.getProfile?.() || {};
+            const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
+            const payload = {
+                email: profile.email || '',
+                name: profile.name || 'Learner',
+                grade: profile.form || 6,
+                dse_pre_grade_zh: preGrades.chinese || '未評估',
+                dse_pre_grade_ma: preGrades.math || '未評估',
+                dse_pre_grade_en: preGrades.english || '未評估',
+                subject: subject || 'unknown',
+                score: Number(score),
+                updated_at: new Date().toISOString(),
+            };
+            let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+            if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
+                result = await client.from('student_scores').upsert([payload]);
+            }
+            if (result.error) {
+                console.warn('[Supabase] student_scores 寫入失敗:', result.error);
+            }
+            return result;
+        }
+
+        window.RowenaSupabase = {
+            init: initRowenaSupabase,
+            getClient: initRowenaSupabase,
+            persistScoreToSupabase: persistStudentScoreToSupabase,
+        };
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/markdown-it@13.0.1/dist/markdown-it.min.js"></script>
     <script>
         window.MathJax = {
@@ -190,6 +239,7 @@
             { id: 'math-en', name: '英文版數學 AI', desc: 'GEM · Mathematics mock (EN)', tag: null, category: 'mock' },
             { id: 'math-zh-mc', name: '中文數學 MC', desc: 'GEM · DSE 數學 MC Mock 卷（繁中）', tag: null, category: 'mock' },
             { id: 'math-en-mc', name: '英文數學 MC', desc: 'GEM · DSE Mathematics MC Mock Paper (EN)', tag: null, category: 'mock' },
+            { id: 'learning-training', name: '學習訓練場', desc: '中文 / 英文 / 數學三科訓練，切換練習更聚焦', tag: '推薦', category: 'external' },
             { id: 'check-paper', name: 'Check 卷 AI（智能批改）', desc: '上傳 PDF/PNG/JPG · RAG 評分 + 多模態批改', tag: '推薦', category: 'check' },
             { id: 'report-ai', name: '📊 報告 AI (Report AI)', desc: '深度學習診斷 · 錯因分析與提分行動建議', tag: '推薦', category: 'report' },
             { id: 'pvp', name: 'PVP', desc: '同級考生即時對戰，限時答題', tag: '競技', category: 'pvp' },
@@ -215,13 +265,13 @@
             const nav = document.getElementById('tool-list');
             nav.innerHTML = TOOLS.map(t => `
                 <button type="button" data-tool="${t.id}"
-                    class="tool-card w-full text-left p-4 rounded-xl sayo-border ${t.id === activeId ? 'active' : 'bg-off-white/30'}"
+                    class="tool-card w-full text-left p-4 rounded-xl sayo-border ${t.id === activeId ? 'active' : 'bg-off-white/30'} ${t.id === 'learning-training' ? 'training-card' : ''}"
                     aria-current="${t.id === activeId}">
                     <div class="flex justify-between items-start gap-2">
-                        <span class="text-sm font-medium text-deep-blue tracking-wide">${t.name}</span>
-                        ${t.tag ? `<span class="text-[9px] px-1.5 py-0.5 rounded ${t.tag === '競技' ? 'bg-pvp-accent/10 text-pvp-accent' : 'bg-calm-mint/10 text-calm-mint'}">${t.tag}</span>` : ''}
+                        <span class="card-title text-sm font-medium tracking-wide ${t.id === 'learning-training' ? 'text-white' : 'text-deep-blue'}">${t.name}</span>
+                        ${t.tag ? `<span class="text-[9px] px-1.5 py-0.5 rounded ${t.tag === '競技' ? 'bg-pvp-accent/10 text-pvp-accent' : t.id === 'learning-training' ? 'bg-white/15 text-white' : 'bg-calm-mint/10 text-calm-mint'}">${t.tag}</span>` : ''}
                     </div>
-                    <p class="text-xs text-slate-gray mt-1.5 leading-relaxed">${t.desc}</p>
+                    <p class="card-desc text-xs mt-1.5 leading-relaxed ${t.id === 'learning-training' ? 'text-gray-200' : 'text-slate-gray'}">${t.desc}</p>
                 </button>
             `).join('');
             nav.querySelectorAll('[data-tool]').forEach(btn => {
@@ -248,6 +298,13 @@
             if (typeof RowenaReportAI !== 'undefined' && RowenaReportAI.isBusy?.()) return;
             const prev = activeId;
             activeId = id;
+            if (id === 'learning-training') {
+                pushRecent(id);
+                renderToolList();
+                renderRecentChips();
+                window.location.href = 'aura_learning_training.html';
+                return;
+            }
             const tool = TOOLS.find(t => t.id === id);
             if (tool.category !== 'mock' && typeof RowenaMockPaper !== 'undefined') {
                 RowenaMockPaper.resetForToolSwitch();
@@ -274,6 +331,7 @@
                 'math-en': 'English maths mock with formatted questions. Full screen edit & download available.',
                 'check-paper': '上傳試卷 →「🚀 開始 AI 批改」；完成後自動彈出診斷報告。',
                 'report-ai': '檢視最新 DSE 學習診斷報告；尚無資料請先使用 Check 卷 AI。',
+                'learning-training': '進入「學習訓練場」，切換中文、英文或數學開始練習。',
                 'pvp': '可選「挑戰 AI 智能導師」體驗 RAG 對戰；限時 90 秒作答。',
                 'dse-leaderboard': 'Top 10：平均分優先，同分以提交 Mock 卷數量排名。',
                 'rank': '查看你的名次與學習時長，設定下週小目標。',
@@ -460,4 +518,4 @@
         });
     </script>
 </body>
-</html>
+</html> 

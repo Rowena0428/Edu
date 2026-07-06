@@ -5,26 +5,72 @@
 (function (global) {
     const PROFILE_KEY = 'rowena_user_profile';
     const PROFILE_MODAL_STATE_KEY = 'rowena_profile_modal_open';
+    const PRE_GRADES_STORAGE_KEY = 'rowena_pre_grades';
 
     const DEFAULT_PROFILE = {
         name: 'Learner',
         form: 6,
         avatar: null,
         pvpScore: 0,
+        email: '',
+        dsePreGrade: '未評估',
     };
+
+    const DEFAULT_PRE_GRADES = {
+        chinese: '未評估',
+        english: '未評估',
+        math: '未評估',
+    };
+
+    function normalizePreGrades(value) {
+        const base = { ...DEFAULT_PRE_GRADES };
+        if (!value || typeof value !== 'object') return base;
+        return { ...base, ...value };
+    }
+
+    function loadPreGrades() {
+        try {
+            const raw = localStorage.getItem(PRE_GRADES_STORAGE_KEY);
+            if (!raw) return { ...DEFAULT_PRE_GRADES };
+            return normalizePreGrades(JSON.parse(raw));
+        } catch {
+            return { ...DEFAULT_PRE_GRADES };
+        }
+    }
+
+    function savePreGrades(preGrades) {
+        localStorage.setItem(PRE_GRADES_STORAGE_KEY, JSON.stringify(normalizePreGrades(preGrades)));
+    }
 
     function loadProfile() {
         try {
             const raw = localStorage.getItem(PROFILE_KEY);
-            if (!raw) return { ...DEFAULT_PROFILE };
-            return { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
+            if (!raw) {
+                const preGrades = loadPreGrades();
+                return { ...DEFAULT_PROFILE, dsePreGrades: preGrades, dsePreGrade: preGrades.chinese };
+            }
+            const parsed = JSON.parse(raw);
+            const preGrades = normalizePreGrades(parsed.dsePreGrades || (parsed.dsePreGrade ? {
+                chinese: parsed.dsePreGrade,
+                english: parsed.dsePreGrade,
+                math: parsed.dsePreGrade,
+            } : loadPreGrades()));
+            return { ...DEFAULT_PROFILE, ...parsed, dsePreGrades: preGrades, dsePreGrade: preGrades.chinese };
         } catch {
-            return { ...DEFAULT_PROFILE };
+            return { ...DEFAULT_PROFILE, dsePreGrades: loadPreGrades(), dsePreGrade: loadPreGrades().chinese };
         }
     }
 
     function saveProfile(profile) {
-        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+        const normalized = { ...profile };
+        normalized.dsePreGrades = normalizePreGrades(normalized.dsePreGrades || (normalized.dsePreGrade ? {
+            chinese: normalized.dsePreGrade,
+            english: normalized.dsePreGrade,
+            math: normalized.dsePreGrade,
+        } : loadPreGrades()));
+        normalized.dsePreGrade = normalized.dsePreGrades.chinese;
+        savePreGrades(normalized.dsePreGrades);
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(normalized));
     }
 
     function isCJK(ch) {
@@ -121,10 +167,61 @@
                         <p id="profile-name-error" class="text-[10px] text-red-600 mt-1 hidden"></p>
                     </div>
                     <div>
+                        <label class="text-[10px] text-slate-gray tracking-widest block mb-1">電子郵件</label>
+                        <input type="email" id="profile-email-input" class="w-full text-sm px-3 py-2.5 rounded-lg bg-off-white sayo-border focus:outline-none focus:border-deep-blue" placeholder="name@example.com" />
+                    </div>
+                    <div>
                         <label class="text-[10px] text-slate-gray tracking-widest block mb-1">年級</label>
                         <select id="profile-form-select" class="w-full text-sm px-3 py-2.5 rounded-lg bg-off-white sayo-border focus:outline-none focus:border-deep-blue text-deep-blue">
                             ${[1, 2, 3, 4, 5, 6].map(n => `<option value="${n}">Form ${n}</option>`).join('')}
                         </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] text-slate-gray tracking-widest block mb-2">DSE 預期成績 (DSE Pre Grades)</label>
+                        <div class="space-y-2.5">
+                            <label class="text-[10px] text-slate-gray flex items-center justify-between gap-2">
+                                <span>📘 中文</span>
+                                <select id="profile-dse-grade-chinese" class="min-w-[120px] text-xs px-3 py-2 rounded-lg bg-off-white sayo-border text-deep-blue focus:outline-none focus:border-deep-blue">
+                                    <option value="未評估">未評估</option>
+                                    <option value="5**">5**</option>
+                                    <option value="5*">5*</option>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="Unclassified">Unclassified</option>
+                                </select>
+                            </label>
+                            <label class="text-[10px] text-slate-gray flex items-center justify-between gap-2">
+                                <span>📐 數学</span>
+                                <select id="profile-dse-grade-math" class="min-w-[120px] text-xs px-3 py-2 rounded-lg bg-off-white sayo-border text-deep-blue focus:outline-none focus:border-deep-blue">
+                                    <option value="未評估">未評估</option>
+                                    <option value="5**">5**</option>
+                                    <option value="5*">5*</option>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="Unclassified">Unclassified</option>
+                                </select>
+                            </label>
+                            <label class="text-[10px] text-slate-gray flex items-center justify-between gap-2">
+                                <span>📙 英文</span>
+                                <select id="profile-dse-grade-english" class="min-w-[120px] text-xs px-3 py-2 rounded-lg bg-off-white sayo-border text-deep-blue focus:outline-none focus:border-deep-blue">
+                                    <option value="未評估">未評估</option>
+                                    <option value="5**">5**</option>
+                                    <option value="5*">5*</option>
+                                    <option value="5">5</option>
+                                    <option value="4">4</option>
+                                    <option value="3">3</option>
+                                    <option value="2">2</option>
+                                    <option value="1">1</option>
+                                    <option value="Unclassified">Unclassified</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
                 </div>
                 <div class="flex gap-3 mt-8 pt-4 border-t border-gray-100">
@@ -173,6 +270,10 @@
         document.getElementById('profile-save-btn')?.addEventListener('click', () => {
             const nameInputEl = document.getElementById('profile-name-input');
             const formSelect = document.getElementById('profile-form-select');
+            const emailInput = document.getElementById('profile-email-input');
+            const chineseSelect = document.getElementById('profile-dse-grade-chinese');
+            const mathSelect = document.getElementById('profile-dse-grade-math');
+            const englishSelect = document.getElementById('profile-dse-grade-english');
             const name = nameInputEl?.value.trim() || '';
             if (!isValidName(name)) {
                 const err = document.getElementById('profile-name-error');
@@ -184,6 +285,13 @@
             }
             profile.name = name;
             profile.form = parseInt(formSelect?.value || '6', 10);
+            profile.email = emailInput?.value.trim() || '';
+            profile.dsePreGrades = {
+                chinese: chineseSelect?.value || '未評估',
+                math: mathSelect?.value || '未評估',
+                english: englishSelect?.value || '未評估',
+            };
+            profile.dsePreGrade = profile.dsePreGrades.chinese;
             saveProfile(profile);
             syncAllHeaders();
         });
@@ -201,11 +309,20 @@
         profile = loadProfile();
         const nameInput = document.getElementById('profile-name-input');
         const formSelect = document.getElementById('profile-form-select');
+        const emailInput = document.getElementById('profile-email-input');
+        const chineseSelect = document.getElementById('profile-dse-grade-chinese');
+        const mathSelect = document.getElementById('profile-dse-grade-math');
+        const englishSelect = document.getElementById('profile-dse-grade-english');
         if (nameInput) {
             nameInput.value = profile.name;
             document.getElementById('profile-name-hint').textContent = nameLimitHint(profile.name);
         }
         if (formSelect) formSelect.value = String(profile.form);
+        if (emailInput) emailInput.value = profile.email || '';
+        const grades = profile.dsePreGrades || DEFAULT_PRE_GRADES;
+        if (chineseSelect) chineseSelect.value = grades.chinese || '未評估';
+        if (mathSelect) mathSelect.value = grades.math || '未評估';
+        if (englishSelect) englishSelect.value = grades.english || '未評估';
         document.getElementById('profile-name-error')?.classList.add('hidden');
         updateModalAvatarPreview();
 
@@ -274,6 +391,55 @@
         isValidName,
         avatarHtml,
         escapeHtml,
+        getDsePreGrades: function () {
+            return loadProfile().dsePreGrades;
+        },
+        getDsePreGradeForSubject: function (subject) {
+            const current = loadProfile();
+            const grades = current.dsePreGrades || DEFAULT_PRE_GRADES;
+            const key = (subject || 'chinese').toLowerCase();
+            if (key === 'english') return grades.english || '未評估';
+            if (key === 'math' || key.includes('math')) return grades.math || '未評估';
+            return grades.chinese || '未評估';
+        },
+        setDsePreGradeForSubject: function (subject, value) {
+            try {
+                const current = loadProfile();
+                const grades = { ...(current.dsePreGrades || DEFAULT_PRE_GRADES) };
+                const normalizedValue = value || '未評估';
+                if ((subject || 'chinese').toLowerCase() === 'english') {
+                    grades.english = normalizedValue;
+                } else if ((subject || 'chinese').toLowerCase() === 'math' || (subject || 'chinese').toLowerCase().includes('math')) {
+                    grades.math = normalizedValue;
+                } else {
+                    grades.chinese = normalizedValue;
+                }
+                current.dsePreGrades = grades;
+                current.dsePreGrade = grades.chinese;
+                saveProfile(current);
+                syncAllHeaders();
+                return grades;
+            } catch (e) {
+                console.error('Error updating DSE pre grade:', e);
+                return { ...DEFAULT_PRE_GRADES };
+            }
+        },
+        setDsePreGrades: function (value) {
+            try {
+                const current = loadProfile();
+                current.dsePreGrades = normalizePreGrades(value);
+                current.dsePreGrade = current.dsePreGrades.chinese;
+                saveProfile(current);
+                syncAllHeaders();
+                return current.dsePreGrades;
+            } catch (e) {
+                console.error('Error updating DSE pre grades:', e);
+                return { ...DEFAULT_PRE_GRADES };
+            }
+        },
+        setDsePreGrade: function (value) {
+            return this.setDsePreGradeForSubject('chinese', value);
+        },
         addPvpScore: function (scoreToAdd) {
             try {
                 const current = loadProfile();

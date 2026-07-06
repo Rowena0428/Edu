@@ -1854,10 +1854,13 @@ Guidelines:
     async function checkSyncLeaderboard(md) {
         const ex = global.RowenaLeaderboard?.extractScoreFromCheckReport;
         const score = typeof ex === 'function' ? ex(md) : null;
-        if (score == null || typeof global.updateUserStats !== 'function') return;
+        if (score == null) return;
         try {
-            await global.updateUserStats(score);
-            if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
+            if (typeof global.updateUserStats === 'function') {
+                await global.updateUserStats(score);
+                if (document.getElementById('leaderboard-root')) global.fetchAndRenderLeaderboard?.();
+            }
+            await global.RowenaSupabase?.persistScoreToSupabase?.(score, checkSubject);
         } catch (e) { console.warn('[Check] leaderboard', e); }
     }
     function checkRenderPanel(tool) {
