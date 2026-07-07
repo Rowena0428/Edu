@@ -183,34 +183,36 @@
             if (!client) return { ok: false, reason: 'missing-config' };
             const profile = window.RowenaUser?.getProfile?.() || {};
             const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
+            const gradeValue = Number(profile.form ?? profile.grade ?? 6);
             const payload = {
-                    email: profile.email || '',
-                    name: profile.name || 'Learner',
+                email: profile.email || '',
+                name: profile.name || 'Learner',
+                grade: Number.isFinite(gradeValue) ? gradeValue : 6,
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
-                subject: subject || 'unknown',
-                score: Number(score),
                 updated_at: new Date().toISOString(),
             };
-                // Prefer authenticated Supabase user info when available
-                try {
-                    const userRes = await client.auth.getUser();
-                    const authUser = userRes?.data?.user || null;
-                    if (authUser) {
-                        payload.email = authUser.email || payload.email;
-                        payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
-                    }
-                } catch (e) {
-                    /* ignore auth errors and fallback to local profile */
+            // Prefer authenticated Supabase user info when available
+            try {
+                const userRes = await client.auth.getUser();
+                const authUser = userRes?.data?.user || null;
+                if (authUser) {
+                    payload.email = authUser.email || payload.email;
+                    payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
+                    const authGrade = Number(authUser.user_metadata?.grade ?? authUser.user_metadata?.form ?? payload.grade);
+                    payload.grade = Number.isFinite(authGrade) ? authGrade : payload.grade;
                 }
+            } catch (e) {
+                /* ignore auth errors and fallback to local profile */
+            }
 
-                let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+            let result = await client.from('student_profiles').upsert([payload], { onConflict: 'email' });
             if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
-                result = await client.from('student_scores').upsert([payload]);
+                result = await client.from('student_profiles').upsert([payload]);
             }
             if (result.error) {
-                console.warn('[Supabase] student_scores 寫入失敗:', result.error);
+                console.warn('[Supabase] student_profiles 寫入失敗:', result.error);
             }
             return result;
         }
@@ -219,32 +221,33 @@
             const client = initRowenaSupabase();
             if (!client) return { ok: false, reason: 'missing-config' };
             const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
+            const gradeValue = Number(profile.form ?? profile.grade ?? 6);
             const payload = {
-                    email: profile.email || '',
-                    name: profile.name || 'Learner',
+                email: profile.email || '',
+                name: profile.name || 'Learner',
+                grade: Number.isFinite(gradeValue) ? gradeValue : 6,
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
                 updated_at: new Date().toISOString(),
             };
-            // Use a dummy subject for profile-only updates
-            payload.subject = 'profile';
-            payload.score = 0;
-                // Prefer authenticated Supabase user info when available
-                try {
-                    const userRes = await client.auth.getUser();
-                    const authUser = userRes?.data?.user || null;
-                    if (authUser) {
-                        payload.email = authUser.email || payload.email;
-                        payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
-                    }
-                } catch (e) {
-                    /* ignore auth errors */
+            // Prefer authenticated Supabase user info when available
+            try {
+                const userRes = await client.auth.getUser();
+                const authUser = userRes?.data?.user || null;
+                if (authUser) {
+                    payload.email = authUser.email || payload.email;
+                    payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
+                    const authGrade = Number(authUser.user_metadata?.grade ?? authUser.user_metadata?.form ?? payload.grade);
+                    payload.grade = Number.isFinite(authGrade) ? authGrade : payload.grade;
                 }
+            } catch (e) {
+                /* ignore auth errors */
+            }
 
-                let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+            let result = await client.from('student_profiles').upsert([payload], { onConflict: 'email' });
             if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
-                result = await client.from('student_scores').upsert([payload]);
+                result = await client.from('student_profiles').upsert([payload]);
             }
             if (result.error) {
                 console.warn('[Supabase] 個人資訊寫入失敗:', result.error);
