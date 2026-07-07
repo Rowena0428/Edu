@@ -124,14 +124,19 @@
     function renderHeaderChip(container) {
         if (!container) return;
         const formLabel = `Form ${profile.form}`;
+        const isWorkspacePage = window.location.pathname.endsWith('/aura_workspace.html') || window.location.href.includes('aura_workspace.html');
         container.innerHTML = `
             <span class="hidden md:inline text-xs text-slate-gray">${escapeHtml(formLabel)} · 🏆 <span data-rowena-pvp-score>${profile.pvpScore || 0}</span> · 今日已學 <span class="text-deep-blue font-medium">1h 12m</span></span>
+            ${isWorkspacePage ? `
             <button type="button" id="rowena-user-btn" class="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-off-white transition-colors sayo-border border-transparent hover:border-gray-200" aria-label="開啟個人主頁">
                 ${avatarHtml(profile, 'w-8 h-8')}
                 <span class="text-xs text-deep-blue font-medium max-w-[96px] truncate hidden sm:inline" id="rowena-user-name">${escapeHtml(profile.name)}</span>
             </button>
+            ` : ''}
         `;
-        container.querySelector('#rowena-user-btn')?.addEventListener('click', openProfileModal);
+        if (isWorkspacePage) {
+            container.querySelector('#rowena-user-btn')?.addEventListener('click', openProfileModal);
+        }
     }
 
     function injectModal() {
@@ -325,6 +330,7 @@
         }
         if (formSelect) formSelect.value = String(profile.form);
         if (emailInput) emailInput.value = profile.email || '';
+        if (emailInput) emailInput.disabled = !!(profile.email && profile.email.length);
         const grades = profile.dsePreGrades || DEFAULT_PRE_GRADES;
         if (chineseSelect) chineseSelect.value = grades.chinese || '未評估';
         if (mathSelect) mathSelect.value = grades.math || '未評估';

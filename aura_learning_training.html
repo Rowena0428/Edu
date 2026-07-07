@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>學習進度 | Aura Learning</title>
+    <title>學習進度</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -36,6 +36,7 @@
 </head>
 <body class="font-sans antialiased min-h-screen">
 
+    <!-- 頂部導航欄 -->
     <header class="bg-pure-white sayo-border border-t-0 border-l-0 border-r-0 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div>
             <p class="text-[10px] tracking-widest text-slate-gray mb-0.5">PROGRESS</p>
@@ -57,16 +58,21 @@
                 <h1 id="chapter-subtitle" class="text-lg font-semibold text-deep-blue">十二篇範文</h1>
             </div>
         </div>
-        <div class="flex gap-4">
-            <span class="text-xs text-slate-gray flex items-center">學習進度：75%</span>
+        <div class="flex gap-4 items-center">
+            <span id="progress-text" class="text-xs text-slate-gray flex items-center">學習進度：0%</span>
             <div class="w-24 h-2 bg-gray-100 rounded-full overflow-hidden self-center">
-                <div class="h-full bg-calm-mint w-[75%]"></div>
+                <div id="progress-bar" class="h-full bg-calm-mint w-[0%] transition-all duration-300"></div>
             </div>
+            <a href="workspace.html" class="text-xs px-3 py-2 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all inline-block">
+                返回工作區
+            </a>
         </div>
     </header>
 
+    <!-- 主要內容區 -->
     <main class="max-w-[1440px] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-[240px,1fr,280px] xl:grid-cols-[260px,1fr,320px] gap-6 xl:gap-8 items-start">
         
+        <!-- 左欄：章節導覽 -->
         <aside class="space-y-6 sticky top-24 z-10 order-1">
             <div class="bg-pure-white rounded-3xl p-6 sayo-border shadow-sm">
                 <h2 class="text-sm font-semibold text-deep-blue mb-4">章節導覽</h2>
@@ -78,24 +84,43 @@
             </div>
         </aside>
 
-        <section class="bg-pure-white rounded-3xl p-6 md:p-10 sayo-border shadow-sm flex flex-col z-10 order-3 lg:order-2">
-            <div class="mb-8 border-b border-gray-100 pb-6">
-                <span class="inline-block text-[10px] tracking-wider font-semibold text-joyful-amber bg-yellow-50 border border-yellow-100 px-3 py-1 rounded-full mb-3">閱讀進行中</span>
-                <h2 class="text-2xl md:text-3xl font-semibold text-deep-blue" id="main-title">內容載入中...</h2>
-                <p class="text-sm text-slate-gray mt-2" id="main-author"></p>
-            </div>
-            
-            <div id="content-body" class="prose prose-sm md:prose-base text-slate-gray leading-loose mb-12"></div>
+        <!-- 中欄：隨堂測驗題目與 AI 按鈕區 -->
+        <section class="rounded-3xl flex flex-col z-10 order-3 lg:order-2 space-y-6">
+            <div class="bg-pure-white rounded-3xl p-6 md:p-10 sayo-border shadow-sm">
+                <div class="mb-8 border-b border-gray-100 pb-6">
+                    <span class="inline-block text-[10px] tracking-wider font-semibold text-joyful-amber bg-yellow-50 border border-yellow-100 px-3 py-1 rounded-full mb-3">測驗進行中</span>
+                    <h2 class="text-2xl md:text-3xl font-semibold text-deep-blue" id="main-title">內容載入中...</h2>
+                    <p class="text-sm text-slate-gray mt-2" id="main-author"></p>
+                </div>
 
-            <div class="space-y-6" id="questions-area">
-                <h3 class="text-xl font-semibold text-deep-blue mb-6 flex items-center gap-2">
-                    <svg class="w-5 h-5 text-joyful-amber" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                    隨堂測驗
-                </h3>
-                <div id="questions-list"></div>
+                <!-- ✨ 新增：動態文章閱讀區塊 (Passage Component) -->
+                <div id="passage-wrapper" class="hidden mb-8 p-6 bg-slate-50 border border-gray-200 rounded-2xl">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
+                        <h3 class="text-xs font-bold text-slate-gray uppercase tracking-wider">Reading Passage</h3>
+                    </div>
+                    <div id="passage-content" class="text-sm text-deep-blue leading-relaxed font-normal space-y-3"></div>
+                </div>
+
+                <!-- 題目核心區塊 -->
+                <div class="space-y-8" id="questions-area">
+                    <div id="questions-list" class="space-y-8"></div>
+                </div>
+
+                <!-- 提交按鈕區 -->
+                <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col items-center justify-center">
+                    <p class="text-xs text-slate-gray mb-3">答完整卷了？提交給 AI 進行全方位深度點評</p>
+                    <button class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-md transition-all active:scale-95">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                        <span>提交 AI 智能全卷批改</span>
+                    </button>
+                </div>
             </div>
         </section>
 
+        <!-- 右欄：答題進度面板 -->
         <aside class="sticky top-24 z-10 order-2 lg:order-3 w-full">
             <div class="bg-pure-white rounded-3xl p-6 md:p-8 sayo-border shadow-sm">
                 <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
@@ -112,25 +137,56 @@
             '中文科': {
                 subtitle: '十二篇範文',
                 title: '廉頗藺相如列傳 (節錄)',
-                author: '司馬遷',
-                content: '<p class="mb-4">廉頗者，趙之良將也...</p>',
-                questions: 24
+                author: '作者：司馬遷',
+                passage: '', // 中文科直接閱讀題目即可
+                chapters: ['1. 導言與作者背景', '2. 完璧歸趙', '3. 澠池之會', '4. 負荊請罪', '5. 人物形象對比', '6. 司馬遷寫作手法'],
+                questions: [
+                    { text: '請簡述藺相如在「完璧歸趙」中所展現的智謀。', tips: '提示：可以從藺相如如何看穿秦王並無償城誠意、如何以「璧有瑕」作藉口騙回和氏璧，以及後續如何暗中護送寶璧回國的角度來作答。' },
+                    { text: '廉頗與藺相如由「不和」走向「同心」的關鍵原因是什麼？', tips: '提示：留意藺相如對廉頗挑釁的處事態度（退讓、顧全大局），以及他提到的那句名言：「先國家之急而後私仇也」。' },
+                    { text: '本文如何透過對比手法來刻劃兩位主角的性格？', tips: '提示：對比是指將兩個對立的特質並列。試著將廉頗最初的「居功自傲、心胸狹隘」，與藺相如的「豁達大度、深謀遠慮」進行對照分析。' },
+                    { text: '試解釋「負荊請罪」在現代人際關係中的啟示。', tips: '提示：思考當我們在團隊或人際交往中犯錯時，勇於承認錯誤並付出實際行動，對於團隊大局與個人信用有何正面影響。' },
+                    { text: '繆賢在文中推薦藺相如時，提及了哪一件事來證明藺相如的遠見？', tips: '提示：回想繆賢曾經犯錯打算逃往燕國，藺相如當時是如何分析燕王的心理並阻止他的。' },
+                    { text: '分析太史公（司馬遷）在本文結尾中，對藺相如的評價側重於哪一方面？', tips: '提示：思考司馬遷對於藺相如「知難而退、以大局為重」的勇氣給予了怎樣的史學定位。' }
+                ]
             },
             '英文科': {
                 subtitle: '閱讀理解',
                 title: 'Global Warming & Climate Change',
-                author: 'Environmental Science Dept.',
-                content: '<p class="mb-4">Climate change is causing global shifts in temperature...</p>',
-                questions: 10
+                author: 'Dept: Environmental Science',
+                // ✨ 英文閱讀理解專屬文章
+                passage: `<p>Global warming remains one of the most defining challenges of the 21st century. Driven primarily by human activities, the excessive burning of fossil fuels has released unprecedented amounts of greenhouse gases into the atmosphere. These gases act like a greenhouse blanket, trapping thermal radiation and causing global average temperatures to spike significantly.</p>
+                          <p>The direct consequences of this warming trend are already visible worldwide: melting polar ice caps, rapidly shifting weather patterns, and more frequent occurrences of extreme weather events. Beyond the immediate environmental toll, climate change poses severe socioeconomic threats to coastal economies due to rising sea levels, which put valuable infrastructure and local tourism at critical risk.</p>
+                          <p>To combat this existential threat, international cooperation is vital. Global frameworks, such as the Paris Agreement, play a pivotal role by legally binding nations to carbon reduction targets, forcing global industries to accelerate their transition toward sustainable, renewable energy alternatives before reaching a point of no return.</p>`,
+                chapters: ['1. Introduction', '2. Causes of Warming', '3. Environmental Impact', '4. Future Solutions', '5. Socioeconomic Toll', '6. Policy Frameworks'],
+                questions: [
+                    { text: 'What is identified as the primary driver of climate change?', tips: 'Tip: Scan the opening sentences for keywords like "human activities" and specific types of non-renewable energy resources.' },
+                    { text: 'According to the text, what are the direct consequences of greenhouse gases?', tips: 'Tip: Look closely at what happens when these gases "trap heat" inside the Earth\'s atmosphere and how that impacts daily weather.' },
+                    { text: 'Explain the meaning of the word "shifts" (or shifting) as used in the paragraph.', tips: 'Tip: Consider contextual synonyms that represent long-term changes, variations, or movements away from standard environmental conditions.' },
+                    { text: 'Suggest one individual action that can help reduce carbon emissions.', tips: 'Tip: Think about practical everyday habits related to personal transportation, domestic energy consumption, or green lifestyle choices.' },
+                    { text: 'How do rising sea levels specifically threaten coastal economies according to recent observations?', tips: 'Tip: Think about infrastructure damage, relocation costs, and the loss of tourism or agricultural lands near coastlines.' },
+                    { text: 'What role do international treaties (like the Paris Agreement) play in regulating global industries?', tips: 'Tip: Focus on how legally binding carbon limits force large corporations to transition to greener alternatives.' }
+                ]
             },
             '數學科': {
                 subtitle: '代數運算',
                 title: '二次方程求解',
-                author: 'Mathematics Unit',
-                content: '<p class="mb-4">二次方程 ax² + bx + c = 0...</p>',
-                questions: 8
+                author: '單元：Mathematics Unit',
+                passage: '', // 數學科不需閱讀文章
+                chapters: ['1. 二次方程定義', '2. 因式分解法解題', '3. 配方法精講', '4. 公式法與判別式', '5. 根與係數的關係', '6. 二次方程應用題'],
+                questions: [
+                    { text: '當判別式 Δ 小於 0 時，該二次方程的實數根有何特徵？', tips: '提示：想一想如果判別式小於 0，在求根公式的根號內會出現負數，這在「實數範圍」內是否允許？有沒有實數解？' },
+                    { text: '試求解二次方程：x² - 5x + 6 = 0。', tips: '提示：常數項是 6，一次項係數是 -5。試著將 6 分解成兩個負數的乘積（例如 -2 與 -3），然後運用十字相乘法進行因式分解。' },
+                    { text: '什麼情況下最適合使用因式分解法而非公式法？', tips: '提示：從計算效率和數字特徵來看，當常數項與一次項係數很容易被肉眼分解為整數乘積優於公式法。' },
+                    { text: '若一組二次方程有重根，其判別式的值應該是多少？', tips: '提示：重根代表方程有兩個相等的實數解。在求根公式中，加減號後面的部分必須變成多少才能讓兩個解完全相同？' },
+                    { text: '若二次方程 ax² + bx + c = 0 的兩根為 α 和 β，請寫出其韋達定理（根與係數關係）的表達式。', tips: '提示：兩根之和 α + β 等於負的二次項係數分之一次項係數；兩根之積 αβ 等於二次項係數分之常數項。' },
+                    { text: '一個矩形的花園，長比寬多 3 米，面積為 40 平方米，請列出求寬度的二次方程。', tips: '提示：設寬度為 x 米，則長度為 (x + 3) 米。利用面積公式「長 × 寬 = 面積」展開並整理成標準一般式。' }
+                ]
             }
         };
+
+        let currentTotalQuestions = 0;
+        let scrollSpyObserver;
+        let isManualScrolling = false;
 
         function changeSubject(subject, subtitle) {
             const data = subjectContent[subject];
@@ -146,33 +202,193 @@
 
             document.getElementById('main-title').textContent = data.title;
             document.getElementById('main-author').textContent = data.author;
-            document.getElementById('content-body').innerHTML = data.content;
-            document.getElementById('total-questions-count').textContent = `共 ${data.questions} 題`;
+            
+            // ✨ 處理閱讀文章顯示/隱藏邏輯
+            const passageWrapper = document.getElementById('passage-wrapper');
+            const passageContent = document.getElementById('passage-content');
+            if (data.passage && data.passage.trim() !== '') {
+                passageContent.innerHTML = data.passage;
+                passageWrapper.classList.remove('hidden');
+            } else {
+                passageWrapper.classList.add('hidden');
+                passageContent.innerHTML = '';
+            }
 
-            renderQuestions(data.questions);
-            renderBulbs(data.questions);
+            currentTotalQuestions = data.questions.length;
+            document.getElementById('total-questions-count').textContent = `共 ${currentTotalQuestions} 題`;
+
+            renderGuide(data.chapters);
+            renderQuestions(data.questions, data.chapters); 
+            renderBulbs(currentTotalQuestions);
+            updateOverallProgress();
+            setupScrollSpy(); 
             closeMenu();
         }
 
-        function renderQuestions(count) {
+        function renderGuide(chapters) {
+            const container = document.getElementById('guide-list');
+            container.innerHTML = '';
+            chapters.forEach((chapter, index) => {
+                const num = index + 1;
+                const isActive = index === 0;
+                container.innerHTML += `
+                    <button id="guide-btn-${num}" onclick="scrollToQuestion(${num})" class="chapter-nav-btn w-full flex items-center justify-between px-3 py-2 text-sm rounded-xl transition-colors ${isActive ? 'bg-off-white text-deep-blue font-semibold' : 'text-slate-gray hover:bg-off-white hover:text-deep-blue'}">
+                        <span class="truncate pr-2">${chapter}</span>
+                        <span id="guide-check-${num}" class="hidden shrink-0 text-calm-mint text-xs bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md font-bold">✓</span>
+                    </button>
+                `;
+            });
+        }
+
+        function scrollToQuestion(num) {
+            const targetBlock = document.getElementById(`q-box-${num}`);
+            if (targetBlock) {
+                isManualScrolling = true; 
+                targetBlock.scrollIntoView({ behavior: 'smooth' });
+                highlightGuide(num);
+                
+                setTimeout(() => {
+                    isManualScrolling = false;
+                }, 800);
+            }
+        }
+
+        function highlightGuide(num) {
+            const buttons = document.querySelectorAll('.chapter-nav-btn');
+            buttons.forEach(btn => {
+                btn.classList.remove('bg-off-white', 'text-deep-blue', 'font-semibold');
+                btn.classList.add('text-slate-gray', 'hover:bg-off-white', 'hover:text-deep-blue');
+            });
+            const activeBtn = document.getElementById(`guide-btn-${num}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('text-slate-gray', 'hover:bg-off-white', 'hover:text-deep-blue');
+                activeBtn.classList.add('bg-off-white', 'text-deep-blue', 'font-semibold');
+            }
+        }
+
+        function setupScrollSpy() {
+            if (scrollSpyObserver) scrollSpyObserver.disconnect();
+
+            const options = {
+                root: null,
+                rootMargin: '-25% 0px -60% 0px', 
+                threshold: 0
+            };
+
+            scrollSpyObserver = new IntersectionObserver((entries) => {
+                if (isManualScrolling) return; 
+                
+                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 60) {
+                    highlightGuide(currentTotalQuestions);
+                    return;
+                }
+
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.id;
+                        const num = id.split('-').pop();
+                        highlightGuide(parseInt(num));
+                    }
+                });
+            }, options);
+
+            document.querySelectorAll('.question-card-block').forEach(section => {
+                scrollSpyObserver.observe(section);
+            });
+        }
+
+        function renderQuestions(questionsArray, chaptersArray) {
             const container = document.getElementById('questions-list');
             container.innerHTML = '';
-            for(let i=1; i<=count; i++) {
+            questionsArray.forEach((q, i) => {
+                const qNum = i + 1;
+                const chapterTag = chaptersArray[i]; 
                 container.innerHTML += `
-                    <div class="bg-pure-white rounded-2xl p-6 sayo-border shadow-sm mb-6 scroll-mt-32" id="q-${i}">
-                        <p class="font-medium text-deep-blue mb-4">題目 ${i}</p>
-                        <textarea class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-joyful-amber outline-none" rows="3"></textarea>
+                    <div class="question-card-block bg-pure-white rounded-2xl p-6 border border-gray-100 shadow-sm scroll-mt-28 transition-all" id="q-box-${qNum}">
+                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
+                            <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider">${chapterTag}</span>
+                            <span class="text-xs bg-amber-50 text-joyful-amber font-semibold px-2.5 py-0.5 rounded-md">Q${qNum}</span>
+                        </div>
+                        <p class="text-base font-medium text-deep-blue mb-4">${q.text}</p>
+                        <textarea 
+                            id="input-${qNum}"
+                            onfocus="highlightGuide(${qNum})"
+                            oninput="handleInput(${qNum}, this.value)" 
+                            class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-joyful-amber outline-none text-sm transition-all resize-none custom-scrollbar" 
+                            rows="4" 
+                            placeholder="請在此處輸入您的作答答案..."></textarea>
+                        
+                        <div class="mt-4 flex justify-end items-center">
+                            <button onclick="toggleTips(${qNum})" class="text-xs px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-deep-blue font-semibold rounded-xl transition-all shadow-sm">
+                                答題提示
+                            </button>
+                        </div>
+
+                        <div id="tips-panel-${qNum}" class="hidden mt-4 p-4 bg-indigo-50/60 border border-indigo-100 rounded-2xl">
+                            <p class="text-xs font-bold text-indigo-500 mb-1.5">💡 思路引導 (Tips)：</p>
+                            <p class="text-sm text-deep-blue leading-relaxed">${q.tips}</p>
+                        </div>
                     </div>
                 `;
-            }
+            });
         }
 
         function renderBulbs(count) {
             const container = document.getElementById('bulb-container');
             container.innerHTML = '';
             for(let i=1; i<=count; i++) {
-                container.innerHTML += `<div class="w-8 h-8 rounded-full bg-soft-red flex items-center justify-center text-white text-xs font-bold cursor-pointer hover:scale-105 transition-transform" onclick="document.getElementById('q-${i}').scrollIntoView({behavior:'smooth'})">${i}</div>`;
+                container.innerHTML += `
+                    <div id="bulb-${i}" 
+                         class="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-slate-gray text-xs font-bold cursor-pointer hover:scale-105 transition-all" 
+                         onclick="scrollToQuestion(${i})">
+                        ${i}
+                    </div>`;
             }
+        }
+
+        function handleInput(index, value) {
+            const bulb = document.getElementById(`bulb-${index}`);
+            const checkTag = document.getElementById(`guide-check-${index}`);
+            
+            highlightGuide(index);
+
+            if (value.trim() === '') {
+                if (bulb) {
+                    bulb.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
+                    bulb.classList.add('bg-gray-100', 'text-slate-gray', 'border-gray-200');
+                }
+                if (checkTag) {
+                    checkTag.classList.add('hidden');
+                }
+            } else {
+                if (bulb) {
+                    bulb.classList.remove('bg-gray-100', 'text-slate-gray', 'border-gray-200');
+                    bulb.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
+                }
+                if (checkTag) {
+                    checkTag.classList.remove('hidden');
+                }
+            }
+            updateOverallProgress();
+        }
+
+        function toggleTips(index) {
+            const panelEl = document.getElementById('tips-panel-' + index);
+            if (panelEl) {
+                panelEl.classList.toggle('hidden');
+            }
+        }
+
+        function updateOverallProgress() {
+            if (currentTotalQuestions === 0) return;
+            const textareas = document.querySelectorAll('#questions-list textarea');
+            let answeredCount = 0;
+            textareas.forEach(ta => {
+                if (ta.value.trim() !== '') answeredCount++;
+            });
+            const percent = Math.round((answeredCount / currentTotalQuestions) * 100);
+            document.getElementById('progress-text').textContent = `學習進度：${percent}%`;
+            document.getElementById('progress-bar').style.width = `${percent}%`;
         }
 
         function closeMenu() {
@@ -184,9 +400,19 @@
             changeSubject('中文科', '十二篇範文');
         };
 
+        window.addEventListener('scroll', () => {
+            if (isManualScrolling) return;
+            if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 20) {
+                highlightGuide(currentTotalQuestions);
+            }
+        });
+
         document.getElementById('subject-dropdown-btn').addEventListener('click', (e) => {
             e.stopPropagation();
-            document.getElementById('subject-dropdown-menu').classList.toggle('hidden');
+            const menu = document.getElementById('subject-dropdown-menu');
+            const arrow = document.getElementById('subject-dropdown-arrow');
+            const isHidden = menu.classList.toggle('hidden');
+            arrow.style.transform = isHidden ? 'rotate(0deg)' : 'rotate(180deg)';
         });
 
         document.addEventListener('click', closeMenu);

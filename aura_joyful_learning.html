@@ -65,7 +65,7 @@
             </div>
             <div class="flex items-center gap-4 md:gap-6">
                 <div id="rowena-header-user" class="flex items-center"></div>
-                <a href="aura_workspace.html" class="text-xs px-5 py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all inline-block shrink-0">進入學習台</a>
+                <button id="btn-open-workspace" type="button" class="text-xs px-5 py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all inline-block shrink-0">使用 Google 帳戶登入</button>
             </div>
         </div>
     </nav>
@@ -82,7 +82,7 @@
             <p class="text-sm md:text-base text-slate-gray tracking-wider font-light opacity-0 transition-opacity duration-1000 delay-300" id="hero-sub">
                 Study with clarity, perform with joy.
             </p>
-            <a href="aura_workspace.html?showDataCollection=1" onclick="localStorage.removeItem('rowena_data_collection_closed')" class="inline-block opacity-0 transition-opacity duration-1000 delay-500 text-xs px-8 py-3 bg-deep-blue text-white rounded-full tracking-widest hover:bg-slate-800 transition-all" id="hero-cta">開始專注學習</a>
+            <button id="hero-cta" type="button" class="inline-block opacity-0 transition-opacity duration-1000 delay-500 text-xs px-8 py-3 bg-deep-blue text-white rounded-full tracking-widest hover:bg-slate-800 transition-all">使用 Google 帳戶登入</button>
         </div>
 
         <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-4 cursor-pointer" onclick="document.getElementById('dashboard').scrollIntoView()">
@@ -342,7 +342,67 @@
     </div>
 
     <script src="rowena_user.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const SUPABASE_URL = 'https://zhcmekhhiilnygiayslq.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoY21la2hoaWlsbnlnaWF5aWF5c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTg3NzQsImV4cCI6MjA5NTA3NDc3NH0.W-XFurvr4leag2xBv2s3hFoZgmVAo_RtfUgdqRIqbWA';
+        let rowenaSupabaseClient = null;
+
+        function initRowenaSupabase() {
+            if (rowenaSupabaseClient) return rowenaSupabaseClient;
+            if (!window.supabase || typeof window.supabase.createClient !== 'function') return null;
+            if (!SUPABASE_URL || !SUPABASE_ANON_KEY || SUPABASE_URL.includes('YOUR_') || SUPABASE_ANON_KEY.includes('YOUR_')) return null;
+            rowenaSupabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            return rowenaSupabaseClient;
+        }
+
+        async function getAuthUser() {
+            const client = initRowenaSupabase();
+            if (!client) return null;
+            try {
+                const { data } = await client.auth.getUser();
+                return data?.user || null;
+            } catch (e) {
+                console.warn('[Auth] getUser failed', e);
+                return null;
+            }
+        }
+
+        async function handleWorkspaceEntry(showDataCollection = false) {
+            const authUser = await getAuthUser();
+            if (authUser) {
+                if (showDataCollection) localStorage.removeItem('rowena_data_collection_closed');
+                window.location.href = `aura_workspace.html${showDataCollection ? '?showDataCollection=1' : ''}`;
+                return;
+            }
+            const client = initRowenaSupabase();
+            if (!client) {
+                showModal('無法登入', 'Supabase 未正確初始化，請稍後再試。');
+                return;
+            }
+            try {
+                const { error } = await client.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin + '/aura_workspace.html' }
+                });
+                if (error) console.error('[OAuth] signIn error', error);
+            } catch (e) {
+                console.error('[OAuth] exception', e);
+                showModal('登入失敗', 'Google 登入時發生錯誤，請稍後再試。');
+            }
+        }
+
+        function bindLoginButtons() {
+            const heroBtn = document.getElementById('hero-cta');
+            const headerBtn = document.getElementById('btn-open-workspace');
+            if (heroBtn) {
+                heroBtn.addEventListener('click', () => handleWorkspaceEntry(true));
+            }
+            if (headerBtn) {
+                headerBtn.addEventListener('click', () => handleWorkspaceEntry(false));
+            }
+        }
+
         // Custom Modal Utility
         function showModal(title, msg) {
             document.getElementById('modal-title').innerText = title;
@@ -355,8 +415,9 @@
             modal.classList.add('opacity-0', 'pointer-events-none');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             if (typeof RowenaUser !== 'undefined') RowenaUser.init('#rowena-header-user');
+            bindLoginButtons();
             setTimeout(() => {
                 document.getElementById('hero-title').classList.remove('opacity-0');
             }, 100);

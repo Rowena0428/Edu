@@ -184,8 +184,8 @@
             const profile = window.RowenaUser?.getProfile?.() || {};
             const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
             const payload = {
-                email: profile.email || '',
-                name: profile.name || 'Learner',
+                    email: profile.email || '',
+                    name: profile.name || 'Learner',
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
@@ -193,7 +193,19 @@
                 score: Number(score),
                 updated_at: new Date().toISOString(),
             };
-            let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+                // Prefer authenticated Supabase user info when available
+                try {
+                    const userRes = await client.auth.getUser();
+                    const authUser = userRes?.data?.user || null;
+                    if (authUser) {
+                        payload.email = authUser.email || payload.email;
+                        payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
+                    }
+                } catch (e) {
+                    /* ignore auth errors and fallback to local profile */
+                }
+
+                let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
             if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
                 result = await client.from('student_scores').upsert([payload]);
             }
@@ -208,8 +220,8 @@
             if (!client) return { ok: false, reason: 'missing-config' };
             const preGrades = profile.dsePreGrades || { chinese: '未評估', english: '未評估', math: '未評估' };
             const payload = {
-                email: profile.email || '',
-                name: profile.name || 'Learner',
+                    email: profile.email || '',
+                    name: profile.name || 'Learner',
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
@@ -218,7 +230,19 @@
             // Use a dummy subject for profile-only updates
             payload.subject = 'profile';
             payload.score = 0;
-            let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
+                // Prefer authenticated Supabase user info when available
+                try {
+                    const userRes = await client.auth.getUser();
+                    const authUser = userRes?.data?.user || null;
+                    if (authUser) {
+                        payload.email = authUser.email || payload.email;
+                        payload.name = (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || payload.name;
+                    }
+                } catch (e) {
+                    /* ignore auth errors */
+                }
+
+                let result = await client.from('student_scores').upsert([payload], { onConflict: 'email,subject' });
             if (result.error && /constraint|not found|relation/i.test(result.error.message || '')) {
                 result = await client.from('student_scores').upsert([payload]);
             }
@@ -276,6 +300,7 @@
 
         let activeId = 'zh-mock';
         const STORAGE_KEY = 'rowena_recent_tools';
+        const workspaceCache = new Map();
 
         function getRecent() {
             try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '["zh-mock"]'); }
@@ -460,31 +485,53 @@
             root.classList.remove('workspace-panel');
             void root.offsetWidth;
             root.classList.add('workspace-panel');
-            if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
-                root.innerHTML = RowenaMockPaper.mount(tool);
-                RowenaMockPaper.afterMount();
-            } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
-                root.innerHTML = RowenaPvp.mount(tool);
-                RowenaPvp.afterMount();
-            } else if (tool.category === 'pvp') {
-                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js 以使用 PvP 對戰。</p>';
-            } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
-                root.innerHTML = RowenaCheckPaper.mount(tool);
-                RowenaCheckPaper.afterMount();
-            } else if (tool.category === 'check') {
-                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
-            } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
-                root.innerHTML = RowenaReportAI.mount(tool);
-                RowenaReportAI.afterMount();
-            } else if (tool.category === 'report') {
-                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
-            } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
-                root.innerHTML = RowenaLeaderboard.mount(tool);
-                RowenaLeaderboard.afterMount();
-            } else if (tool.category === 'leaderboard') {
-                root.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_leaderboard.js。</p>';
+
+            Array.from(root.children).forEach(child => child.classList.add('hidden'));
+            let toolPanel = workspaceCache.get(tool.id);
+            if (!toolPanel) {
+                toolPanel = document.createElement('div');
+                toolPanel.dataset.workspaceTool = tool.id;
+                toolPanel.className = 'workspace-tool-panel';
+
+                if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                    toolPanel.innerHTML = RowenaMockPaper.mount(tool);
+                } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
+                    toolPanel.innerHTML = RowenaPvp.mount(tool);
+                } else if (tool.category === 'pvp') {
+                    toolPanel.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js 以使用 PvP 對戰。</p>';
+                } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
+                    toolPanel.innerHTML = RowenaCheckPaper.mount(tool);
+                } else if (tool.category === 'check') {
+                    toolPanel.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
+                } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
+                    toolPanel.innerHTML = RowenaReportAI.mount(tool);
+                } else if (tool.category === 'report') {
+                    toolPanel.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_mock_paper.js。</p>';
+                } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
+                    toolPanel.innerHTML = RowenaLeaderboard.mount(tool);
+                } else if (tool.category === 'leaderboard') {
+                    toolPanel.innerHTML = '<p class="text-sm text-slate-gray p-8">請載入 rowena_leaderboard.js。</p>';
+                } else if (tool.category === 'rank') {
+                    toolPanel.innerHTML = rankPanel(tool);
+                }
+
+                workspaceCache.set(tool.id, toolPanel);
+                root.appendChild(toolPanel);
+
+                if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                    RowenaMockPaper.afterMount();
+                } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
+                    RowenaPvp.afterMount();
+                } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
+                    RowenaCheckPaper.afterMount();
+                } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
+                    RowenaReportAI.afterMount();
+                } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
+                    RowenaLeaderboard.afterMount();
+                }
+            } else {
+                toolPanel.classList.remove('hidden');
             }
-            else if (tool.category === 'rank') root.innerHTML = rankPanel(tool);
         }
 
         window.onRowenaProfileUpdated = function () {
@@ -529,9 +576,67 @@
             document.getElementById('btn-data-collection-leave')?.addEventListener('click', closeDataCollectionPanel);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        async function redirectToLoginPage() {
+            window.location.href = window.location.origin + '/aura_joyful_learning.html';
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             initDataCollectionPanel();
+
+            const client = initRowenaSupabase();
+            if (!client) {
+                console.warn('[Auth] Supabase client not initialized');
+                redirectToLoginPage();
+                return;
+            }
+
+            let authUser = null;
+            try {
+                const { data: userData } = await client.auth.getUser();
+                authUser = userData?.user || null;
+            } catch (e) {
+                console.warn('[Auth] getUser failed', e);
+            }
+
+            if (!authUser) {
+                redirectToLoginPage();
+                return;
+            }
+
+            // Render user header after successful auth
             RowenaUser.init('#rowena-header-user');
+
+            // Merge authenticated user info into local profile and persist
+            try {
+                const current = RowenaUser.getProfile ? RowenaUser.getProfile() : JSON.parse(localStorage.getItem('rowena_user_profile') || '{}');
+                const merged = {
+                    ...current,
+                    email: authUser.email || current.email || '',
+                    name: (authUser.user_metadata && (authUser.user_metadata.full_name || authUser.user_metadata.name || authUser.user_metadata.fullName)) || current.name || 'Learner',
+                    avatar: (authUser.user_metadata && (authUser.user_metadata.avatar_url || authUser.user_metadata.avatarUrl || authUser.user_metadata.picture)) || current.avatar || null,
+                    dsePreGrades: current.dsePreGrades || current.dse_pre_grade || undefined,
+                };
+                localStorage.setItem('rowena_user_profile', JSON.stringify(merged));
+                RowenaUser.init('#rowena-header-user');
+
+                const emailInput = document.getElementById('profile-email-input');
+                if (emailInput) {
+                    emailInput.value = merged.email || '';
+                    emailInput.disabled = true;
+                }
+                const nameInput = document.getElementById('profile-name-input');
+                if (nameInput) nameInput.value = merged.name || '';
+            } catch (e) {
+                console.error('[Auth] merge profile failed', e);
+            }
+
+            // Optional: react to auth state changes (e.g., after redirect)
+            client.auth.onAuthStateChange((event, session) => {
+                if (event === 'SIGNED_IN') {
+                    window.location.href = window.location.origin + '/aura_workspace.html';
+                }
+            });
+
             RowenaLayout.init({
                 shellId: 'layout-shell',
                 sidebarId: 'layout-sidebar',
