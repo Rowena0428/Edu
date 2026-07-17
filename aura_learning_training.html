@@ -84,7 +84,7 @@
                 <div class="mb-8 border-b border-gray-100 pb-6">
                     <span class="inline-block text-[10px] tracking-wider font-semibold text-joyful-amber bg-yellow-50 border border-yellow-100 px-3 py-1 rounded-full mb-3">測驗進行中</span>
                     <h2 class="text-2xl md:text-3xl font-semibold text-deep-blue" id="main-title">內容載入中...</h2>
-                    <p class="text-sm text-soft-red font-medium mt-2" id="main-author"></p>
+                    <p class="text-sm font-medium mt-2" id="main-author"></p>
                 </div>
 
                 <div id="passage-wrapper" class="hidden mb-8 p-6 bg-slate-50 border border-gray-200 rounded-2xl">
@@ -137,6 +137,10 @@
 
         const extraTrainingPages = [
             '《師說》',
+            '《魚我所欲也》',
+            '《六國論》',
+            '《勸學》',
+            '《逍遙遊》',
             '《論仁、論孝、論君子》',
             '《廉頗藺相如列傳》',
             '《岳陽樓記》',
@@ -147,7 +151,6 @@
             '《月下獨酌》',
             '《青玉案．元夕》',
             '《聲聲慢．秋情》',
-            
             '《念奴嬌．赤壁懷古》'
         ];
 
@@ -158,8 +161,13 @@
                 name: '中文科',
                 subtitle: '十二篇範文 (測試模式)',
                 title: '閱讀理解測驗',
-                author: '後端連線失敗，目前顯示為 UI 測試資料',
-                passage: '<p>這是一段用於測試介面的文章段落。如果您看到這段文字，代表您的前端無法成功從 localhost:3000/api/subjects 取得資料。</p>',
+                author: '',
+                passage: '<div class="space-y-4"><h3 class="text-sm font-semibold">原文</h3><p>古之學者必有師。師者，所以傳道、受業、解惑也。人非生而知之者，孰能無惑？惑而不從師，其為惑也終不解矣。<br><br>生乎吾前，其聞道也，固先乎吾，吾從而師之；生乎吾後，其聞道也，亦先乎吾，吾從而師之。吾師道也，夫庸知其年之先後生於吾乎？是故無貴無賤，無長無少，道之所存，師之所存也。<br><br>嗟乎！師道之不傳也久矣！欲人之無惑也難矣！古之聖人，其出人也遠矣，猶且從師而問焉；今之眾人，其下聖人也亦遠矣，而恥學於師。是故聖益聖，愚益愚，聖人之所以為聖，愚人之所以為愚，其皆出於此乎！<br><br>愛其子，擇師而教之；於其身也，則恥師焉，惑矣！彼童子之師，授之書而習其句讀者，非吾所謂傳其道、解其惑者也。句讀之不知，惑之不解，或師焉，或不焉，小學而大遺，吾未見其明也。<br><br>巫、醫、樂師、百工之人，不恥相師；士大夫之族，曰師、曰弟子云者，則羣聚而笑之。問之，則曰︰「彼與彼年相若也，道相似也。」位卑則足羞，官盛則近諛。嗚呼！師道之不復，可知矣。巫、醫、樂師、百工之人，君子不齒，今其智乃反不能及，其可怪也歟！<br><br>聖人無常師，孔子師郯子、萇弘、師襄、老聃。郯子之徒，其賢不及孔子。孔子曰︰「三人行，則必有我師。」是故弟子不必不如師，師不必賢於弟子；聞道有先後，術業有專攻，如是而已。李氏子蟠，年十七，好古文，六藝經傳，皆通習之，不拘於時，學於余。余嘉其能行古道，作《師說》以貽之。</p><h3 class="text-sm font-semibold">譯文</h3><p>古代求學的人一定有老師。老師，是（用來）傳授道理、教授學業、解答疑惑的。人不是生下來就什麼都懂的，誰能沒有疑惑？有了疑惑卻不向老師學習，那些疑惑就終究無法解決。<br><br>出生在我前面的人，他聞道（領悟道理）的時間本來就比我早，我跟從他並以他為師；出生在我後面的人，如果他聞道的時間也比我早，我也跟從他並以他為師。我學習的是「道」，哪裡需要管他的年齡比我大還是比我小呢？因此，無論地位高貴或卑賤，無論年紀大或小，道理存在的地方，就是老師存在的地方。<br><br>唉！從師學習的風氣不流傳已經很久了！想要人們沒有疑惑是很難的！古代的聖人，他們的才智遠遠超過一般人，尚且向老師請教；現在的一般人，他們的才智遠遠不如聖人，卻以向老師學習為恥。所以，聖人更加聖明，愚人更加愚昧。聖人之所以成為聖人，愚人之所以成為愚人，大概都是出於這個原因吧！<br><br>（人們）疼愛自己的孩子，選擇老師來教育他；但對待自己（的學習）時，卻以向老師學習為恥，真是糊塗啊！那些兒童的老師，傳授書本內容，教導他們斷句讀的人，並不是我所說的能傳授道理、解答疑惑的老師。不懂得斷句讀，疑惑又不能解決，有的（小問題）向老師請教，有的（大問題）卻不向老師請教，（這就叫做）小的方面學習了，卻遺漏了大的方面，我沒看出他們哪裡明智。<br><br>巫醫、樂師、工匠這些人，不以互相學習為恥；士大夫那一類人，聽到「老師」、「學生」的稱呼，就聚在一起譏笑。問他們為什麼，就說：「那個人跟那個人年紀差不多，道理也差不多。」（跟地位低的人學習）地位卑微就感到羞恥，（跟地位高的人學習）官位顯赫就覺得是諂媚。唉！從師學習的風氣不能恢復，是可以預見的了！巫醫、樂師、工匠這些人，是君子們所不屑一顧的，現在士大夫的智慧竟然反而比不上他們，這難道不是很可怪的事嗎！<br><br>聖人沒有固定的老師。孔子曾經向郯子、萇弘、師襄、老聃請教。郯子這些人，他們的賢能比不上孔子。孔子說：「三個人走在一起，裡面一定有可以當我老師的人。」所以，學生不一定不如老師，老師也不一定比學生賢能；聞道有先後，術業有專攻，就是這樣罷了。<br><br>李家的孩子蟠，年十七歲，喜好古文，六經的經文與傳注，都認真學習，不被世俗的風氣所限制，向我學習。我讚賞他能實行古人從師學習的道理，所以寫這篇《師說》來送給他。</p></div>',
+                pagePassages: {
+                    '《廉頗藺相如列傳》': '<div class="space-y-4"><h3 class="text-sm font-semibold">原文</h3><p>廉頗者，趙之良將也。趙惠文王十六年，廉頗為趙將伐齊，大破之，取陽晉，拜為上卿，以勇氣聞於諸侯。藺相如者，趙人也，為趙宦者令繆賢舍人。趙惠文王時，得楚和氏璧。秦昭王聞之，使人遺趙王書，願以十五城請易璧。趙王與大將軍廉頗諸大臣謀：欲予秦，秦城恐不可得，徒見欺；欲勿予，即患秦兵之來。計未定，求人可使報秦者，未得。宦者令繆賢曰：「臣舍人藺相如可使。」王問：「何以知之？」對曰：「臣嘗有罪，竊計欲亡走燕，臣舍人相如止臣，曰：『君何以知燕王？』臣語曰：『臣嘗從大王與燕王會境上，燕王私握臣手，曰：「願結友。」以此知之，故欲往。』相如謂臣曰：『夫趙彊而燕弱，而君幸於趙王，故燕王欲結於君。今君乃亡趙走燕，燕畏趙，其勢必不敢留君，而束君歸趙矣。君不如肉袒伏斧質請罪，則幸得脫矣。』臣從其計，大王亦幸赦臣。臣竊以為其人勇士，有智謀，宜可使。」於是王召見，問藺相如曰：「秦王以十五城請易寡人之璧，可予不？」相如曰：「秦彊而趙弱，不可不許。」王曰：「取吾璧，不予我城，奈何？」相如曰：「秦以城求璧而趙不許，曲在趙；趙予璧而秦不予趙城，曲在秦。均之二策，寧許以負秦曲。」王曰：「誰可使者？」相如曰：「王必無人，臣願奉璧往使。城入趙而璧留秦；城不入，臣請完璧歸趙。」趙王於是遂遣相如奉璧西入秦。<br><br>秦王坐章臺見相如，相如奉璧奏秦王。秦王大喜，傳以示美人及左右，左右皆呼萬歲。相如視秦王無意償趙城，乃前曰：「璧有瑕，請指示王。」王授璧，相如因持璧卻立，倚柱，怒髮上衝冠，謂秦王曰：「大王欲得璧，使人發書至趙王，趙王悉召羣臣議，皆曰：『秦貪，負其彊，以空言求璧，償城恐不可得。』議不欲予秦璧。臣以為布衣之交尚不相欺，況大國乎！且以一璧之故逆彊秦之驩，不可。於是趙王乃齋戒五日，使臣奉璧，拜送書於庭。何者？嚴大國之威以修敬也。今臣至，大王見臣列觀，禮節甚倨；得璧，傳之美人，以戲弄臣。臣觀大王無意償趙王城邑，故臣復取璧。大王必欲急臣，臣頭今與璧俱碎於柱矣！」<br><br>相如持其璧睨柱，欲以擊柱。秦王恐其破璧，乃辭謝固請，召有司案圖，指從此以往十五都予趙。相如度秦王特以詐佯為予趙城，實不可得，乃謂秦王曰：「和氏璧，天下所共傳寶也。趙王恐，不敢不獻。趙王送璧時，齋戒五日，今大王亦宜齋戒五日，設九賓於廷，臣乃敢上璧。」秦王度之，終不可彊奪，遂許齋五日，舍相如廣成傳。相如度秦王雖齋，決負約不償城，乃使其從者衣褐，懷其璧，從徑道亡，歸璧於趙。<br><br>秦王齋五日後，乃設九賓禮於廷，引趙使者藺相如。相如至，謂秦王曰：「秦自繆公以來二十餘君，未嘗有堅明約束者也。臣誠恐見欺於王而負趙，故令人持璧歸，間至趙矣。且秦彊而趙弱，大王遣一介之使至趙，趙立奉璧來；今以秦之彊而先割十五都予趙，趙豈敢留璧而得罪於大王乎？臣知欺大王之罪當誅，臣請就湯鑊。唯大王與羣臣孰計議之！」秦王與羣臣相視而嘻。左右或欲引相如去，秦王因曰：「今殺相如，終不能得璧也，而絕秦趙之驩，不如因而厚遇之，使歸趙，趙王豈以一璧之故欺秦邪！」卒廷見相如，畢禮而歸之。相如既歸，趙王以為賢大夫，使不辱於諸侯，拜相如為上大夫。秦亦不以城予趙，趙亦終不予秦璧。<br><br>其後秦伐趙，拔石城。明年，復攻趙，殺二萬人。秦王使使者告趙王，欲與王為好會於西河外澠池。趙王畏秦，欲毋行。廉頗、藺相如計曰：「王不行，示趙弱且怯也。」趙王遂行，相如從。廉頗送至境，與王訣曰：「王行，度道里會遇之禮畢，還，不過三十日。三十日不還，則請立太子為王，以絕秦望。」王許之，遂與秦王會澠池。秦王飲酒酣，曰：「寡人竊聞趙王好音，請奏瑟。」趙王鼓瑟。秦御史前書曰：「某年月日，秦王與趙王會飲，令趙王鼓瑟。」藺相如前曰：「趙王竊聞秦王善為秦聲，請奏盆缻秦王，以相娛樂。」秦王怒，不許。於是相如前進缻，因跪請秦王。秦王不肯擊缻。相如曰：「五步之內，相如請得以頸血濺大王矣！」左右欲刃相如，相如張目叱之，左右皆靡。於是秦王不懌，為一擊缻。相如顧召趙御史書曰：「某年月日，秦王為趙王擊缻。」秦之羣臣曰：「請以趙十五城為秦王壽。」藺相如亦曰：「請以秦之咸陽為趙王壽。」秦王竟酒，終不能加勝於趙。趙亦盛設兵以待秦，秦不敢動。<br><br>既罷歸國，以相如功大，拜為上卿，位在廉頗之右。廉頗曰：「我為趙將，有攻城野戰之大功，而藺相如徒以口舌為勞，而位居我上，且相如素賤人，吾羞，不忍為之下。」宣言曰：「我見相如，必辱之。」相如聞，不肯與會。相如每朝時，常稱病，不欲與廉頗爭列。已而相如出，望見廉頗，相如引車避匿。於是舍人相與諫曰：「臣所以去親戚而事君者，徒慕君之高義也。今君與廉頗同列，廉君宣惡言而君畏匿之，恐懼殊甚，且庸人尚羞之，況於將相乎！臣等不肖，請辭去。」藺相如固止之，曰：「公之視廉將軍孰與秦王？」曰：「不若也。」相如曰：「夫以秦王之威，而相如廷叱之，辱其羣臣，相如雖駑，獨畏廉將軍哉？顧吾念之，彊秦之所以不敢加兵於趙者，徒以吾兩人在也。今兩虎共鬥，其勢不俱生。吾所以為此者，以先國家之急而後私讎也。」廉頗聞之，肉袒負荊，因賓客至藺相如門謝罪。曰：「鄙賤之人，不知將軍寬之至此也。」卒相與驩，為刎頸之交。</p></div><h3 class="text-sm font-semibold">譯文</h3><p>廉頗是趙國的名將。趙惠文王十六年，廉頗攻伐齊國，獲得大勝，被拜為上卿，並以勇氣聞名於諸侯。藺相如是趙國的士人，任職宦者令。當時趙國得到了楚國的和氏璧，秦昭王聞訊後，派人致書請以十五座城交換和氏璧。趙王與群臣商議：「要是把璧送給秦，恐怕秦不履行求城之約；若不送，恐怕秦兵來犯。」一時無計可施。宦者令繆賢推薦藺相如作為使者。藺相如報秦王：趙國弱於秦，無法不允許。秦王要求趙王送璧，卻不肯如約讓城。於是藺相如說出自己願意冒險奉璧赴秦，堅持若秦不守信，必將璧完璧歸趙。秦王接見他後見其不服，藺相如借口璧有瑕疵要求秦王檢查，趁機逼問秦王是否肯償城。秦王怕弄壞璧，先允許齋戒五日、設九賓之禮，但仍不打算真正讓城。結果藺相如以機智奪璧而歸趙，保住了國寶。後來秦趙在澠池會盟，秦王酒醉之際試圖貶低趙王，藺相如挺身而出，憑藉機智和知書達禮維護了國家尊嚴。趙王回國後，因藺相如功勞很大，任命他為上大夫，地位高於廉頗。廉頗不滿，誓言羞辱他；藺相如為避免內耗，多次稱病不出和他見面。藺相如的忍讓和大義最終保全了趙國安定，成為忠勇兼備的名臣。</p></div>',
+                    '《論仁、論孝、論君子》': '<div class="space-y-4"><h3 class="text-sm font-semibold">原文</h3><p>【論仁】<br><br>1.子曰：「不仁者，不可以久處約，不可以長處樂。仁者安仁，知者利仁。」(《里仁》第四)<br><br>2.子曰：「富與貴，是人之所欲也；不以其道得之，不處也。貧與賤，是人之所惡也；不以其道得之，不去也。君子去仁，惡乎成名？君子無終食之間違仁，造次必於是，顛沛必於是。」(《里仁》第四)<br><br>3.顏淵問仁。子曰：「克己復禮為仁。一日克己復禮，天下歸仁焉。為仁由己，而由人乎哉？」 顏淵曰：「請問其目。」子曰：「非禮勿視，非禮勿聽，非禮勿言，非禮勿動。」 顏淵曰：「回雖不敏，請事斯語矣。」（《顏淵》第十二）<br><br>4.子曰：「志士仁人，無求生以害仁，有殺身以成仁。」《（衞靈公》第十五）<br><br>【論孝】<br><br>1.孟懿子問孝。子曰：「無違。」 樊遲御，子告之曰：「孟孫問孝於我，我對曰，無違。」 樊遲曰：「何謂也？」子曰：「生，事之以禮；死，葬之以禮，祭之以禮。（《為政》第二）<br><br>2.子游問孝。子曰：「今之孝者，是謂能養。至於犬馬，皆能有養；不敬，何以別乎！」（《為政》第二）<br><br>3.子曰：「事父母幾諫，見志不從，又敬不違，勞而不怨。」（《里仁》第四）<br><br>4.子曰：「父母之年，不可不知也。一則以喜，一則以懼。」（《里仁》第四）<br><br>【論君子】<br><br>1.子曰：「君子不重則不威；學則不固。主忠信。無友不如己者。過則勿憚改。」（《學而》第一）<br><br>2.子曰：「君子坦蕩蕩，小人長戚戚。」（《述而》第七）<br><br>3.司馬牛問君子。子曰：「君子不憂不懼。」 曰：「不憂不懼，斯謂之君子已乎？」子曰：「內省不疚，夫何憂何懼？」（《顏淵》第十二）<br><br>4.子曰：「君子成人之美，不成人之惡。小人反是。」 （《顏淵》第十二）<br><br>5.子曰：「君子恥其言而過其行。」（《憲問》第十四）<br><br>6.子曰：「君子義以為質，禮以行之，孫以出之，信以成之。君子哉！」（《衞靈公》第十五）<br><br>7.子曰：「君子病無能焉，不病人之不己知也。」（《衞靈公》第十五）<br><br>8.子曰：「君子求諸己，小人求諸人。」（《衞靈公》第十五）<br><br>譯文：<br><br>【論仁】<br><br>1.孔子說：「沒有仁德的人，無法長久處於貧困之中，也無法長久處於安樂之中。有仁德的人安於行仁，明智的人知道行仁對自己有利，所以去實行。」<br><br>2.孔子說：「富貴是人人都想要的，但如果不是用正當手段得到的，君子不接受；貧賤是人人都厭惡的，但如果不是因為正當原因造成的，君子也不會以不正當的手段擺脫。君子如果離開了仁德，怎麼能稱得上是君子呢？君子即使在吃一頓飯那麼短的時間裡，也不會背離仁德，即便是在匆忙急迫的時候，也一定堅守仁德，即使在顛沛流離的時候，也同樣堅守仁德。」<br><br>3.顏淵問怎樣才是仁。孔子說：「克制自己，使言行合乎禮，就是仁。一旦做到了克己復禮，天下人自然都會歸向仁。行仁這件事全靠自己，難道還要靠別人嗎？」 顏淵說：「請問實行仁的具體條目。」孔子說：「不合乎禮的事不看，不合乎禮的話不聽，不合乎禮的話不說，不合乎禮的事不做。」 顏淵說：「我雖然愚鈍，請讓我按照您這些話去做。」<br><br>4.孔子說：「志士仁人，不會為了貪生怕死而損害仁德，反而會為了成就仁德，而不惜犧牲自己的生命。」<br><br>【論孝】<br><br>1.孟懿子問什麼是孝。孔子說：「不要違背禮。」後來樊遲替孔子駕車時，孔子告訴他：「孟孫問我孝，我回答他說『不要違背禮』。」樊遲問：「這是什麼意思？」孔子說：「父母活著的時候，依禮侍奉他們；父母去世後，依禮埋葬他們、祭祀他們。」<br><br>2.子游問孝。孔子說：「現在所謂的孝，是指能夠奉養父母。但連狗馬都能夠得到飼養；如果對父母缺乏尊敬，那奉養父母和飼養狗馬有什麼分別呢？」<br><br>3.孔子說：「侍奉父母，如果發現他們有不對的地方，要委婉地勸阻。如果父母心意已決，不聽從自己的勸告，仍舊要對他們保持恭敬，不要違背孝道，雖然內心憂慮，也不要抱怨。」<br><br>4.孔子說：「父母的年紀，不能不記在心裡。一方面因為他們高壽而感到高興，另一方面又因為他們年事已高而感到擔憂。」<br><br>【論君子】<br><br>1.孔子說：「君子如果不莊重，就沒有威嚴；學習（知識）就不會穩固。為人要忠信。不要結交不如自己（指道德修養）的人。有了過錯，就不要怕改正。」<br><br>2.孔子說：「君子心胸寬廣，坦然自若；小人卻經常憂愁恐懼。」<br><br>3.司馬牛問什麼是君子。孔子說：「君子不憂慮，不恐懼。」司馬牛問：「只要不憂不懼，就能算是君子了嗎？」孔子說：「內心反省沒有任何愧疚，有什麼可憂慮、可恐懼的呢？」<br><br>4.孔子說：「君子成全別人的好事，而不助長別人的壞事。小人則剛好相反。」<br><br>5.孔子說：「君子以說出大話而沒有做到為恥。」<br><br>6.孔子說：「君子以義作為做事的根本，用禮節來推行，用謙遜的態度表達出來，用誠信來使其圓滿成功。這才是真正的君子啊！」<br><br>7.孔子說：「君子只擔心自己沒有才能，不擔心別人不了解自己。」<br><br>8.孔子說：「君子要求自己，小人要求別人。」</p></div>'
+                },
+
                 chapters: ["《魚我所欲也》", "《勸學》（節錄）", "《六國論》", "《逍遙遊》"],
                 questions: [
                     { id: 'q1', text: '請問《魚我所欲也》的主旨是什麼？', tips: '思考孟子對於義與生的抉擇。' },
@@ -203,6 +211,16 @@
                 ]
             }
         ];
+
+        // Remove the heavy embedded entry for '《廉頗藺相如列傳》' at runtime
+        try {
+            const chineseSubj = mockData.find(s => s.id === 'chinese');
+            if (chineseSubj && chineseSubj.pagePassages && Object.prototype.hasOwnProperty.call(chineseSubj.pagePassages, '《廉頗藺相如列傳》')) {
+                delete chineseSubj.pagePassages['《廉頗藺相如列傳》'];
+            }
+        } catch (e) {
+            // ignore
+        }
 
         async function initApp() {
             try {
@@ -250,10 +268,16 @@
             subtitleEl.style.display = 'block';
 
             document.getElementById('main-title').textContent = subject.title;
-            // 如果是假資料，把作者欄位變成紅字提醒
             const authorEl = document.getElementById('main-author');
-            authorEl.textContent = subject.author;
-            if (subject.author.includes('失敗')) authorEl.classList.add('text-soft-red');
+            if (subject.author && subject.author.trim()) {
+                authorEl.textContent = subject.author;
+                authorEl.classList.remove('hidden');
+                authorEl.classList.toggle('text-soft-red', subject.author.includes('失敗'));
+            } else {
+                authorEl.textContent = '';
+                authorEl.classList.add('hidden');
+                authorEl.classList.remove('text-soft-red');
+            }
 
             const passageWrapper = document.getElementById('passage-wrapper');
             const passageContent = document.getElementById('passage-content');
@@ -268,14 +292,11 @@
 
             renderGuideSelect(subject.chapters); // 這裡改為渲染下拉選單
             if (subject.id === 'chinese') {
-                currentChinesePage = extraTrainingPages[0];
-                switchTrainingPage(extraTrainingPages[0]);
+                currentChinesePage = extraTrainingPages.includes(currentChinesePage) ? currentChinesePage : extraTrainingPages[0];
+                switchTrainingPage(currentChinesePage);
             } else {
                 renderChapterQuestions(currentChapterIndex);
             }
-            renderBulbs(1);
-            updateOverallProgress();
-            setupScrollSpy();
             closeMenu();
         }
 
@@ -307,16 +328,27 @@
                 </div>
             `;
 
+            syncChapterSelect();
+        }
+
+        function syncChapterSelect() {
             const select = document.getElementById('chapter-select');
-            if (select && currentSubject) {
-                if (currentSubject.id === 'chinese') {
-                    const selectedPage = currentChinesePage || extraTrainingPages[0];
-                    select.value = `page:${selectedPage}`;
-                } else {
-                    const currentChapter = currentSubject.chapters[currentChapterIndex - 1];
-                    select.value = `chapter:${currentChapter}`;
-                }
+            if (!select || !currentSubject) return;
+
+            let expectedValue;
+            if (currentSubject.id === 'chinese') {
+                const selectedPage = extraTrainingPages.includes(currentChinesePage) ? currentChinesePage : extraTrainingPages[0];
+                currentChinesePage = selectedPage;
+                expectedValue = `page:${selectedPage}`;
+            } else {
+                const currentChapter = currentSubject.chapters?.[currentChapterIndex - 1] || currentSubject.chapters?.[0] || '';
+                expectedValue = `chapter:${currentChapter}`;
             }
+
+            select.value = expectedValue;
+            Array.from(select.options).forEach((option) => {
+                option.selected = option.value === expectedValue;
+            });
         }
 
         function handleChapterSelection(value) {
@@ -334,6 +366,7 @@
                 const pageTitle = value.slice(5);
                 currentChinesePage = pageTitle;
                 switchTrainingPage(pageTitle);
+                syncChapterSelect();
             }
         }
 
@@ -364,10 +397,25 @@
         }
 
         function highlightGuide(num) {
-            const select = document.getElementById('chapter-select');
-            const chapterTitle = currentSubject?.chapters?.[num - 1];
-            if (select && chapterTitle) {
-                select.value = `chapter:${chapterTitle}`;
+            if (currentSubject?.id === 'chinese') {
+                syncChapterSelect();
+            } else {
+                const select = document.getElementById('chapter-select');
+                const chapterTitle = currentSubject?.chapters?.[num - 1];
+                if (select && chapterTitle) {
+                    select.value = `chapter:${chapterTitle}`;
+                    Array.from(select.options).forEach((option) => {
+                        option.selected = option.value === select.value;
+                    });
+                }
+            }
+
+            document.querySelectorAll('#bulb-container [id^="bulb-"]').forEach((bulb) => {
+                bulb.classList.remove('ring-2', 'ring-indigo-500', 'scale-110');
+            });
+            const activeBulb = document.getElementById(`bulb-${num}`);
+            if (activeBulb) {
+                activeBulb.classList.add('ring-2', 'ring-indigo-500', 'scale-110');
             }
         }
 
@@ -409,29 +457,1780 @@
         }
 
         function renderChinesePage(pageTitle) {
-            const pageIndex = extraTrainingPages.indexOf(pageTitle);
             const chapterTitle = pageTitle;
             document.getElementById('current-subject-name').textContent = currentSubject?.name || '中文科';
             document.getElementById('chapter-subtitle').textContent = pageTitle;
             document.getElementById('main-title').textContent = pageTitle;
-            document.getElementById('main-author').textContent = currentSubject?.author || '';
-            document.getElementById('passage-wrapper').classList.add('hidden');
-            document.getElementById('questions-list').innerHTML = `
+
+            const authorEl = document.getElementById('main-author');
+            const pageAuthors = {
+                '《論仁、論孝、論君子》': '孔子及其弟子',
+                '《魚我所欲也》': '孟子',
+                '《逍遙遊》': '莊子',
+                '《逍遙遊》（節錄）': '莊子',
+                '《勸學》（節錄）': '荀子',
+                '《勸學》': '荀子',
+                '《廉頗藺相如列傳》': '司馬遷',
+                '《師說》': '韓愈',
+                '《始得西山宴遊記》': '柳宗元',
+                '《岳陽樓記》': '范仲淹',
+                '《六國論》': '蘇洵',
+                '《出師表》': '諸葛亮',
+                '《山居秋暝》': '王維',
+                '《月下獨酌》': '李白',
+                '《登樓》': '杜甫',
+                '《念奴嬌．赤壁懷古》': '蘇軾',
+                '《聲聲慢．秋情》': '李清照',
+                '《青玉案．元夕》': '辛棄疾'
+            };
+
+            const pageAuthor = pageAuthors[pageTitle] || (currentSubject?.author && currentSubject.author.trim() ? currentSubject.author : '');
+            if (pageAuthor) {
+                authorEl.textContent = pageAuthor;
+                authorEl.classList.remove('hidden');
+            } else {
+                authorEl.textContent = '';
+                authorEl.classList.add('hidden');
+            }
+
+            const passageWrapper = document.getElementById('passage-wrapper');
+            const passageContent = document.getElementById('passage-content');
+            const pagePassage = currentSubject?.pagePassages?.[pageTitle] ?? (pageTitle === '《師說》' ? currentSubject?.passage : '');
+            if (pagePassage) {
+                passageContent.innerHTML = pagePassage;
+                passageWrapper.classList.remove('hidden');
+            } else {
+                passageWrapper.classList.add('hidden');
+            }
+
+            // 根據所選頁面顯示對應文章（若為特定課文則插入全文與譯文）
+            let articleHtml = '';
+            if (pageTitle === '《魚我所欲也》') {
+                articleHtml = `
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根據原文，下列句子中加點字（括號內的字）的解釋，不正確的一項是？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 二者不可得（兼） —— 兼：同時獲得</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 如使人之所欲莫（甚）於生 —— 甚：超過、厲害</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 所識窮乏者（得）我與 —— 得：得到、獲得</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 故患有所不（辟）也 —— 辟：通「避」，躲避</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 文中第一段以「魚」與「熊掌」不可兼得作為比喻，其主要的寫作意圖是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 說明古代權貴飲食的奢華與不公</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 引出「生」與「義」不可兼得時，應當「捨生取義」的核心觀點</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 告誡讀者在面對利益衝突時，應當選擇價值較低的項目</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 探討自然資源與環境保護的平衡問題</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 文中第二段提到「呼爾而與之，行道之人弗受」，這個例子主要是為了論證什麼道理？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 社會底層人民往往比讀書人更有骨氣</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 施捨他人時，應該注意禮貌與態度</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 「羞惡之心」（人本有的義心）是人人皆有的，即使在生死關頭也一樣</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 飢餓會讓人失去理智，做出錯誤的判斷</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. 文中第三段批評有些人為了「萬鍾」之祿而接受高官厚祿。作者認為這些人為什麼會失去原本的「本心」？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 因為萬鍾的俸祿可以用來救濟更多貧窮的百姓</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 因為他們受到了朝廷的威脅，不得不接受</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 因為他們被「宮室之美、妻妾之奉、所識窮乏者得我」等物欲與虛榮所蒙蔽</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 因為他們認為個人的生死比國家的道義更重要</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 綜觀全篇，《魚我所欲也》一文的主要宗旨是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 呼籲統治者應當推行仁政，減輕百姓的賦稅與徭役</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 論證「人皆有羞惡之心」，並勸勉人們在面對生死抉擇時要保有本心、捨生取義</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 探討命運的不可預測性，鼓勵人們在逆境中保持樂觀的態度</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 說明物質生活的富足是提升個人道德修養的前提條件</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《師說》') {
+                articleHtml = `
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根據原文與譯文，「師者，所以傳道受業解惑也」中加點字（括號內的字）的解釋，不正確的一項是？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 師者，所（以）傳道 —— 以：用來……的</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 夫庸知其年之先後（生）於吾乎 —— 生：出生</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 聖人無（常）師 —— 常：平常的</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 吾從而（師）之 —— 師：以……為師</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 詞中（文中）提出「古之學者必有師」，作者認為決定一個人是否有資格成為老師的關鍵是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 老師的年齡大小與資歷</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 老師是否擁有崇高的社會地位</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 老師是否掌握了「道」</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 老師的口才與博學程度</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 文中第二段批判了中唐時期的不良風氣，作者主要藉由什麼寫作手法來加強批判力度？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 借景抒情，將個人遭遇與國家命運相結合</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 運用多組對比，如聖人與眾人、為子擇師與自身恥學</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 大量援引古代神話傳說，增添文章的神秘色彩</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 採用欲揚先抑，先讚美士大夫再指出其缺點</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. 文中特意提到「孔子師郯子、萇弘、師襄、老聃」，其主要的寫作意圖是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 讚美孔子高尚的道德品格與人格魅力</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 交代春秋時期的詳細歷史發展與政治背景</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 藉由聖人孔子言行，論證「聖人無常師」與「弟子不必不如師」的道理</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 表達作者對孔子儒家學說的盲目崇拜</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 文末提及李蟠「能行古道」，作者藉此抒發了怎樣的情感與主旨？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 徹底放棄抗爭、遁入空門的消極態度</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 讚揚不隨波逐流的求學精神，並藉此呼籲復興與傳承「師道」</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 對當時教育制度完全絕望的無奈與痛心</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 對未來重返朝廷、建功立業的狂熱信心</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《六國論》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">課文原文 / 譯文</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+六國破滅，非兵不利，戰不善，弊在賂秦。賂秦而力虧，破滅之道也。或曰：「六國互喪，率賂秦耶？」曰：「不賂者以賂者喪。蓋失強援，不能獨完，故曰『弊在賂秦』也。」
+
+秦以攻取之外，小則獲邑，大則得城，較秦之所得與戰勝而得者，其實百倍；諸侯之所亡與戰敗而亡者，其實亦百倍。則秦之所大欲，諸侯之所大患，固不在戰矣。思厥先祖父，暴霜露，斬荊棘，以有尺寸之地。子孫視之不甚惜，舉以予人，如棄草芥。今日割五城，明日割十城，然後得一夕安寢，起視四境，而秦兵又至矣。然則諸侯之地有限，暴秦之欲無厭，奉之彌繁，侵之愈急，故不戰而強弱勝負已判矣。至於顛覆，理固宜然。古人云：「以地事秦，猶抱薪救火，薪不盡，火不滅。」此言得之。
+
+齊人未嘗賂秦，終繼五國遷滅，何哉？與嬴而不助五國也。五國既喪，齊亦不免矣。燕趙之君，始有遠略，能守其土，義不賂秦。是故燕雖小國而後亡，斯用兵之效也。至丹以荊卿為計，始速禍焉。趙嘗五戰于秦，二敗而三勝，後秦擊趙者再，李牧連卻之。洎牧以讒誅，邯鄲為郡，惜其用武而不終也。且燕趙處秦革滅殆盡之際，可謂智力孤危，戰敗而亡，誠不得已。向使三國各愛其地，齊人勿附於秦，刺客不行，良將猶在，則勝負之數，存亡之理，當與秦相較，或未易量。
+
+嗚呼！以賂秦之地，封天下之謀臣；以事秦之心，禮天下之奇才；幷力西嚮，則吾恐秦人食之不得下嚥也。悲夫！有如此之勢，而為秦人積威之所劫，日削月割，以趨於亡。為國者無使為積威之所劫哉！
+
+夫六國與秦皆諸侯，其勢弱於秦，而猶有可以不賂而勝之之勢；茍以天下之大，而從六國破亡之故事，是又在六國下矣！
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+六國的滅亡，並不是因為武器不鋒利、戰術不精良，弊病就在於「割地賂秦」。賄賂秦國而使得自己的實力虧損，這正是走向滅亡的原因。有人說：「六國相繼滅亡，難道都是因為賄賂秦國嗎？」我回答：「那些不賄賂秦國的國家，是因為那此賄賂秦國的國家滅亡了，它們才跟著滅亡。因為失去了強大的援助，自己無法單獨保全，所以說『弊病就在於賄賂秦國』。」
+
+秦國除了用戰爭手段奪取土地外，小的收穫就有邑，大的收穫就有城，比較秦國所得的土地與靠戰爭獲勝所得的，實際上多出百倍；諸侯所喪失的土地，與戰敗所失去的，實際上也多出百倍。那麼秦國真正渴望的、諸侯真正擔憂的，其實根本不在於戰場上的勝負了。回想他們的先祖父，冒著風霜雨露，披荊斬棘，才開拓出這丁點兒大的土地；但子孫們對此卻一點也不珍惜，隨手就送給別人，簡直像扔掉雜草一樣。今天割讓五座城，明天割讓十座城，然後才能得到一晚上的安穩睡覺，可早上一醒來看看邊境，秦國的軍隊又打到了。既然這樣，諸侯的土地有限，而貪暴秦國的慾望沒有止境；奉獻得越多，侵略得就越急。所以，不用打仗，強弱勝負早就已經分出來了。最終導致滅亡，這在道理上本來就是必然的。古人說：「用土地來侍奉秦國，就像抱著柴火去救火，柴火沒燒完，火就不會滅。」這句話說得真對。
+
+齊國人不曾賄賂秦國，最終也隨著其他五國一起滅亡了，這是為什麼呢？因為它與秦國結盟，而不去幫助其他五國。五國滅亡後，齊國也就無法倖免了。燕國和趙國的國君，起初有長遠的謀略，能固守自己的領土，堅持正義不賄賂秦國。所以燕國雖然是小國，卻比其他國家晚滅亡，這就是堅持抵抗的效用啊。直到燕太子丹用了刺客荊軻的計策（想刺殺秦王），才招致了災禍。趙國曾經與秦國交戰五次，兩次敗、三次勝，後來秦國兩次進攻趙國，都被名將李牧擊退。等到李牧因為讒言被殺，趙國國都邯鄲就變成了秦國的郡，可惜趙國沒能堅持運用武力到底啊。況且燕、趙兩國處於秦國把其他國家消滅得快要殆盡的時候，可以說形勢非常孤立危險，戰敗而滅亡，實在是不得已的。假使這三國各自愛惜他們的土地，齊國不附和秦國，刺客不派往秦國，優秀將領還活著，那麼戰爭的勝負、存亡的道理，拿來跟秦國較量，勝負恐怕還很難預料呢。
+
+唉！如果把割讓給秦國的土地，用來封賞天下的謀臣；把侍奉秦國的心，用來禮遇天下的奇才；聯合起來向西進攻，那我恐怕秦國人連飯都吃不下嚥了。可悲啊！有這麼好的形勢，卻被秦國積累的威勢所劫持，每天被割讓一塊，每月被削減一點，以至於走向滅亡。治理國家的人，千萬不要被強敵積累的威勢所劫持啊！
+
+六國和秦國同樣是諸侯，他們的實力雖然弱於秦國，但其實是有「不賄賂秦國也能取勝」的條件與局勢。如果憑藉今天這麼大的國家（宋朝），卻重蹈六國滅亡的覆轍，那反而比六國還要不如了！
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根據原文，下列句子中加點字（括號內的字）的解釋，不正確的一項是？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 六國破滅，非兵不利，戰不（善） —— 善：好、妥當</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. （率）賂秦耶 —— 率：皆、全都</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 思厥先祖父，（暴）霜露 —— 暴：通「曝」，暴露、冒著</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 苟以天下之大，而（從）六國破亡之故事 —— 從：跟從、跟隨</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 文章第一段開門見山提出了中心論點。根據原文，作者認為六國破滅的根本原因是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 六國的軍隊不夠精銳，武器不夠鋒利</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 六國互相猜忌，無法達成真正的軍事同盟</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 六國割地賂秦，導致自身實力虧損而秦國勢力更強</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 燕國刺殺秦王失敗，引發秦國的大舉報復</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 文章第二段提到「古人云：『以地事秦，猶抱薪救火，薪不盡，火不滅。』」這個比喻的主要段意是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 說明六國割地求和只是姑息養奸，非但無法消弭割地之患，反而會加速自身的滅亡</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 讚美秦國如同烈火般強大，擁有不可抵擋的吞併之勢</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 告誡後世統治者在作戰時，應善用火攻等兵法策略</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 批評六國統治者缺乏遠見，未能及時儲備足夠的作戰物資</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. 文章第三段分析了「不賂者」燕國和趙國的滅亡原因。作者認為趙國最後之所以會破滅，最關鍵的原因是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 趙國的軍事力量太弱，無法與秦軍正面抗衡</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 趙王中了秦國的反間計，錯殺大將李牧，自毀長城</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 趙國地理位置太接近秦國，首當其衝</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 燕國未能及時派出援軍，導致趙國孤立無援</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 綜觀全篇，蘇洵寫作《六國論》的主要諷諫宗旨（主旨）是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 單純考證並分析戰國時期六國滅亡的歷史原因</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 歌頌秦始皇遠交近攻、吞併六國的雄才大略</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 借古諷今，警告北宋統治者切勿對遼和西夏採取屈辱割地、歲幣納貢的妥協政策，以免重蹈六國滅亡的覆轍</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 呼籲天下百姓團結一致，共同推翻殘暴的統治階層</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《逍遙遊》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">課文原文 / 譯文</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+惠子謂莊子曰：「魏王貽我大瓠之種，我樹之成而實五石。以盛水漿，其堅不能自舉也。剖之以為瓢，則瓠落無所容。非不呺然大也，吾為其無用而掊之。」莊子曰：「夫子固拙於用大矣！宋人有善為不龜手之藥者，世世以洴澼絖為事。客聞之，請買其方百金。聚族而謀曰：『我世世為洴澼絖，不過數金；今一朝而鬻技百金，請與之。』客得之，以說吳王。越有難，吳王使之將，冬與越人水戰，大敗越人，裂地而封之。能不龜手一也；或以封，或不免於洴澼絖，則所用之異也。今子有五石之瓠，何不慮以為大樽而浮於江湖，而憂其瓠落無所容，則夫子猶有蓬之心也夫！」
+
+惠子謂莊子曰：「吾有大樹，人謂之樗；其大本擁腫而不中繩墨，其小枝卷曲而不中規矩。立之塗，匠者不顧。今子之言，大而無用，眾所同去也。」莊子曰：「子獨不見狸狌乎？卑身而伏，以候敖者；東西跳梁，不辟高下，中於機辟，死於罔罟。今夫斄牛，其大若垂天之雲；此能為大矣，而不能執鼠。今子有大樹，患其無用，何不樹之於無何有之鄉，廣莫之野，彷徨乎無為其側，逍遙乎寢卧其下；不夭斤斧，物無害者。無所可用，安所困苦哉？」
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+惠子對莊子說：「魏王送給我大葫蘆的種子，我種成之後，果實大到可以容納五石的水。用它來盛水，它太堅硬，無法提起；剖開它做成瓢，又太大而沒有容器能容納它。這葫蘆並不是不夠大，但我認為它沒有用，就把它敲碎了。」
+
+莊子說：「先生您真是不擅長運用『大』的東西啊！宋國有人擅長製作防止手凍裂的藥，世代都以漂洗絲絮為業。有個客人聽說了，願意出百金買這個藥方。那家人聚在一起商量說：『我們世世代代漂洗絲絮，所得不過幾金；現在一旦賣掉這個技術就能得到百金，就賣給他吧。』客人得到藥方後，去遊說吳王。當時越國發動戰爭，吳王派此人帶兵，冬天與越人在水上作戰，大敗越人，吳王於是劃地封賞他。同樣是那個『不龜手』的藥方，有的人拿來得到封賞，有的人卻只能用來漂洗絲絮，這是因為運用的方式不同啊。現在您有五石大的葫蘆，為什麼不把它考慮做成大腰舟，浮游在江湖之上，反而擔心它太大沒處容納呢？看來先生您的心思還是很狹隘（蓬之心）啊！」
+
+惠子對莊子說：「我有一棵大樹，人們叫它『樗』。它的樹幹臃腫而不符合木匠的墨線，小枝條彎曲而不合圓規矩尺的標準。它立在路邊，木匠連看都不看一眼。現在您說的話，就像這棵樹一樣，大而無用，大家都會拋棄它。」
+
+莊子說：「您難道沒看過野貓或黃鼠狼嗎？牠們壓低身子潛伏，等待前來的小動物；東跳西躍，不避高低，結果往往觸碰到機關，死在網羅之中。再看看斄牛，體型大得像垂天的雲；這可以說是夠大了吧，但卻連老鼠都捉不到。現在您有這棵大樹，擔心它沒用，為什麼不把它種在虛無空曠的地方，廣闊無垠的郊野，悠然自得地在樹旁徘徊，或是在樹下睡覺呢？它不會遭受斧頭砍伐，也沒有東西會傷害它。既然沒有什麼用途，又哪裡會帶來什麼困苦呢？」
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《勸學》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">課文原文 / 譯文</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+君子曰：學不可以已。青，取之於藍，而青於藍；冰，水為之，而寒於水。木直中繩，輮以為輪，其曲中規；雖有槁暴、不復挺者，輮使之然也。故木受繩則直，金就礪則利，君子博學而日參省乎己，則知明而行無過矣。
+
+吾嘗終日而思矣，不如須臾之所學也；吾嘗跂而望矣，不如登高之博見也。登高而招，臂非加長也，而見者遠。順風而呼，聲非加疾也，而聞者彰。假輿馬者，非利足也，而致千里；假舟楫者，非能水也，而絕江河。君子生非異也，善假於物也。
+
+積土成山，風雨興焉；積水成淵，蛟龍生焉；積善成德，而神明自得，聖心備焉。故不積跬步，無以至千里；不積小流，無以成江海。騏驥一躍，不能十步；駑馬十駕，功在不舍。鍥而舍之，朽木不折；鍥而不舍，金石可鏤。螾無爪牙之利，筋骨之強，上食埃土，下飲黃泉，用心一也。蟹六跪而二螯，非蛇蟺之穴無可寄託者，用心躁也。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm leading-relaxed text-slate-700 whitespace-pre-wrap">
+君子說：學習是不可以停止的。青靛色是從藍草中提取的，但顏色卻比藍草更深；冰是水結成的，但卻比水更寒冷。木材直得合乎墨線的標準，經過烘烤彎曲作成車輪，它的弧度就能合乎圓規的標準；即使曬乾了，也不會再挺直，這是因為加工使它改變的緣故。所以，木材經過墨線測量就能變直，金屬刀具放在磨刀石上磨過就會鋒利，君子廣泛地學習，並且每天對自己進行省察，那麼他的智慧就會明達，行為就不會有過錯了。
+
+我曾經整天思考，卻不如片刻學習所得到的收穫多；我曾經踮起腳遠望，卻不如登高處看得廣闊。登高招手，手臂並沒有變長，但遠處的人都能看見；順著風呼喊，聲音並沒有變大，但聽的人聽得特別清楚。借助車馬的人，腳力並沒有變好，卻能到達千里之外；借助船隻的人，並不擅長游泳，卻能橫渡江河。君子的天性與一般人並無不同，只是他們善於借助外物來學習罷了。
+
+堆積土石成為高山，風雨就會在這裡興起；匯集水流成為深淵，蛟龍就會在這裡生長；積累善行養成高尚的品德，就能達到心智澄明、聖人的境界。所以，不積累半步一步的行程，就無法到達千里之外；不積累細小的溪流，就無法匯成江海。駿馬躍一次，不能超過十步；劣馬奔跑十天，也能到達，牠的成功在於不停止。雕刻時中途放棄，朽木也刻不斷；雕刻時堅持不懈，金石也能雕刻出花紋。蚯蚓沒有鋒利的爪牙、強壯的筋骨，卻能向上吃地上的泥土，向下喝地下的泉水，這是因為牠用心專一的緣故。螃蟹有六條腿和兩隻蟹鉗，卻沒有蛇或鱔魚的洞穴就無處容身，這是因為牠用心浮躁的緣故。
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《念奴嬌．赤壁懷古》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+大江東去，浪淘盡、千古風流人物。故壘西邊，人道是、三國周郎赤壁。亂石穿空，驚濤拍岸，捲起千堆雪。江山如畫，一時多少豪傑！ 遙想公瑾當年，小喬初嫁了，雄姿英發。羽扇綸巾，談笑間、檣櫓灰飛煙滅。故國神遊，多情應笑我，早生華髮。人間如夢，一尊還酹江月。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>大江之水滚滚东流，淘尽了千百年来历史上的无数英雄人物。那古旧营垒的西边，人们说，就是三国时期周瑜大败曹军的赤壁。陡峭的石壁直插云霄，汹涌的骇浪猛烈拍击着江岸，卷起千堆雪花般的浪花。江山如画，在那一时期，涌现出了多少英雄豪杰！</p>
+                        <p>遥想当年的周公瑾，年轻美貌的小乔刚刚嫁给他，他是那样的英姿飒爽、才华横溢。他手执羽扇，头戴纶巾，在谈笑风生之间，曹军那强劲的战船战舰就在烈火中化为飞烟，灰飞烟灭。</p>
+                        <p>我今日神游于这片古战场，多情的人应该会笑我太过多愁善感，以致于早早地长出了白头发。人生就像一场大梦，还是倒一杯酒，祭奠这江中的明月吧！</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根据原文与译文，“樯橹灰飞烟灭”主要描写了哪一场历史战役的激烈场面？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 官渡之战</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 赤壁之战</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 淝水之战</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 夷陵之战</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 词中“羽扇纶巾，谈笑间”生动地刻画了哪一位历史人物的英姿与儒雅？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 苏轼</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 曹操</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 周瑜</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 诸葛亮</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. 词中开篇“大江东去，浪淘尽、千古风流人物”，作者借滚滚东流的长江主要表达了什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 对祖国壮丽山河的纯粹赞美</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 历史的无情流逝与英雄人物的消逝</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 对古代水利工程的惊叹</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 个人想要远游他乡的强烈愿望</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 词中特意提到“小乔初嫁了”，其主要的写作意图是什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 赞美小乔的绝代美貌</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 交代三国时期的政治联姻历史</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 衬托周瑜年轻得意、风华正茂的英雄形象</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 表达作者对美满婚姻的向往</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 词末“人生如梦，一尊还酹江月”抒发了作者怎样的情感？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 彻底放弃生活、遁入空门的消极态度</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 慨叹韶华易逝、壮志难酬的复杂心境与自我超脱</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 对曹操大军惨败的同情与惋惜</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 对未来重返朝廷、建功立业的狂热信心</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            } else if (pageTitle === '《聲聲慢．秋情》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+尋尋覓覓，冷冷清清，悽悽慘慘戚戚。乍煖還寒時候，最難將息。三
+
+杯兩盞淡酒，怎敵他晚來風急！雁過也，正傷心，卻是舊時相識。 滿
+
+地黃花堆積，憔悴損，如今有誰堪摘﹖守著窗兒，獨自怎生得黑！梧桐更
+
+兼細雨，到黃昏、點點滴滴。這次第，怎一箇愁字了得！
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>我整天在漫无目的地到处寻觅，却什么也找不到，陪伴我的只有冷冷清清的环境，内心充满了凄凉、悲伤与哀戚。在这忽暖忽寒、最难将息的时节，最是难以调养身体。只喝两三杯清淡的薄酒，又怎么能抵挡得住傍晚时分刮得紧急的寒风呢？</p>
+                        <p>仰望天空，一行大雁正飞过去，正让我感到伤心，却发现它们竟是以前在北方就相识的旧相识。</p>
+                        <p>满地的菊花枯萎凋零，堆积在一起，如今它们已经憔悴不堪，还有谁有心思去采摘呢？我独自一人守在窗边，孤孤单单的，可怎么挨到天黑啊！</p>
+                        <p>偏偏到了黄昏时分，细雨又打在梧桐树上，发出点点滴滴、连续不断的哀鸣。这般光景、这种种凄凉的境遇，又怎么是一个“愁”字能够概括得了的呢！</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 词开篇连用十四个叠字（“寻寻觅觅，冷冷清清，凄凄惨惨戚戚”），在全词中起到了什么作用？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 营造一种欢快、灵动的音韵美</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 奠定全词极其凄凉、悲伤的情感基调，层层递进地刻画词人的孤独心境</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 仅仅为了押韵，没有实际的情感表达</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 描写词人在庭院中捉迷藏的日常生活场景</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 根据原文与译文，“乍暖还寒时候，最难将息”中的“将息”是什么意思？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 离别、分别</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 调养身体、休息</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 停止、结束</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 奔跑、赶路</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 词中提到“雁过也，正伤心，却是旧时相识”，作者看到大雁为什么会感到“伤心”？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 因为大雁飞得太快，无法捕捉</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 因为大雁破坏了庭院中的菊花</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 大雁勾起了词人对北方故乡、过往幸福生活的深切回忆与哀思</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 因为大雁的叫声太吵，打扰了她休息</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. “满地黄花堆积，憔悴损，如今有谁堪摘？”这里的“黄花”指的是什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 菊花</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 迎春花</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 油菜花</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 枯树叶</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 词末“这次第，怎一个愁字了得！”表达了词人怎样的复杂心境？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 愁绪非常简单，一个字就能说清楚</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 看到黄昏落雨后，心情逐渐释怀</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 种种凄凉境遇交织在一起，内心的深重愁苦根本无法用语言来穷尽</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 埋怨天气变化无常带来的烦躁</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《青玉案．元夕》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+東風夜放花千樹，更吹落、星如雨。寶馬雕車香滿路。鳳簫聲動，玉
+
+壺光轉，一夜魚龍舞。 蛾兒雪柳黃金縷，笑語盈盈暗香去。眾裏尋他
+
+千百度；驀然迴首，那人卻在、燈火闌珊處。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>春風吹拂，仿佛一夜之间催开了千树繁花；又如将满天的繁星吹落，化作阵阵流星雨。华丽的骏马和雕刻精美的马车在大街上穿行，所过之处留下一路香气。</p>
+                        <p>悠扬的箫声四处回荡，晶莹剔透的月亮缓缓转动（或是指彻夜旋转的花灯），整夜都是鱼灯、龙灯在欢快地起舞。</p>
+                        <p>美人们头上戴着亮丽的花朵、雪柳和黄金丝编织的饰品，欢声笑语、成群结队地走过，只留下阵阵幽香。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div>
+                            <p class="font-medium mb-2">Q1. 词中开篇“东风夜放花千树，更吹落、星如雨”，主要描绘了元宵节怎样的节日景象？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 狂风暴雨来临前的自然景观</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 满城花灯璀璨闪烁、绚丽烟花如雨落下的热闹场面</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 春天百花盛开、落英缤纷的春景</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 流星雨划过夜空的宏大天文现象</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q2. 结合原文与译文，词中的“玉壶光转”指的是什么在缓缓转动或流转？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 华丽的饮酒器具</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 晶莹剔透的月亮（或指彻夜旋转的花灯）</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 雕刻精美的马车车轮</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 晶莹的冰块</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. “蛾儿雪柳黄金缕，笑语盈盈暗香去”一句话，主要刻画了哪一个群体的形象？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 街头玩耍的顽皮孩童</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 彻夜舞龙舞狮的民间艺人</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 头戴亮丽饰品、欢声笑语游街盛装打扮的观灯女子</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 骑着骏马巡逻的朝廷官员</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 词中最著名的经典名句“众里寻他千百度；蓦然回首，那人却在、灯火阑珊处”，这里的“灯火阑珊”是指什么地方？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 灯火最通明、最热闹的中心舞台</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 灯光零落、人烟稀少且安静的幽暗角落</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 高挂红灯笼的豪华酒楼</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 烟火升腾的江边码头</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q5. 词人在这首词中，通过将“盛装热闹的游人”与“独处灯火阑珊处的那人”进行对比，寄托了自己怎样的情怀？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 渴望与朋友一起参与元宵狂欢的世俗愿望</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 孤高傲世、不愿同流合污、坚守孤独与初心的品格</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 叹息自己没有钱买漂亮饰品的无奈与窘迫</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 谴责元宵节过于铺张浪费的批判精神</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《月下獨酌》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+花間一壺酒，獨酌無相親。\n舉杯邀明月，對影成三人。\n月既不解飲，影徒隨我身。\n暫伴月將影，行樂須及春。\n我歌月徘徊，我舞影零亂。\n醒時同交歡，醉後各分散。\n永結無情遊，相期邈雲漢。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>提着一壶美酒摆在花丛中，我独自一人自斟自饮，身边没有一个亲近的知心朋友。我举起酒杯，邀请天上的明月共饮，再低头看看自己的影子，这就变成了三个人。</p>
+                        <p>然而明月根本不懂得饮酒的乐趣，影子也只是徒劳地尾随在我的身后。即便如此，我暂且把明月和影子当作伴侣，毕竟行乐要趁着这美好的春光。</p>
+                        <p>我唱歌时，月亮在天上随我徘徊游荡；我起舞时，影子也跟着我摇曳零乱。清醒的时候，我们一起欢聚娱乐；喝醉酒以后，我们便各自分散。</p>
+                        <p>让我们结为永恒的、不为世俗情感所羁绊的友谊吧，相约在遥远而浩瀚的银河深处再次相见。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div>
+                            <p class="font-medium mb-2">Q1. 诗中经典名句“举杯邀明月，对影成三人”，这里的“三人”具体指的是哪三者？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 李白、杜甫、高适</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 诗人自己、天上的明月、地上的影子</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 诗人的三个知心朋友</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 诗人、月亮、手中的酒杯</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q2. 根据原文与译文，“暂伴月将影，行乐须及春”中，诗人为什么强调要“及春”？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 因为春天是他最喜欢的捕鱼季节</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 因为春天的美酒比其他季节更好喝</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 意在表达应当趁着这美好的春光，抓紧时间及时行乐</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 因为朝廷要求他必须在春天返回京城</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. “我歌月徘徊，我舞影零乱”这两句诗，主要通过生动的动态描写表现了什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 诗人在宴会上与众多宾客载歌载舞的热闹场面</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 诗人借着酒意唱歌跳舞，月亮与影子仿佛与他互动，以此排遣极度的孤独</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 诗人因为醉酒而步伐不稳，摔倒在地的狼狈样子</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 描写月食发生时，月光和影子发生变化的自然现象</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 诗中“醒时同交欢，醉后各分散”反映了诗人与月亮、影子之间怎样的微妙关系？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 他们是一起喝酒的真正朋友，喝醉了就吵架分散</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 喝醉酒后，月亮和影子会嫌弃诗人并主动离开</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 清醒时可以一同欢聚娱乐，但醉倒无意识后，这种幻化出的陪伴便不复存在，重回孤独</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 诗人只喜欢和他们一起喝酒，平时不愿来往</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q5. 诗末“永结无情游，相期邈云汉”表达了诗人怎样的超脱情怀？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 发誓以后再也不碰酒，要戒酒隐居</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 愿与月、影结为超越世俗情感的永恒友谊，相约在浩瀚的银河深处再次相见</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 表达对朝廷现实生活彻底绝望，想要寻短见的悲观想法</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 抱怨月亮和影子太冷酷无情，决定不再和它们玩耍</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 惠子認為大瓠「非不呺然大也」，這句話的意思最接近下列哪一項？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 大瓠本身不夠大，無法盛水</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 大瓠非常大，但因為沒有適當用途而成為負擔</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 大瓠太重，連自己都無法支撐自己</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 大瓠太硬，不能用來做器具</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 莊子建議惠子將大瓠「為大樽而浮於江湖」，這個建議主要在提醒惠子什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 將大瓠捨棄，因為它沒有利用價值</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 找到適合它的用途，而不是只看它能否符合他人的期望</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 把大瓠切開做成小器具，更容易使用</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 把大瓠賣給國君換取財富</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 惠子稱大樹為「樗」，這裡的樗木象徵哪一種人或處境？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 外表普通但適合做器具的人</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 看似不合標準、無法被世人利用的傢伙</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 能夠像老虎一樣威猛的人</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 只有在宮廷中才會被重用的人</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. 「今夫斄牛，其大若垂天之雲；此能為大矣，而不能執鼠。」這句話想表達什麼道理？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 只要體型大，就一定有實用價值</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 大的東西不一定能完成所有小的、具體的工作</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 斄牛比鼠更勇猛，適合狩獵</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 只有像斄牛那樣的動物才能存活於森林中</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 莊子最後說「無所可用，安所困苦哉？」這句話最主要是在強調什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 只要沒有被他人利用，就不會有困難</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 若不被世俗用途拘束，就能自由無礙，亦不易遭遇困苦</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 要努力讓自己成為有用之人，才能避免困境</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 大樹應該被砍下來製作器具，否則就是浪費</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">提交答案</button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《山居秋暝》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+空山新雨後，天氣晚來秋。\n明月松間照，清泉石上流。\n竹喧歸浣女，蓮動下漁舟。\n隨意春芳歇，王孫自可留。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>空旷的青翠山峦中，刚刚下过一场清新的秋雨；傍晚时分，空气里更平添了几分秋天的凉爽与惬意。</p>
+                        <p>皎洁的月光洒落在茂密的松林之间，清澈的泉水在山石上淙淙流淌。</p>
+                        <p>竹林里传来一阵阵欢声笑语，原来是洗完衣服的姑娘们结伴归来；水面的荷叶纷纷摇动，那是顺流而下的渔船正划破荷塘。</p>
+                        <p>任凭春天的芳华在不知不觉中消逝吧，面对这秋日山中的美景，隐居的王孙贵族（指诗人自己）自然愿意留在这里，不愿离去。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div>
+                            <p class="font-medium mb-2">Q1. 诗中前两句“空山新雨后，天气晚来秋”，主要交代了什么样的背景环境？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 盛夏暴雨来临前的闷热午后</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 初秋傍晚时分，一场新雨刚刚洗涤过后的空旷山林</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 深冬大雪过后，异常寒冷的清晨</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 春天绵绵细雨中，充满生机的田野</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q2. “明月松间照，清泉石上流”这两句诗，创造了怎样的艺术意境？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 繁华热闹、色彩斑斓的都市夜生活</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 狂风暴雨、电闪雷鸣的自然奇观</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 幽静、清新、澄澈且富有生机的山水秋夜</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 荒凉、孤寂、让人感到恐惧的深山密林</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. 根据原文与译文，“竹喧归浣女”一句话中，为什么竹林里会传来“喧”闹的声音？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 因为狂风吹打竹叶发出沙沙的响声</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 因为林中聚集了大量受惊飞起的鸟类</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 因为洗完衣服的姑娘们结伴从竹林中归来，一路上欢声笑语</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 因为有渔夫在竹林里大声呼喊</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 诗中“莲动下渔舟”一句，作者是如何巧妙地暗示“渔舟正顺流而下”的？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 直接描写渔夫用力划桨的动作</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 通过描写水面上荷叶纷纷摇动、被拨开的动态来侧面烘托</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 描写听到了渔船上发动机的轰鸣声</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 描写鱼儿受惊跳出水面的场景</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q5. 诗末“随意春芳歇，王孙自可留”，这里的“王孙”指代谁？表达了诗人怎样的志向？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 指代古代的某位达官贵人，表达诗人渴望回京做官的愿望</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 指代诗人自己，表达其厌恶世俗官场、甘愿留在山中隐居的闲适与坚守</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 指代迷路的山中游客，劝导他们抓紧时间回家</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 指代辛勤劳作的渔夫，赞美他们高尚的品格</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《登樓》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+花近高樓傷客心，萬方多難此登臨。\n錦江春色來天地，玉壘浮雲變古今。\n北極朝廷終不改，西山寇盜莫相侵。\n可憐後主還祠廟，日暮聊為梁甫吟。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>高楼洒满春色，百花盛开，却反而让客居他乡的我感到伤心；因为在举国上下多灾多难的动荡时刻，我独自登上了这座高楼。</p>
+                        <p>看那锦江的明媚春光铺天盖地而来，玉垒山上的浮云自古至今变幻莫测，正如国家局势的动荡。</p>
+                        <p>大唐朝廷就像北极星一样稳固，最终绝不会改变；西山那些侵扰边境的寇盗，你们不要再徒劳地前来侵犯。</p>
+                        <p>可怜那懦弱无能的蜀汉后主刘禅，如今还有祠庙供奉并享受祭祀；在这夕阳西下的黄昏时分，我姑且吟诵一曲《梁甫吟》，以寄托对贤才的渴求。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 诗歌首句写“花近高楼伤客心”，高楼前繁花盛开，为什么反而让诗人感到“伤心”？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 因为诗人对花粉过敏，导致身体不适</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 诗人客居他乡，面对明媚春光，反衬出国家多灾多难、个人漂泊的沉重忧伤</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 因为春花即将凋零，诗人感叹自己容颜老去</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 繁华的景色让诗人想起了家中不愉快的往事</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 诗中“玉垒浮云变古今”一句，作者借玉垒山上变幻莫测的浮云主要是为了比喻什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 自然界天气的无常变化</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 国家局势的动荡不宁与历史政治的变幻</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 诗人自己起伏不定的仕途升迁</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 建筑设计的精妙与时代变迁</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. “北极朝廷终不改，西山寇盗莫相侵”两句诗，表达了诗人怎样的坚定信念？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 西山的盗贼最终会被感化，不再前来侵犯</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 诗人坚信自己能够加官进爵，改变命运</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 坚信大唐朝廷政权像北极星一样稳固，绝不会改变，对国家充满信心并警告外敌</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 朝廷应该顺应局势，主动向西山的敌寇妥协</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 诗中提到“可怜后主还祠庙”，这里的“后主”指的是历史上的哪位人物？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 诸葛亮</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 刘禅（蜀汉后主）</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 刘备</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 曹操</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 尾句“日暮聊为梁甫吟”，诗人提到自己在黄昏时分吟诵《梁甫吟》，其深层寄托是什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 表达对音乐艺术的纯粹热爱</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 抒发自己渴望隐居山林、不再过问世事的出世想法</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 借此典故表达对像诸葛亮那样能够匡扶社稷的贤才的极度渴望，以及自己报国无门的感叹</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 纯粹为了消磨黄昏的无聊时间</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《出師表》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+先帝創業未半，而中道崩殂；今天下三分，益州疲弊，此誠危急存亡之秋也﹗然侍衞之臣，不懈於內；忠志之士，忘身於外者，蓋追先帝之殊遇，欲報之於陛下也。
+
+誠宜開張聖聽，以光先帝遺德，恢弘志士之氣﹔不宜妄自菲薄，引喻失義，以塞忠諫之路也。
+
+宮中、府中，俱為一體；陟罰臧否，不宜異同。若有作姦、犯科，及為忠善者，宜付有司，論其刑賞，以昭陛下平明之治；不宜偏私，使內外異法也。
+
+侍中、侍郎郭攸之、費禕、董允等，此皆良實，志慮忠純，是以先帝簡拔以遺陛下。愚以為宮中之事，事無大小，悉以咨之，然後施行，必能裨補闕漏，有所廣益。將軍向寵，性行淑均，曉暢軍事，試用於昔日，先帝稱之曰「能」，是以眾議舉寵為督。愚以為營中之事，悉以咨之，必能使行陣和睦，優劣得所。
+
+親賢臣，遠小人，此先漢所以興隆也﹔親小人，遠賢臣，此後漢所以傾頹也。先帝在時，每與臣論此事，未嘗不歎息痛恨於桓、靈也！侍中、尚書、長史、參軍，此悉貞良死節之臣，願陛下親之、信之，則漢室之隆，可計日而待也。
+
+臣本布衣，躬耕於南陽，苟全性命於亂世，不求聞達於諸侯。先帝不以臣卑鄙，猥自枉屈，三顧臣於草廬之中，諮臣以當世之事；由是感激，遂許先帝以驅馳。
+
+後值傾覆，受任於敗軍之際，奉命於危難之間，爾來二十有一年矣。先帝知臣謹慎，故臨崩寄臣以大事也。受命以來，夙夜憂歎，恐託付不效，以傷先帝之明。故五月渡瀘，深入不毛。
+
+今南方已定，兵甲已足，當獎率三軍，北定中原，庶竭駑鈍，攘除姦凶，興復漢室，還於舊都。此臣所以報先帝而忠陛下之職分也。
+
+至於斟酌損益，進盡忠言，則攸之、禕、允之任也。願陛下託臣以討賊興復之效；不效，則治臣之罪，以告先帝之靈。若無興德之言，則責攸之、禕、允等之慢，以彰其咎。陛下亦宜自謀，以諮諏善道，察納雅言，深追先帝遺詔。臣不勝受恩感激。今當遠離，臨表涕零，不知所言。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>先帝（劉備）創立帝業還沒有完成一半，就中途去世了。現在天下分裂為三國，我州地疲弊，民力衰弱，這實在是國家危急、生死存亡之秋。然而宮廷內的侍衛、外邊的忠臣，都不敢懈怠，皆是為了追念先帝的厚恩，欲在陛下身上盡忠報恩。</p>
+                        <p>陛下誠宜廣開聖聽，以光先帝遺德，恢弘有志之士的氣概；不宜妄自菲薄，用不合義理的譬喻自貶，從而堵塞忠諫之路。</p>
+                        <p>宮中與府中本為一體，賞罰不宜異同。若有犯錯作惡或為忠良之事，應交由有司論處，明示陛下公正，勿使內外有異法偏私。</p>
+                        <p>侍中郭攸之、費禕、董允等人，皆為良實忠純之臣，先帝特別選拔留給陛下。我愚見以為，宮中的大小事務，悉應咨詢他們再行施行，必能補闕益事。將軍向寵，性行淑均，曉暢軍務，先帝曾稱其能，故眾人推舉之為督。營中事務亦宜咨之，可使行陣和睦，優劣得所。</p>
+                        <p>親賢臣遠小人，是先漢興盛的緣由；親小人遠賢臣，是後漢傾頹的原因。先帝生前常與臣論及此事，未嘗不歎於桓、靈。侍中、尚書、長史、參軍等人，皆忠貞之臣，願陛下親信之，漢室復興可期。</p>
+                        <p>臣本布衣，躬耕南陽，僅圖苟全性命於亂世，不求聞達。先帝三顧草廬以重禮召臣，詢以治世之策，臣受感激而從。後遇國勢傾覆，臣受命於危難之時，迄今二十一年，先帝臨崩以大事託臣。臣受命以來，夙夜憂歎，恐託付不效，傷先帝之明。故五月渡瀘，深入不毛。今南方已定，武備已足，宜率三軍北定中原，盡臣微力，除奸凶，興復漢室，還于舊都。</p>
+                        <p>至於衡量利弊、進呈忠言，則攸之、禕、允等人之任。願陛下付臣討賊復國之任；若不成功，治臣以告慰先帝之靈。若無興德之言，責攸之、禕、允等之慢，以彰其咎。陛下亦當自謀治道，察納雅言，深追先帝遺詔。臣銘感於心，今當遠行，臨表涕零，不知所言。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根据原文与译文，诸葛亮在开篇指出“益州疲弊”，认为当时蜀汉处于怎样的局势？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 国泰民安、兵强马壮的鼎盛时期</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 国家危急、生死存亡的关键时刻</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 彻底放弃抵抗、准备投降的绝境</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 正在积极扩张、吞并曹魏的阶段</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 诸葛亮在文中劝诫后主“不宜妄自菲薄，引喻失义”，其最主要的目的是什么？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 劝刘禅多读书、提高文学素养</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 建议刘禅减少宫廷内的开支与赏赐</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 告诫刘禅不要无端轻视自己、说话不合义理，从而堵塞了忠臣进谏的言路</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 鼓励刘禅亲自带兵出征、北定中原</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. 诸葛亮提到“亲贤臣，远小人”与“亲小人，远贤臣”，并以此对比了哪两个时期的兴衰？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 先汉的兴隆与后汉的倾颓</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 曹魏的强大与东吴的衰落</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 西周的繁荣与东周的战乱</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 秦朝的统一与汉朝的建立</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 文中“三顾臣于草庐之中，咨臣以当世之事”这一名句，描写的是哪一个著名的历史典故？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 负荆请罪</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 闻鸡起舞</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 三顾茅庐</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 桃园三结义</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 诸葛亮在《出师表》的末尾写道“今当远离，临表涕零，不知所言”，这主要表达了他怎样的情感？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 面对即将到来的战争感到恐惧与退缩</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 对先帝遗托的极度忠诚、对国家的责任感以及临行前的深沉感激与不舍</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 埋怨后主不够聪明、对自己缺乏信任的无奈</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 对南方战事久拖不决的烦躁与愤怒</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《始得西山宴遊記》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+自余為僇人，居是州，恒惴慄。其隙也，則施施而行，漫漫而遊。日
+
+與其徒上高山，入深林，窮迴溪，幽泉怪石，無遠不到。到則披草而坐，
+
+傾壺而醉。醉則更相枕以臥，臥而夢。意有所極，夢亦同趣。覺而起，起
+
+而歸。以為凡是州之山有異態者，皆我有也，而未始知西山之怪特。
+
+今年九月二十八日，因坐法華西亭，望西山，始指異之。遂命僕過湘
+
+江，緣染溪，斫榛莽。焚茅茷，窮山之高而止。攀援而登，箕踞而遨，則
+
+凡數州之土壤，皆在衽席之下。其高下之勢，岈然窪然，若垤若穴，尺寸
+
+千里，攢蹙累積，莫得遯隱。縈青繚白，外與天際，四望如一。然後知是
+
+山之特出，不與培塿為類。悠悠乎與顥氣俱，而莫得其涯；洋洋乎與造物
+
+者遊，而不知其所窮。引觴滿酌，頹然就醉，不知日之入。蒼然暮色，自
+
+遠而至，至無所見，而猶不欲歸。心凝形釋，與萬化冥合。然後知吾嚮之
+
+未始遊，遊於是乎始，故為之文以志。是歲元和四年也。
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>自从我成为被贬之人，居住在永州，心中常惴惴不安。公事之余，我便缓缓行走，漫游四方。每日与友人登高入林，穷尽曲折的溪流，探访幽泉怪石，无远弗至。到处披草席坐，倾壶痛饮；酒醉相枕而卧，梦中所至与心所向相同。醒来起身，便回归家中。我自以为州内怪异之山水皆为所览，却未曾识得西山之特奇。</p>
+                        <p>今年九月二十八日，我坐于法华寺西亭，遥望西山，始觉其异。于是令仆人渡湘江，沿染溪开路，斫除荆棘，焚茅草，穷尽山之高处而止。攀援登上，纵足而坐，极目四望，数州之土皆在脚下。高下起伏，或峙或坳，聚积错落，视之虽尺许，实则千里。青山环绕相绕，与天相接，四望无异。我始知此山卓然出众，不可与寻常土丘类比。悠远与浩荡之气同在，而不可穷其涯；与造物者同游，而无穷尽之感。我举杯尽酌，尽兴醉倒，不知日已入暮。暮色苍茫自远而至，尽蔽所见，我仍不愿归去。心凝而形释，与万物合一。此刻方知以往之游未称为游，真正之游始于此，故作此文以志，岁在元和四年。</p>
+                    </div>
+                </div>
+
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 文章開頭提到「自余為僇人，居是州，恒惴慄」，這反映了作者當時怎樣的心境？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 寄情山水、無憂無慮的閒適</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 因被貶官而內心憂懼、惶惶不安</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 對永州自然景色的極度厭惡</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 渴望建功立業、急於回京的雄心</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 課文描述西山景觀時提到「尺寸千里，攢蹙累積」，這主要是運用了什麼描寫手法？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 描寫西山的山徑非常狹窄，難以通行</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 以視覺上的縮小效果，反襯西山視野極其遼闊、氣勢磅礴</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 說明西山上有許多奇形怪狀的小石頭</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 抱怨登山過程辛苦，每一寸土地都像千里遠</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q3. 作者在登上西山後，感受到了「心凝形釋，與萬化冥合」，這表達了什麼樣的境界？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 身體因勞累而失去知覺，陷入昏迷</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 精神專注而形體忘我，與大自然合而為一的忘我境界</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 內心感到疑惑不解，無法理解自然的變化</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 想要離開塵世，獨自在山林中生活的決定</span></label>
+                            </div>
+                        </div>
+                        <div>
+                            <p class="font-medium mb-2">Q4. 為何作者在文末說「然後知吾嚮之未始遊，遊於是乎始」？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 因為之前他從來沒有離開過家門去旅遊</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 因為西山的旅遊設施比其他地方更完善</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 因為之前的遊覽只是消遣排悶，唯有這次西山之遊才真正獲得心靈的解脫與震撼</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 因為他打算從元和四年開始轉行做導遊</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 文章提到西山「不與培塿為類」，這句話除了描寫地形外，還有什麼深層含義？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 說明西山的土質與一般的土丘完全不同</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 藉由西山卓爾不群的形象，寄託作者孤高傲世、不隨俗浮沉的人格追求</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 抱怨永州的小山丘太多，阻礙了視線</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 讚美當地的農民保護自然環境的意識很高</span></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">
+                            提交答案
+                        </button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《岳陽樓記》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+慶曆四年春，滕子京謫守巴陵郡。越明年，政通人和，百廢具興。乃重修岳陽樓，增其舊制，刻唐賢、今人詩賦於其上；屬予作文以記之。
+
+予觀夫巴陵勝狀，在洞庭一湖。銜遠山，吞長江，浩浩湯湯，橫無際涯；朝暉夕陰，氣象萬千。此則岳陽樓之大觀也，前人之述備矣。然則北通巫峽，南極瀟湘，遷客騷人，多會於此，覽物之情，得無異乎？
+
+若夫霪雨霏霏，連月不開；陰風怒號，濁浪排空；日星隱耀，山岳潛形；商旅不行，檣傾楫摧；薄暮冥冥，虎嘯猿啼。登斯樓也，則有去國懷鄉，憂讒畏譏，滿目蕭然，感極而悲者矣。
+
+至若春和景明，波瀾不驚，上下天光，一碧萬頃；沙鷗翔集，錦鱗游泳；岸芷汀蘭，郁郁青青。而或長煙一空，皓月千里，浮光躍金，靜影沉璧；漁歌互答，此樂何極！登斯樓也，則有心曠神怡，寵辱皆忘，把酒臨風，其喜洋洋者矣。
+
+嗟夫！予嘗求古仁人之心，或異二者之為。何哉？不以物喜，不以己悲。居廟堂之高，則憂其民；處江湖之遠，則憂其君。是進亦憂，退亦憂，然則何時而樂耶？其必曰：「先天下之憂而憂，後天下之樂而樂」歟！噫！微斯人，吾誰與歸！
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>慶曆四年春天，滕子京被貶為岳州太守。到了第二年，由於他治理得法，政治清明、百姓和諧，各種廢弛的事業都興辦起來了。於是重新修繕岳陽樓，擴大了原有的規模，並把唐代名家與當代文人的詩賦刻在上面，委託我寫一篇文章來記錄這件事。</p>
+                        <p>我看那巴陵郡的美景，全都在洞庭湖上了。它銜接遠山，吞吐長江，水勢浩大，無邊無際；早晚陰晴變化，氣象萬千。這就是岳陽樓的雄偉景觀，前人已經描述得非常詳盡了。然而，這裡向北通往巫峽，向南直達瀟湘，被貶的官員與文人墨客，多聚集於此，他們面對眼前景物所產生的心情，難道不會有所不同嗎？</p>
+                        <p>若是遇到連綿細雨，整個月不放晴；陰冷的風怒吼，混濁的浪花騰空而起；太陽與星辰的光輝隱沒，山岳也潛藏不見；商人旅客不敢前行，船桅傾倒、船槳折斷；傍晚時分昏暗一片，傳來虎嘯猿啼的聲音。這時候登上岳陽樓，就會有離開京城、懷念家鄉，擔心被讒言陷害、畏懼遭人譏諷的感慨，滿眼蕭條淒涼，感傷到了極點，令人悲從中來。</p>
+                        <p>至於若是遇到春風和煦、陽光明媚，波瀾平靜無波，天色湖光相連，一望無際，碧綠如鏡；沙洲上的鷗鳥時而飛翔時而停駐，美麗的魚兒在水底游動；岸邊的香草與小洲上的蘭花，生機盎然、青翠繁茂。有時煙霧消散，萬里天空清朗，明月當空，水面浮動的光影如金子般閃耀，靜止的倒影如玉璧般沈入水底；漁夫的歌聲互相应和，這種快樂哪有窮盡！這時候登上岳陽樓，就會感到心胸開闊、精神愉悅，寵辱皆忘，端著酒杯面對春風，那快樂真是洋洋灑灑。</p>
+                        <p>唉！我曾經探求古代仁人的心境，或許與上述這兩種人的表現有所不同。為什麼呢？因為他們不因外在環境的好壞而喜悅，也不因自己境遇的順逆而悲傷。在朝廷做高官，就擔憂百姓的疾苦；退隱在偏遠的江湖，就憂慮君王的過失。這樣看來，身居上位也憂，退居下位也憂，那麼到底什麼時候才會快樂呢？他們一定會說：「在天下人憂慮之前先憂慮，在天下人享樂之後才享樂吧！」唉！如果沒有這樣的人，我還能跟隨誰呢！</p>
+                    </div>
+                </div>
+                <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                    <div class="space-y-6 text-sm text-slate-700">
+                        <div id="q-box-1">
+                            <p class="font-medium mb-2">Q1. 根據原文與譯文，促成范仲淹寫下這篇《岳陽樓記》的直接背景原因是什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 范仲淹自己重修了岳陽樓，需要慶功</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 好友滕子京謫守巴陵郡後重修岳陽樓，並囑託范仲淹作記</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 朝廷下令普查全國名勝古蹟，需要撰寫報告</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 洞庭湖一帶發生嚴重水災，需要寫信賑災</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-2">
+                            <p class="font-medium mb-2">Q2. 課文第三段描寫了「霪雨霏霏，連月不開；陰風怒號，濁浪排空」的陰慘景色，這時「遷客騷人」登樓會產生什麼樣的情感？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 心曠神怡，把酒臨風的洋洋喜氣</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 想要放棄官職、隱居洞庭湖畔的閒適之情</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 產生去國懷鄉、憂讒畏譏的滿目蕭然與極度悲傷</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 對自然美景的由衷讚美與驚嘆</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-3">
+                            <p class="font-medium mb-2">Q3. 課文第四段用「浮光躍金，靜影沉璧」來描寫洞庭湖夜景。其中的「靜影沉璧」是指什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 漁民捕魚時不小心將玉璧掉入湖中</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 月亮倒映在平靜的水面上，就像沈入水底的完美玉璧</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 湖底藏有發光的金色寶藏</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 天空中的雲霧散去後露出的碧綠色山巒</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-4">
+                            <p class="font-medium mb-2">Q4. 范仲淹提出「不以物喜，不以己悲」，這句話所代表的「古仁人之心」是指什麼？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 只要待在朝廷當大官就會非常快樂，不在乎別人怎麼看</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 面對大自然的風景變化時，內心毫無波動與感覺</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 不因外在環境的好壞而喜悅，也不因自己遭遇的順逆而悲傷的超然心境</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 徹底與世隔絕，不再關心百姓與君王的痛苦</span></label>
+                            </div>
+                        </div>
+                        <div id="q-box-5">
+                            <p class="font-medium mb-2">Q5. 全文最著名的千古名句「先天下之憂而憂，後天下之樂而樂」，表達了作者怎樣的抱負？</p>
+                            <div class="space-y-2 pl-4">
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 憂國憂民、以天下為己任，將個人的快樂置於大眾之後的高尚政治情操</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 認為自己應該比全天下的人都更早享受物質生活</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 抱怨當官太過辛苦，永遠沒有辦法得到真正的快樂</span></label>
+                                <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 勸導後輩要遠離政治，先讓天下人去憂慮，自己留在最後享樂</span></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 flex flex-col gap-3">
+                        <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">提交答案</button>
+                        <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                    </div>
+                </div>
+                `;
+            }
+            else if (pageTitle === '《廉頗藺相如列傳》') {
+                articleHtml = `
+                <div class="p-6 mb-6 bg-slate-50 rounded-2xl border border-gray-100 shadow-sm text-deep-blue">
+                    <div class="flex items-center gap-3 mb-4">
+                        <span class="inline-block text-xs font-semibold text-indigo-700 bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-full">READING PASSAGE</span>
+                    </div>
+
+                    <h3 class="text-lg font-semibold text-deep-blue mb-2">原文</h3>
+                    <div class="mt-2 text-base leading-relaxed text-slate-700 whitespace-pre-wrap border-l-4 border-indigo-200 pl-4 py-3">
+廉頗者，趙之良將也。趙惠文王十六年，廉頗為趙將伐齊，大破之，取陽晉，拜為上卿，以勇氣聞於諸侯。藺相如者，趙人也，為趙宦者令繆賢舍人。
+
+趙惠文王時，得楚和氏璧。秦昭王聞之，使人遺趙王書，願以十五城請易璧。趙王與大將軍廉頗諸大臣謀：欲予秦，秦城恐不可得，徒見欺；欲勿予，即患秦兵之來。計未定，求人可使報秦者，未得。宦者令繆賢曰：「臣舍人藺相如可使。」王問：「何以知之？」對曰：「臣嘗有罪，竊計欲亡走燕，臣舍人相如止臣，曰：『君何以知燕王？』臣語曰：『臣嘗從大王與燕王會境上，燕王私握臣手，曰「願結友。」以此知之，故欲往。』相如謂臣曰：『夫趙彊而燕弱，而君幸於趙王，故燕王欲結於君。今君乃亡趙走燕，燕畏趙，其勢必不敢留君，而束君歸趙矣。君不如肉袒伏斧質請罪，則幸得脫矣。』臣從其計，大王亦幸赦臣。臣竊以為其人勇士，有智謀，宜可使。」於是王召見，問藺相如曰：「秦王以十五城請易寡人之璧，可予不？」相如曰：「秦彊而趙弱，不可不許。」王曰：「取吾璧，不予我城，奈何？」相如曰：「秦以城求璧而趙不許，曲在趙；趙予璧而秦不予趙城，曲在秦。均之二策，寧許以負秦曲。」王曰：「誰可使者？」相如曰：「王必無人，臣願奉璧往使。城入趙而璧留秦；城不入，臣請完璧歸趙。」趙王於是遂遣相如奉璧西入秦。
+
+秦王坐章台見相如，相如奉璧奏秦王。秦王大喜，傳以示美人及左右，左右皆呼萬歲。相如視秦王無意償趙城，乃前曰：「璧有瑕，請指示王。」王授璧，相如因持璧，卻立，倚柱，怒髮上衝冠，謂秦王曰：「大王欲得璧，使人發書至趙王，趙王悉召羣臣議，皆曰：『秦貪，負其彊，以空言求璧，償城恐不可得』。議不欲予秦璧。臣以為布衣之交尚不相欺，況大國乎！且以一璧之故逆彊秦之驩，不可。於是趙王乃齋戒五日，使臣奉璧，拜送書於庭。何者？嚴大國之威以修敬也。今臣至，大王見臣列觀，禮節甚倨；得璧，傳之美人，以戲弄臣。臣觀大王無意償趙王城邑，故臣復取璧。大王必欲急臣，臣頭今與璧俱碎於柱矣！」相如持其璧睨柱，欲以擊柱。秦王恐其破璧，乃辭謝固請，召有司案圖，指從此以往十五都予趙。
+
+相如度秦王特以詐佯為予趙城，實不可得，乃謂秦王曰：「和氏璧，天下所共傳寶也。趙王恐，不敢不獻。趙王送璧時，齋戒五日，今大王亦宜齋戒五日，設九賓於廷，臣乃敢上璧。」秦王度之，終不可彊奪，遂許齋五日，舍相如廣成傳。相如度秦王雖齋，決負約不償城，乃使其從者衣褐，懷其璧，從徑道亡，歸璧於趙。
+
+秦王齋五日後，乃設九賓禮於廷，引趙使者藺相如。相如至，謂秦王曰：「秦自繆公以來二十餘君，未嘗有堅明約束者也。臣誠恐見欺於王而負趙，故令人持璧歸，間至趙矣。且秦彊而趙弱，大王遣一介之使至趙，趙立奉璧來；今以秦之彊而先割十五都予趙，趙豈敢留璧而得罪於大王乎？臣知欺大王之罪當誅，臣請就湯鑊。唯大王與羣臣孰計議之！」秦王與羣臣相視而嘻。左右或欲引相如去，秦王因曰：「今殺相如，終不能得璧也，而絕秦趙之驩，不如因而厚遇之，使歸趙，趙王豈以一璧之故欺秦邪！」卒廷見相如，畢禮而歸之。相如既歸，趙王以為賢大夫，使不辱於諸侯，拜相如為上大夫。秦亦不以城予趙，趙亦終不予秦璧。
+
+其後秦伐趙，拔石城。明年，復攻趙，殺二萬人。秦王使使者告趙王，欲與王為好會於西河外澠池。趙王畏秦，欲毋行。廉頗、藺相如計曰：「王不行，示趙弱且怯也。」趙王遂行，相如從。廉頗送至境，與王訣曰：「王行，度道里會遇之禮畢，還，不過三十日。三十日不還，則請立太子為王，以絕秦望。」王許之，遂與秦王會澠池。秦王飲酒酣，曰：「寡人竊聞趙王好音，請奏瑟。」趙王鼓瑟。秦御史前書曰：「某年月日，秦王與趙王會飲，令趙王鼓瑟。」藺相如前曰：「趙王竊聞秦王善為秦聲，請奏盆缻秦王，以相娛樂。」秦王怒，不許。於是相如前進缻，因跪請秦王。秦王不肯擊缻。相如曰：「五步之內，相如請得以頸血濺大王矣！」左右欲刃相如，相如張目叱之，左右皆靡。於是秦王不懌，為一擊缻。相如顧召趙御史書曰：「某年月日，秦王為趙王擊缻。」秦之羣臣曰：「請以趙十五城為秦王壽。」藺相如亦曰：「請以秦之咸陽為趙王壽。」秦王竟酒，終不能加勝於趙。趙亦盛設兵以待秦，秦不敢動。
+
+既罷歸國，以相如功大，拜為上卿，位在廉頗之右。廉頗曰：「我為趙將，有攻城野戰之大功，而藺相如徒以口舌為勞，而位居我上，且相如素賤人，吾羞，不忍為之下。」宣言曰：「我見相如，必辱之。」相如聞，不肯與會。相如每朝時，常稱病，不欲與廉頗爭列。已而相如出，望見廉頗，相如引車避匿。於是舍人相與諫曰：「臣所以去親戚而事君者，徒慕君之高義也。今君與廉頗同列，廉君宣惡言而君畏匿之，恐懼殊甚，且庸人尚羞之，況於將相乎！臣等不肖，請辭去。」藺相如固止之，曰：「公之視廉將軍孰與秦王？」曰：「不若也。」相如曰：「夫以秦王之威，而相如廷叱之，辱其羣臣，相如雖駑，獨畏廉將軍哉？顧吾念之，彊秦之所以不敢加兵於趙者，徒以吾兩人在也。今兩虎共鬥，其勢不俱生。吾所以為此者，以先國家之急而後私讎也。」廉頗聞之，肉袒負荊，因賓客至藺相如門謝罪。曰：「鄙賤之人，不知將軍寬之至此也。」卒相與驩，為刎頸之交。
+                    </div>
+
+                    <div class="p-6 rounded-2xl border border-gray-100 bg-white shadow-sm mt-6">
+                        <h4 class="text-lg font-semibold text-deep-blue mb-4">練習題</h4>
+                        <div class="space-y-6 text-sm text-slate-700">
+                            <div id="q-box-1">
+                                <p class="font-medium mb-2">Q1. 在「完璧歸趙」的故事中，藺相如隻身赴秦，他在章台宮看穿秦王毫無償城誠意後，是用什麼藉口成功將和氏璧從秦王手中騙回來的？</p>
+                                <div class="space-y-2 pl-4">
+                                    <label class="flex items-start gap-2"><input type="radio" name="q1" value="A" class="mt-1" /><span>A. 聲稱自己要親自為秦王擦拭寶璧</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q1" value="B" class="mt-1" /><span>B. 假稱璧上有一點瑕疵，要指給秦王看</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q1" value="C" class="mt-1" /><span>C. 藉口要帶和氏璧到光線更好的殿外觀賞</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q1" value="D" class="mt-1" /><span>D. 謊稱和氏璧需要配合趙國的咒語才能發光</span></label>
+                                </div>
+                            </div>
+                            <div id="q-box-2">
+                                <p class="font-medium mb-2">Q2. 澠池之會上，秦王逼迫趙王鼓瑟並讓御史記錄，企圖羞辱趙國。藺相如隨即採取了什麼行動進行反制？</p>
+                                <div class="space-y-2 pl-4">
+                                    <label class="flex items-start gap-2"><input type="radio" name="q2" value="A" class="mt-1" /><span>A. 當場拔劍刺向秦國御史，強行奪走記錄</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q2" value="B" class="mt-1" /><span>B. 藉口趙王身體不適，提早離席退出會盟</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q2" value="C" class="mt-1" /><span>C. 以死相逼強迫秦王擊缻，並命趙國御史記錄下來以維護國家尊嚴</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q2" value="D" class="mt-1" /><span>D. 主動提出用趙國的十五座城池來為秦王祝壽</span></label>
+                                </div>
+                            </div>
+                            <div id="q-box-3">
+                                <p class="font-medium mb-2">Q3. 澠池之會結束回到趙國後，廉頗對藺相如心生不滿並宣言「我見相如，必辱之」的原因是什麼？</p>
+                                <div class="space-y-2 pl-4">
+                                    <label class="flex items-start gap-2"><input type="radio" name="q3" value="A" class="mt-1" /><span>A. 廉頗認為藺相如在澠池之會上表現懦弱，丟了趙國的面子</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q3" value="B" class="mt-1" /><span>B. 藺相如私自扣留了秦王賞賜給趙國將領的財物</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q3" value="C" class="mt-1" /><span>C. 廉頗自恃有攻城野戰大功，不滿出身低微的藺相如僅憑口舌之勞便位居其上</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q3" value="D" class="mt-1" /><span>D. 趙王聽信藺相如的讒言，削減了廉頗的軍隊編制</span></label>
+                                </div>
+                            </div>
+                            <div id="q-box-4">
+                                <p class="font-medium mb-2">Q4. 藺相如面對廉頗的處處刁難與羞辱，甚至「引車避匿」，他這樣做的出發點是什麼？</p>
+                                <div class="space-y-2 pl-4">
+                                    <label class="flex items-start gap-2"><input type="radio" name="q4" value="A" class="mt-1" /><span>A. 藺相如深知自己武藝不如廉頗，因害怕挨打而選擇逃避</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q4" value="B" class="mt-1" /><span>B. 藺相如自知理虧，覺得自己的功勞確實比不上廉頗</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q4" value="C" class="mt-1" /><span>C. 以國家利益為先，避免兩虎共鬥給強秦有機可乘的機會</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q4" value="D" class="mt-1" /><span>D. 企圖以退為進，故意向趙王裝可憐來彈劾廉頗</span></label>
+                                </div>
+                            </div>
+                            <div id="q-box-5">
+                                <p class="font-medium mb-2">Q5. 故事最後，廉頗聽聞藺相如避讓的真正原因後，做出了什麼歷史上著名的舉動來表達歉意？</p>
+                                <div class="space-y-2 pl-4">
+                                    <label class="flex items-start gap-2"><input type="radio" name="q5" value="A" class="mt-1" /><span>A. 在朝廷上當著趙王與文武百官的面宣讀謝罪書</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q5" value="B" class="mt-1" /><span>B. 將自己攻城奪地換來的所有封地與財產全部送給藺相如</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q5" value="C" class="mt-1" /><span>C. 「肉袒負荊」親自到藺相如門前謝罪，兩人結為刎頸之交</span></label>
+                                    <label class="flex items-start gap-2"><input type="radio" name="q5" value="D" class="mt-1" /><span>D. 主動向趙王請辭，告老還鄉以示懲罰</span></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex flex-col gap-3">
+                            <button id="mc-submit-button" type="button" class="w-full sm:w-auto inline-flex items-center justify-center px-5 py-3 rounded-2xl bg-deep-blue text-white text-sm font-semibold hover:bg-indigo-700 transition-colors">提交答案</button>
+                            <div id="mc-score-result" class="text-sm text-slate-700"></div>
+                        </div>
+                    </div>
+
+                    <h4 class="text-sm font-semibold text-deep-blue mt-4">譯文</h4>
+                    <div class="mt-2 text-sm text-slate-700 leading-relaxed">
+                        <p>廉颇是赵国的优秀将领。赵惠文王十六年，廉颇担任赵国大将去讨伐齐国，大败齐军，夺取了阳晋，被封为上卿，凭着勇气在诸侯国中闻名。蔺相如是赵国人，担任赵国宦官头目缪贤的门客。</p>
+                        <p>赵惠文王在位时，得到了楚国的和氏璧。秦昭王听说这件事，派人送给赵王一封信，表示愿意用十五座城池来换取这块璧。赵王与大将军廉颇等群臣商议：想给秦国吧，担心秦国的城池根本得不到，白白被欺骗；想不给吧，又担心秦国的军队打过来。计策还没有定下来，想找一个可以派去回复秦国的人，也没有找到。宦者令缪贤说：“我的门客蔺相如可以派去。”赵王问：“你怎么知道他可以？”缪贤回答说：“我曾犯过罪，私下计划想逃亡到燕国去，我的门客相如阻止我，说：‘您怎么了解燕王呢？’我告诉他：‘我曾跟随大王与燕王在边境上会盟，燕王私下握着我的手说“愿意结为朋友”。我凭这一点了解他，所以想去。’相如对我说：‘赵国强大而燕国弱小，而您当时受到赵王的宠信，所以燕王想和您结交。如今您是从赵国逃亡到燕国，燕王害怕赵国，在那种势头下他一定不敢收留您，反而会把您绑了送回赵国。您不如脱掉上衣，露出肩膀，伏在刑具上请罪，这样或许侥幸能得到赦免。’我听从了他的计策，大王您也宽大赦免了我。我私下认为这个人是个勇士，又有智谋，应该可以派去。”</p>
+                        <p>于是赵王召见蔺相如，问他：“秦王用十五座城池请求交换我的和氏璧，可以给他吗？”相如说：“秦国强大而赵国弱小，不能不答应。”赵王说：“拿走了我的璧，却不给我城池，怎么办？”相如说：“秦国用城池求取璧而赵国不答应，理亏在赵国；赵国给了璧而秦国不给赵国城池，理亏在秦国。衡量这两个对策，宁可答应给秦国，让秦国承担理亏的责任。”赵王问：“谁可以作为使者？”相如说：“大王如果实在没有合适的人，臣愿意捧着和氏璧出使秦国。城池划归赵国，璧就留在秦国；城池如果不给赵国，臣请求将完好无损的璧带回赵国。”赵王于是就派遣蔺相如奉着璧向西进入秦国。</p>
+                        <p>秦王坐在章台宫接见蔺相如，相如捧着璧献给秦王。秦王大喜，把璧传给妃嫔美人们以及左右侍从观看，左右侍从都高呼万岁。相如看出秦王没有诚意把城池补偿给赵国，于是上前说：“这块璧上有点瑕疵，请让我指给大王看。”秦王把璧交给他，相如趁机一把夺过璧，退后几步站定，靠着柱子，愤怒得头发直竖把帽子都顶了起来，对秦王说：“大王想要得到这块璧，派人送来书信给赵王，赵王悉召群臣议，皆曰：‘秦贪，负其强，以空言求璧，偿城恐不可得’。议不欲予秦璧。臣以为布衣之交尚不相欺，况大国乎！且以一璧之故逆强秦之欢，不可。于是赵王乃斋戒五日，使臣奉璧，拜送书于庭。何者？严大国之威以修敬也。今臣至，大王见臣列观，礼节甚倨；得璧，传之美人，以戏弄臣。臣观大王无意偿赵王城邑，故臣复取璧。大王必欲急臣，臣头今与璧俱碎于柱矣！”</p>
+                        <p>相如拿着那块璧斜眼看着柱子，作势要撞向柱子。秦王害怕他撞碎和氏璧，于是道歉并坚决请求他不要这么做，又召来主管官吏查看地图，指着说从这里到那里的十五座城邑给赵国。相如料定秦王只不过是欺诈、假装给赵国城池，实际上根本得不到，于是对秦王说：“和氏璧是天下公认的宝贝。赵王害怕，不敢不献。赵王送璧时，斋戒五日，今大王亦宜斋戒五日，设九宾于庭，臣乃敢上璧。”秦王估计一下，终究不能强行夺取，遂许斋五日，舍相如广成传。相如度秦王虽斋，决负约不偿城，乃使其从者衣褐，怀其璧，從徑道亡，归璧于赵。</p>
+                        <p>秦王斋五日后，乃设九宾礼于庭，引赵使者蔺相如。相如至，谓秦王曰：“秦自缪公以来二十余君，未尝有坚明约束者也。臣诚恐见欺于王而负赵，故令人持璧归，间至赵矣。且秦强而赵弱，大王遣一介之使至赵，赵立奉璧来；今以秦之强而先割十五都予赵，赵岂敢留璧而得罪于大王乎？臣知欺大王之罪当诛，臣请就汤锅。唯大王与群臣孰计议之！”秦王与群臣面面相觑发出惊叹声。左右侍从有的想把相如拉下去处死，秦王因曰：“今杀相如，终不能得璧也，而绝秦赵之欢，不如因而厚遇之，使归赵，赵王岂以一璧之故欺秦邪！”卒廷见相如，毕礼而归之。相如既归，赵王以为贤大夫，使不辱于诸侯，拜相如为上大夫。秦亦不以城予赵，赵亦终不予秦璧。</p>
+                        <p>其后秦伐赵，拔石城。明年，复攻赵，杀二万人。秦王使使者告赵王，欲与王为好会于西河外渑池。赵王畏秦，欲毋行。廉颇、蔺相如计曰：“王不行，示赵弱且怯也。”赵王遂行，相如从。廉颇送至境，与王诀曰：“王行，度道里会遇之礼毕，还，不过三十日。三十日不还，则请立太子为王，以绝秦望。”王许之，遂与秦王会渑池。秦王饮酒酣，曰：“寡人窃闻赵王好音，请奏瑟。”赵王鼓瑟。秦御史前书曰：“某年月日，秦王与赵王会饮，令赵王鼓瑟。”蔺相如前曰：“赵王窃闻秦王善为秦声，请奏盆缻秦王，以相娱乐。”秦王怒，不许。于是相如前进缻，因跪请秦王。秦王不肯击缻。相如曰：“五步之内，相如请得以颈血溅大王矣！”左右欲刃相如，相如张目叱之，左右皆靡。于是秦王不怿，为一击缻。相如顾召赵御史书曰：“某年月日，秦王为赵王击缻。”秦之群臣曰：“请以赵十五城为秦王寿。”蔺相如亦曰：“请以秦之咸阳为赵王寿。”秦王竟酒，终不能加胜于赵。赵亦盛设兵以待秦，秦不敢动。既罢归国，以相如功大，拜为上卿，位在廉颇之右。廉颇曰：“我为赵将，有攻城野战之大功，而蔺相如徒以口舌为劳，而位居我上，且相如素贱人，吾羞，不忍为之下。”宣言曰：“我见相如，必辱之。”相如闻，不肯与会。相如每朝时，常称病，不欲与廉颇争列。已而相如出，望见廉颇，相如引车避匿。于是舍人相与谏曰：“臣所以去亲戚而事君者，徒慕君之高义也。今君与廉颇同列，廉君宣恶言而君畏匿之，恐惧殊甚，且庸人尚羞之，况于将相乎！臣等不肖，请辞去。”蔺相如固止之，曰：“公之视廉将军孰与秦王？”曰：“不若也。”相如曰：“夫以秦王之威，而相如廷叱之，辱其群臣，相如雖驽，独畏廉将军哉？顾吾念之，强秦之所以不敢加兵于赵者，徒以吾两人在也。今两虎共斗，其势不俱生。吾所以为此者，以先国家之急而后私仇也。”廉颇闻之，肉袒负荊，因宾客至蔺相如门谢罪。曰：“鄙贱之人，不知将校宽之至此也。”卒相与欢，为刎颈之交。</p>
+                    </div>
+                </div>
+                `;
+            }
+
+            document.getElementById('questions-list').innerHTML = articleHtml + `
                 <div class="p-6 rounded-2xl border border-dashed border-gray-300 text-sm text-slate-gray bg-gray-50">
                     目前已切換至 ${pageTitle}。請選擇內容章節以查看對應練習題。
                 </div>
             `;
-            document.getElementById('total-questions-count').textContent = '共 0 題';
-            document.getElementById('bulb-container').innerHTML = '';
+            if (pageTitle === '《念奴嬌．赤壁懷古》' || pageTitle === '《聲聲慢．秋情》' || pageTitle === '《青玉案．元夕》' || pageTitle === '《月下獨酌》' || pageTitle === '《山居秋暝》' || pageTitle === '《逍遙遊》' || pageTitle === '《出師表》' || pageTitle === '《登樓》' || pageTitle === '《始得西山宴遊記》' || pageTitle === '《岳陽樓記》' || pageTitle === '《廉頗藺相如列傳》' || pageTitle === '《師說》' || pageTitle === '《魚我所欲也》' || pageTitle === '《六國論》') {
+                currentTotalQuestions = 5;
+                document.getElementById('total-questions-count').textContent = `共 ${currentTotalQuestions} 題`;
+                renderBulbs(currentTotalQuestions);
+            } else {
+                currentTotalQuestions = 0;
+                document.getElementById('total-questions-count').textContent = '共 0 題';
+                document.getElementById('bulb-container').innerHTML = '';
+            }
             document.getElementById('progress-text').textContent = '學習進度：0%';
             document.getElementById('progress-bar').style.width = '0%';
             currentSubjectId = currentSubject?.id || 'chinese';
-            currentTotalQuestions = 0;
 
             const select = document.getElementById('chapter-select');
             if (select) {
-                select.value = `page:${pageTitle}`;
+                currentChinesePage = pageTitle;
+                syncChapterSelect();
             }
+            setupScrollSpy();
+
+            const submitButton = document.getElementById('mc-submit-button');
+            if (submitButton) {
+                const clonedButton = submitButton.cloneNode(true);
+                submitButton.parentNode.replaceChild(clonedButton, submitButton);
+                let handler = evaluateRedCliffMC;
+                if (pageTitle === '《聲聲慢．秋情》') {
+                    handler = evaluateShengShengManMC;
+                } else if (pageTitle === '《青玉案．元夕》') {
+                    handler = evaluateQingYuAnMC;
+                } else if (pageTitle === '《月下獨酌》') {
+                    handler = evaluateYueXiaDuZhuoMC;
+                } else if (pageTitle === '《山居秋暝》') {
+                    handler = evaluateShanJuQiuMingMC;
+                } else if (pageTitle === '《逍遙遊》') {
+                    handler = evaluateXiaoYaoYouMC;
+                } else if (pageTitle === '《出師表》') {
+                    handler = evaluateChuShiBiaoMC;
+                } else if (pageTitle === '《登樓》') {
+                    handler = evaluateDengLouMC;
+                } else if (pageTitle === '《始得西山宴遊記》') {
+                    handler = evaluateShiDeXiShanMC;
+                } else if (pageTitle === '《岳陽樓記》') {
+                    handler = evaluateYueYangLouJiMC;
+                } else if (pageTitle === '《廉頗藺相如列傳》') {
+                    handler = evaluateLianPoLinXiangRuMC;
+                } else if (pageTitle === '《師說》') {
+                    handler = evaluateShiShuoMC;
+                } else if (pageTitle === '《魚我所欲也》') {
+                    handler = evaluateYuWoSoYuYeMC;
+                } else if (pageTitle === '《六國論》') {
+                    handler = evaluateLiuGuoMC;
+                }
+                clonedButton.addEventListener('click', handler);
+            }
+
+            const radioInputs = document.querySelectorAll('#questions-list input[type="radio"]');
+            radioInputs.forEach((radio) => {
+                radio.removeEventListener('change', updateOverallProgress);
+                radio.addEventListener('change', updateOverallProgress);
+            });
+
+            updateOverallProgress();
+        }
+
+        function evaluateRedCliffMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'B',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateShengShengManMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'C',
+                q4: 'A',
+                q5: 'C'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateQingYuAnMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'C',
+                q4: 'B',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateYueXiaDuZhuoMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'B',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateXiaoYaoYouMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'C',
+                q4: 'C',
+                q5: 'C'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateYueYangLouJiMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'B',
+                q4: 'C',
+                q5: 'A'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateLianPoLinXiangRuMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'C',
+                q4: 'C',
+                q5: 'C'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateShanJuQiuMingMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'C',
+                q4: 'B',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateChuShiBiaoMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'C',
+                q3: 'A',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateShiShuoMC() {
+            const correctAnswers = {
+                q1: 'C',
+                q2: 'C',
+                q3: 'B',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateYuWoSoYuYeMC() {
+            const correctAnswers = {
+                q1: 'C',
+                q2: 'B',
+                q3: 'C',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateLiuGuoMC() {
+            const correctAnswers = {
+                q1: 'D',
+                q2: 'C',
+                q3: 'A',
+                q4: 'B',
+                q5: 'C'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateDengLouMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'C',
+                q4: 'B',
+                q5: 'C'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
+        }
+
+        function evaluateShiDeXiShanMC() {
+            const correctAnswers = {
+                q1: 'B',
+                q2: 'B',
+                q3: 'B',
+                q4: 'C',
+                q5: 'B'
+            };
+
+            const resultEl = document.getElementById('mc-score-result');
+            if (!resultEl) return;
+
+            const missing = [];
+            let score = 0;
+
+            Object.keys(correctAnswers).forEach((questionId) => {
+                const selected = document.querySelector(`input[name="${questionId}"]:checked`);
+                if (!selected) {
+                    missing.push(questionId);
+                    return;
+                }
+                if (selected.value === correctAnswers[questionId]) {
+                    score += 1;
+                }
+            });
+
+            if (missing.length > 0) {
+                resultEl.innerHTML = `<span class="text-amber-700">请完成所有题目再提交。还有 ${missing.length} 题未作答。</span>`;
+                return;
+            }
+
+            resultEl.innerHTML = `<span class="font-semibold text-deep-blue">你已答对 ${score} / 5 题。</span>`;
         }
 
         function renderChapterQuestions(chapterNumber) {
@@ -455,7 +2254,8 @@
 
             const select = document.getElementById('chapter-select');
             if (select && currentSubject) {
-                select.value = `chapter:${chapterTitle}`;
+                currentChapterIndex = chapterNumber;
+                syncChapterSelect();
             }
 
             document.getElementById('questions-list').innerHTML = question ? `
@@ -475,7 +2275,11 @@
 
             currentTotalQuestions = question ? 1 : 0;
             document.getElementById('total-questions-count').textContent = `共 ${currentTotalQuestions} 題`;
-            document.getElementById('bulb-container').innerHTML = question ? `<div id="bulb-1" class="w-8 h-8 rounded-full bg-calm-mint border border-transparent flex items-center justify-center text-white text-xs font-bold">1</div>` : '';
+            if (question) {
+                renderBulbs(currentTotalQuestions);
+            } else {
+                document.getElementById('bulb-container').innerHTML = '';
+            }
             updateOverallProgress();
             setupScrollSpy();
         }
@@ -493,8 +2297,23 @@
                 });
             }, options);
 
-            document.querySelectorAll('.question-card-block').forEach(section => {
-                scrollSpyObserver.observe(section);
+            const sections = document.querySelectorAll('#questions-list [id^="q-box-"], #questions-list .question-card-block');
+            sections.forEach(section => {
+                if (section.id) {
+                    scrollSpyObserver.observe(section);
+                }
+            });
+        }
+
+        function ensureQuestionSectionIds() {
+            const questionBlocks = Array.from(document.querySelectorAll('#questions-list > .question-card-block, #questions-list .space-y-6 > div'));
+            let idCounter = 1;
+            questionBlocks.forEach((block) => {
+                if (!block.querySelector('input[type="radio"], textarea')) return;
+                if (!block.id?.startsWith('q-box-')) {
+                    block.id = `q-box-${idCounter}`;
+                }
+                idCounter += 1;
             });
         }
 
@@ -502,12 +2321,17 @@
             const container = document.getElementById('bulb-container');
             container.innerHTML = '';
             for (let i = 1; i <= count; i++) {
-                container.innerHTML += `
-                    <div id="bulb-${i}"
-                         class="w-8 h-8 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-slate-gray text-xs font-bold cursor-pointer hover:scale-105 transition-all"
-                         onclick="scrollToQuestion(${i})">
-                        ${i}
-                    </div>`;
+                const bulb = document.createElement('div');
+                bulb.id = `bulb-${i}`;
+                bulb.className = 'w-8 h-8 rounded-full bg-soft-red text-white border border-transparent flex items-center justify-center text-xs font-bold cursor-pointer hover:scale-105 transition-all';
+                bulb.title = `跳轉至第 ${i} 題`;
+                bulb.textContent = `${i}`;
+                bulb.addEventListener('click', () => scrollToQuestion(i));
+                container.appendChild(bulb);
+            }
+            updateMCBulbs();
+            if (count > 0) {
+                highlightGuide(1);
             }
         }
 
@@ -516,22 +2340,74 @@
             highlightGuide(index);
             if (value.trim() === '') {
                 bulb?.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
-                bulb?.classList.add('bg-gray-100', 'text-slate-gray', 'border-gray-200');
+                bulb?.classList.add('bg-soft-red', 'text-white', 'border-transparent');
             } else {
-                bulb?.classList.remove('bg-gray-100', 'text-slate-gray', 'border-gray-200');
+                bulb?.classList.remove('bg-soft-red', 'text-white', 'border-transparent');
                 bulb?.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
             }
             updateOverallProgress();
         }
 
-        function updateOverallProgress() {
+        function scrollToQuestion(index) {
+            let target = document.getElementById(`q-box-${index}`);
+            if (!target) {
+                const sections = Array.from(document.querySelectorAll('#questions-list [id^="q-box-"], #questions-list .space-y-6 > div'));
+                target = sections[index - 1];
+            }
+            if (!target) return;
+            isManualScrolling = true;
+            target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            setTimeout(() => {
+                isManualScrolling = false;
+            }, 600);
+            highlightGuide(index);
+        }
+
+        function updateMCBulbs() {
             if (currentTotalQuestions === 0) return;
-            const textareas = document.querySelectorAll('#questions-list textarea');
+            for (let i = 1; i <= currentTotalQuestions; i++) {
+                const bulb = document.getElementById(`bulb-${i}`);
+                if (!bulb) continue;
+                const answeredRadio = document.querySelector(`#questions-list input[name="q${i}"]:checked`);
+                const textarea = document.querySelector(`#questions-list textarea#input-${i}`);
+                const isCompleted = !!answeredRadio || (textarea && textarea.value.trim() !== '');
+                if (isCompleted) {
+                    bulb.classList.remove('bg-soft-red', 'border-transparent');
+                    bulb.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
+                } else {
+                    bulb.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
+                    bulb.classList.add('bg-soft-red', 'text-white', 'border-transparent');
+                }
+            }
+        }
+
+        function updateOverallProgress() {
+            if (currentTotalQuestions === 0) {
+                document.getElementById('progress-text').textContent = '學習進度：0%';
+                document.getElementById('progress-bar').style.width = '0%';
+                return;
+            }
+
             let answeredCount = 0;
-            textareas.forEach(ta => { if (ta.value.trim() !== '') answeredCount++; });
+            const textareas = document.querySelectorAll('#questions-list textarea');
+            textareas.forEach(ta => {
+                if (ta.value.trim() !== '') answeredCount++;
+            });
+
+            const radioNames = new Set();
+            document.querySelectorAll('#questions-list input[type="radio"]').forEach((radio) => {
+                radioNames.add(radio.name);
+            });
+            radioNames.forEach((name) => {
+                if (document.querySelector(`#questions-list input[name="${name}"]:checked`)) {
+                    answeredCount++;
+                }
+            });
+
             const percent = Math.round((answeredCount / currentTotalQuestions) * 100);
             document.getElementById('progress-text').textContent = `學習進度：${percent}%`;
             document.getElementById('progress-bar').style.width = `${percent}%`;
+            updateMCBulbs();
         }
 
         function closeMenu() {

@@ -1083,9 +1083,9 @@ Guidelines:
 
     /** PvP 狀態：idle → matching → countdown → playing → result */
     let pvpState = 'idle';
-    /** 對戰模式：human 真人配對（示範）| ai Rowena Bot */
+    /** 對戰模式：human 真人配對 */
     let pvpMode = 'human';
-    let pvpCategory = 'math_ch';
+    let pvpCategory = 'chinese';
     let pvpTimer = null;
     let pvpCountdown = 3;
     let pvpPlayTimer = null;
@@ -1107,6 +1107,25 @@ Guidelines:
     let pvpAiTask = null;
 
     let pvpResultPayload = null;
+    let pvpRoomCode = '';
+    let pvpJoinRoomCode = '';
+    let pvpRoomMessage = '';
+    let pvpChannel = null;
+    let pvpIsHost = false;
+    let pvpQuestions = [];
+    let pvpQuestionsSent = false;
+    let currentSubject = 'chinese';
+    let pvpSessionId = `${Date.now()}-${Math.random()}`;
+
+    let pvpQuestionIndex = 0;
+    let pvpMyScore = 0;
+    let pvpOpponentScore = 0;
+    let pvpQuestionStartTime = 0;
+    let pvpHostAnswerData = null;
+    let pvpClientAnswerData = null;
+    let pvpRoundResult = null;
+    let pvpRoundTransitionTimer = null;
+    let pvpLastProcessedRoundIndex = -1;
 
     function pvpEscapeHtml(s) {
         const d = document.createElement('div');
@@ -1116,6 +1135,475 @@ Guidelines:
 
     function pvpSleep(ms) {
         return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function pvpStartRound() {
+        pvpUserSubmitted = false;
+        pvpUserAnswer = null;
+        pvpUserAnswerSec = null;
+        pvpHostAnswerData = null;
+        pvpClientAnswerData = null;
+        pvpRoundResult = null;
+        pvpQuestionStartTime = Date.now();
+        pvpPlaySecondsLeft = 15;
+        pvpClearPlayTimer();
+        pvpStartPlayTimer();
+        pvpRefreshUi();
+    }
+
+    function pvpClearRoundTransitionTimer() {
+        if (pvpRoundTransitionTimer) {
+            clearTimeout(pvpRoundTransitionTimer);
+            pvpRoundTransitionTimer = null;
+        }
+    }
+
+    function proceedToNextQuestionDelayed(nextIndex) {
+        pvpClearRoundTransitionTimer();
+        pvpRoundTransitionTimer = setTimeout(() => {
+            pvpRoundTransitionTimer = null;
+            pvpUserSubmitted = false;
+            pvpUserAnswer = null;
+            pvpUserAnswerSec = null;
+            pvpHostAnswerData = null;
+            pvpClientAnswerData = null;
+            pvpRoundResult = null;
+            pvpQuestionIndex = typeof nextIndex === 'number' ? nextIndex : pvpQuestionIndex + 1;
+            pvpQuestion = pvpQuestions[pvpQuestionIndex] || pvpFallbackQuestion(currentSubject);
+            pvpQuestionStartTime = Date.now();
+            pvpPlaySecondsLeft = 15;
+            pvpClearPlayTimer();
+            pvpStartPlayTimer();
+            pvpRefreshUi();
+        }, 2000);
+    }
+
+    function pvpBroadcastAnswer(answerData) {
+        if (!pvpChannel) return;
+        try {
+            pvpChannel.send({
+                type: 'broadcast',
+                event: 'client_answer',
+                payload: {
+                    senderId: pvpSessionId,
+                    questionIndex: pvpQuestionIndex,
+                    isCorrect: answerData.isCorrect,
+                    timeTaken: answerData.timeTaken,
+                },
+            });
+        } catch (err) {
+            console.warn('[PvP] 無法廣播答案狀態', err);
+        }
+    }
+
+    function pvpBroadcastRoundEvaluation(roundData) {
+        if (!pvpChannel) return;
+        try {
+            pvpChannel.send({
+                type: 'broadcast',
+                event: 'round_evaluation',
+                payload: roundData,
+            });
+        } catch (err) {
+            console.warn('[PvP] 無法廣播回合結果', err);
+        }
+    }
+
+    function pvpHostEvaluateRound() {
+        if (!pvpIsHost || !pvpHostAnswerData || !pvpClientAnswerData) return;
+        pvpClearPlayTimer();
+
+        const host = pvpHostAnswerData;
+        const client = pvpClientAnswerData;
+        let roundHeadline = '';
+        let roundDetail = '';
+        let myPoint = 0;
+        let oppPoint = 0;
+        let roundWinner = 'draw';
+
+        if (host.isCorrect && !client.isCorrect) {
+            myPoint = 1;
+            roundHeadline = '你贏了這題！';
+            roundDetail = '挑戰者答錯，你取得本題 1 分。';
+            roundWinner = 'host';
+        } else if (!host.isCorrect && client.isCorrect) {
+            oppPoint = 1;
+            roundHeadline = '挑戰者贏了這題';
+            roundDetail = '你答錯，挑戰者得分。';
+            roundWinner = 'client';
+        } else if (host.isCorrect && client.isCorrect) {
+            if (host.timeTaken < client.timeTaken) {
+                myPoint = 1;
+                roundHeadline = '你贏了這題！(速度較快)';
+                roundDetail = `你的作答 ${host.timeTaken}ms，比挑戰者的 ${client.timeTaken}ms 更快。`;
+                roundWinner = 'host';
+            } else if (host.timeTaken > client.timeTaken) {
+                oppPoint = 1;
+                roundHeadline = '挑戰者贏了這題';
+                roundDetail = `挑戰者的作答 ${client.timeTaken}ms 比你更快。`;
+                roundWinner = 'client';
+            } else {
+                roundHeadline = '平手！';
+                roundDetail = '雙方皆答對且速度相同，皆不得分。';
+                roundWinner = 'draw';
+            }
+        } else {
+            roundHeadline = '雙方皆答錯';
+            roundDetail = '本題無人得分，繼續下一題。';
+            roundWinner = 'draw';
+        }
+
+        pvpMyScore += myPoint;
+        pvpOpponentScore += oppPoint;
+        pvpRoundResult = {
+            headline: roundHeadline,
+            detail: roundDetail,
+            myPoint,
+            oppPoint,
+            roundWinner,
+            hostCorrect: host.isCorrect,
+            clientCorrect: client.isCorrect,
+        };
+
+        const isFinalRound = pvpQuestionIndex + 1 >= pvpQuestions.length;
+        const scoreResult = isFinalRound
+            ? (pvpIsFriendMatch() ? { scoreChange: 0, newScore: typeof RowenaUser !== 'undefined' && typeof RowenaUser.getProfile === 'function' ? (RowenaUser.getProfile().pvpScore || 0) : 0 } : updatePvpScore(pvpMyScore > pvpOpponentScore ? 'win' : pvpMyScore < pvpOpponentScore ? 'lose' : 'draw'))
+            : { scoreChange: 0, newScore: typeof RowenaUser !== 'undefined' && typeof RowenaUser.getProfile === 'function' ? (RowenaUser.getProfile().pvpScore || 0) : 0 };
+
+        const nextIndex = pvpQuestionIndex + 1;
+        const roundData = {
+            senderId: pvpSessionId,
+            questionIndex: pvpQuestionIndex,
+            nextIndex,
+            hostScore: pvpMyScore,
+            clientScore: pvpOpponentScore,
+            roundWinner,
+            hostCorrect: host.isCorrect,
+            clientCorrect: client.isCorrect,
+            hostTime: host.timeTaken,
+            clientTime: client.timeTaken,
+            headline: roundHeadline,
+            detail: roundDetail,
+            gameOver: isFinalRound,
+            finalOutcome: isFinalRound ? (pvpMyScore > pvpOpponentScore ? 'win' : pvpMyScore < pvpOpponentScore ? 'lose' : 'draw') : undefined,
+            scoreChange: scoreResult.scoreChange,
+            newScore: scoreResult.newScore,
+        };
+
+        pvpBroadcastRoundEvaluation(roundData);
+        pvpApplyRoundEvaluation(roundData);
+    }
+
+    function pvpApplyRoundEvaluation(roundData) {
+        if (!roundData || typeof roundData.questionIndex !== 'number') return;
+        if (roundData.questionIndex !== pvpQuestionIndex) return;
+        if (roundData.questionIndex === pvpLastProcessedRoundIndex) return;
+        pvpLastProcessedRoundIndex = roundData.questionIndex;
+
+        pvpClearRoundTransitionTimer();
+        pvpMyScore = pvpIsHost ? roundData.hostScore : roundData.clientScore;
+        pvpOpponentScore = pvpIsHost ? roundData.clientScore : roundData.hostScore;
+        const myPoint = pvpIsHost
+            ? roundData.roundWinner === 'host' ? 1 : 0
+            : roundData.roundWinner === 'client' ? 1 : 0;
+        const oppPoint = pvpIsHost
+            ? roundData.roundWinner === 'client' ? 1 : 0
+            : roundData.roundWinner === 'host' ? 1 : 0;
+
+        pvpRoundResult = {
+            headline: roundData.headline,
+            detail: roundData.detail,
+            myPoint,
+            oppPoint,
+            roundWinner: roundData.roundWinner,
+            userCorrect: pvpIsHost ? roundData.hostCorrect : roundData.clientCorrect,
+            opponentCorrect: pvpIsHost ? roundData.clientCorrect : roundData.hostCorrect,
+        };
+        pvpResultPayload = null;
+
+        if (roundData.gameOver) {
+            pvpFinalizeGame(roundData);
+            return;
+        }
+
+        if (typeof roundData.nextIndex === 'number') {
+            proceedToNextQuestionDelayed(roundData.nextIndex);
+        } else {
+            proceedToNextQuestionDelayed(pvpQuestionIndex + 1);
+        }
+    }
+
+    function pvpFinalizeGame(finalData) {
+        pvpState = 'result';
+        const isHost = pvpIsHost;
+        const hostTotalScore = typeof finalData.hostScore === 'number' ? finalData.hostScore : pvpMyScore;
+        const clientTotalScore = typeof finalData.clientScore === 'number' ? finalData.clientScore : pvpOpponentScore;
+        const myFinalScore = isHost ? hostTotalScore : clientTotalScore;
+        const opponentFinalScore = isHost ? clientTotalScore : hostTotalScore;
+        const finalOutcome = myFinalScore > opponentFinalScore ? 'win' : myFinalScore < opponentFinalScore ? 'lose' : 'draw';
+        const localProfileScore = typeof RowenaUser !== 'undefined' && typeof RowenaUser.getProfile === 'function' ? (RowenaUser.getProfile().pvpScore || 0) : 0;
+
+        pvpResultPayload = {
+            outcome: finalOutcome,
+            isFriendMatch: pvpIsFriendMatch(),
+            isFinalResult: true,
+            headline:
+                finalOutcome === 'win'
+                    ? '🎉 恭喜！你贏得了對戰！'
+                    : finalOutcome === 'lose'
+                        ? '😭 很遺憾，對手勝出'
+                        : '🤝 雙方平手！',
+            detail: `最終比分 ${myFinalScore} : ${opponentFinalScore}`,
+            myFinalScore,
+            opponentFinalScore,
+            userCorrect: pvpRoundResult.userCorrect,
+            opponentCorrect: pvpRoundResult.opponentCorrect,
+            userSec: pvpIsHost ? finalData.hostTime : finalData.clientTime,
+            opponentSec: pvpIsHost ? finalData.clientTime : finalData.hostTime,
+            userAnswer: pvpRoundResult.userCorrect ? '正確' : '錯誤',
+            opponentAnswer: pvpRoundResult.opponentCorrect ? '正確' : '錯誤',
+            correct: pvpQuestion?.correct || '',
+            scoreChange: finalData.scoreChange,
+            newScore: localProfileScore,
+        };
+        pvpRefreshUi();
+    }
+
+    function pvpRecordMyAnswer(optionLetter = null) {
+        if (pvpState !== 'playing' || pvpUserSubmitted) return;
+        pvpUserSubmitted = true;
+        const timeTaken = Math.min(15000, Math.max(0, Date.now() - pvpQuestionStartTime));
+        const isCorrect = optionLetter === pvpQuestion?.correct;
+        pvpUserAnswer = optionLetter;
+        pvpClearPlayTimer();
+
+        if (pvpIsHost) {
+            pvpHostAnswerData = { isCorrect, timeTaken };
+            if (pvpClientAnswerData) {
+                pvpHostEvaluateRound();
+            }
+        } else {
+            pvpClientAnswerData = { isCorrect, timeTaken };
+            pvpBroadcastAnswer({ isCorrect, timeTaken });
+        }
+
+        pvpRefreshUi();
+    }
+
+    function pvpAutoSubmitAnswer() {
+        if (pvpState !== 'playing' || pvpUserSubmitted) return;
+        pvpRecordMyAnswer(null);
+    }
+
+    function shuffleArray(array) {
+        const list = Array.isArray(array) ? [...array] : [];
+        for (let i = list.length - 1; i > 0; i -= 1) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [list[i], list[j]] = [list[j], list[i]];
+        }
+        return list;
+    }
+
+    function normalizeLocalQuestion(raw, category) {
+        if (!raw || typeof raw !== 'object') return null;
+        const question = String(raw.question || raw.stem || raw.title || '').trim();
+        if (!question) return null;
+
+        const optionsSource = raw.options || raw.choices || raw.option || [];
+        const options = Array.isArray(optionsSource)
+            ? optionsSource.slice(0, 4)
+            : typeof optionsSource === 'object'
+                ? optionsSource
+                : [];
+
+        const normalizedOptions = {};
+        const letters = ['A', 'B', 'C', 'D'];
+        if (Array.isArray(optionsSource)) {
+            letters.forEach((L, index) => {
+                const value = optionsSource[index];
+                if (value != null) normalizedOptions[L] = String(value).trim();
+            });
+        } else {
+            letters.forEach((L) => {
+                if (options[L] != null) normalizedOptions[L] = String(options[L]).trim();
+            });
+        }
+
+        if (letters.some((L) => !normalizedOptions[L])) return null;
+
+        let correct = raw.correct ?? raw.answer ?? raw.correctAnswer ?? raw.answerIndex;
+        if (typeof correct === 'number') {
+            correct = letters[correct] || '';
+        } else if (typeof correct === 'string') {
+            correct = correct.trim().toUpperCase().replace(/[^A-D]/g, '');
+            if (correct.length === 1 && letters.includes(correct)) {
+                // already a valid letter
+            } else if (/^[0-3]$/.test(correct)) {
+                correct = letters[Number(correct)];
+            }
+        }
+        if (!correct || !letters.includes(correct)) return null;
+
+        return {
+            question,
+            options: normalizedOptions,
+            correct,
+            category,
+        };
+    }
+
+    function normalizeSubjectCode(subjectCode) {
+        const map = {
+            chinese: 'chinese',
+            english: 'english',
+            math_ch: 'math_zh',
+            math_en: 'math_en',
+            math_ch_mc: 'math_zh',
+            math_en_mc: 'math_en',
+        };
+        return map[subjectCode] || 'chinese';
+    }
+
+    async function fetchPvPQuestions(subjectCode) {
+        console.log("目前前端傳入的科目代碼是：", subjectCode);
+        const jsonKey = normalizeSubjectCode(subjectCode);
+        const resp = await fetch('/PvP_question.json');
+        if (!resp.ok) {
+            throw new Error('無法讀取本地題庫');
+        }
+        const payload = await resp.json();
+        const source = Array.isArray(payload[jsonKey]) ? [...payload[jsonKey]] : [];
+        const normalized = source
+            .map((raw) => normalizeLocalQuestion(raw, subjectCode))
+            .filter(Boolean);
+        if (normalized.length === 0) {
+            throw new Error('題庫尚未包含該科目題目');
+        }
+        return shuffleArray(normalized).slice(0, 10);
+    }
+
+    function getSupabaseClient() {
+        return window.RowenaSupabase?.getClient?.() || window.initRowenaSupabase?.();
+    }
+
+    async function pvpSubscribeToRoom(roomCode) {
+        const client = getSupabaseClient();
+        if (!client) {
+            pvpRoomMessage = 'Supabase 連線尚未初始化。';
+            pvpRefreshUi();
+            return;
+        }
+
+        if (pvpChannel) {
+            await pvpChannel.unsubscribe();
+            pvpChannel = null;
+        }
+
+        const channelName = `pvp-room-${roomCode}`;
+        pvpChannel = client.channel(channelName, { config: { broadcast: { self: true } } });
+
+        pvpChannel.on('presence', { event: 'sync' }, async () => {
+            const presenceState = typeof pvpChannel.presenceState === 'function' ? pvpChannel.presenceState() : {};
+            const memberIds = Object.keys(presenceState || {});
+            if (pvpIsHost && memberIds.length >= 2 && !pvpQuestionsSent) {
+                try {
+                    pvpQuestions = await fetchPvPQuestions(currentSubject);
+                    pvpQuestionsSent = true;
+                    await pvpChannel.send({ type: 'broadcast', event: 'pvp_questions', payload: { subject: currentSubject, questions: pvpQuestions } });
+                    pvpRoomMessage = '題目已同步給對手，準備開始比賽。';
+                    pvpState = 'countdown';
+                    pvpCountdown = 3;
+                    pvpQuestion = pvpQuestions[0] || pvpFallbackQuestion(currentSubject);
+                    pvpRefreshUi();
+                    pvpStartCountdown();
+                } catch (error) {
+                    pvpRoomMessage = `題目讀取失敗：${error.message}`;
+                    pvpRefreshUi();
+                }
+            }
+        });
+
+        pvpChannel.on('broadcast', { event: 'pvp_questions' }, (payload) => {
+            if (payload?.payload?.questions) {
+                pvpQuestions = payload.payload.questions;
+                currentSubject = payload.payload.subject || currentSubject;
+                pvpCategory = currentSubject;
+                pvpQuestionIndex = 0;
+                pvpQuestion = pvpQuestions[0] || pvpFallbackQuestion(currentSubject);
+                pvpRoomMessage = '已收到主題與題目，準備開始對戰。';
+                if (pvpState !== 'countdown' && pvpState !== 'playing') {
+                    pvpState = 'countdown';
+                    pvpCountdown = 3;
+                    pvpRefreshUi();
+                    pvpStartCountdown();
+                } else {
+                    pvpRefreshUi();
+                }
+            }
+        });
+
+        pvpChannel.on('broadcast', { event: 'client_answer' }, (payload) => {
+            const answer = payload?.payload;
+            if (!answer || typeof answer.isCorrect !== 'boolean' || typeof answer.timeTaken !== 'number' || typeof answer.questionIndex !== 'number') return;
+            if (answer.senderId === pvpSessionId) return;
+            if (answer.questionIndex !== pvpQuestionIndex) return;
+            pvpClientAnswerData = { isCorrect: answer.isCorrect, timeTaken: answer.timeTaken };
+            if (pvpIsHost && pvpHostAnswerData) {
+                pvpHostEvaluateRound();
+            }
+            pvpRefreshUi();
+        });
+
+        pvpChannel.on('broadcast', { event: 'round_evaluation' }, (payload) => {
+            const roundData = payload?.payload;
+            if (!roundData || roundData.senderId === pvpSessionId) return;
+            pvpApplyRoundEvaluation(roundData);
+            pvpRefreshUi();
+        });
+
+        await pvpChannel.subscribe();
+        await pvpChannel.track({ joinedAt: Date.now(), subject: currentSubject, sessionId: pvpSessionId });
+    }
+
+    async function pvpCreateRoom() {
+        pvpRoomCode = String(Math.floor(100000 + Math.random() * 900000));
+        pvpJoinRoomCode = '';
+        pvpRoomMessage = '';
+        pvpIsHost = true;
+        pvpQuestionsSent = false;
+        pvpQuestions = [];
+        pvpState = 'room';
+        await pvpSubscribeToRoom(pvpRoomCode);
+        pvpRefreshUi();
+    }
+
+    async function pvpJoinRoom() {
+        const input = document.getElementById('pvp-join-room-code');
+        const code = input?.value?.trim() || '';
+        if (!/^[0-9]{6}$/.test(code)) {
+            pvpRoomMessage = '請輸入 6 位數房間碼';
+            pvpRefreshUi();
+            return;
+        }
+
+        pvpRoomCode = code;
+        pvpJoinRoomCode = code;
+        pvpRoomMessage = '';
+        pvpIsHost = false;
+        pvpState = 'matching';
+        await pvpSubscribeToRoom(code);
+        pvpRoomMessage = `已加入房間 ${code}，等待開始...`;
+        pvpRefreshUi();
+    }
+
+    function pvpLeaveRoom() {
+        if (pvpChannel) {
+            pvpChannel.unsubscribe();
+            pvpChannel = null;
+        }
+        pvpIsHost = false;
+        pvpQuestionsSent = false;
+        pvpQuestions = [];
     }
 
     /** 從 Gemini 回覆中擷取 JSON（支援 ```json 區塊） */
@@ -1296,7 +1784,7 @@ Guidelines:
 
     function pvpStartPlayTimer() {
         pvpClearPlayTimer();
-        pvpPlaySecondsLeft = 90;
+        pvpPlaySecondsLeft = 15;
         pvpPlayTimer = setInterval(() => {
             pvpPlaySecondsLeft--;
             const el = document.getElementById('pvp-timer');
@@ -1304,10 +1792,7 @@ Guidelines:
             if (pvpPlaySecondsLeft <= 0) {
                 pvpClearPlayTimer();
                 if (!pvpUserSubmitted) {
-                    pvpUserAnswer = null;
-                    pvpUserSubmitted = true;
-                    pvpUserAnswerSec = 90;
-                    pvpTryFinalizeBattle();
+                    pvpAutoSubmitAnswer();
                 }
             }
         }, 1000);
@@ -1317,50 +1802,38 @@ Guidelines:
     function pvpComputeResult() {
         const correct = pvpQuestion?.correct;
         const userCorrect = pvpUserAnswer === correct;
-        const aiCorrect = pvpAiAnswer === correct;
+        const opponentCorrect = false;
         const userSec = pvpUserAnswerSec ?? 999;
-        const aiSec = pvpAiAnswerSec ?? 999;
+        const opponentSec = 999;
 
         let outcome = 'draw';
         let headline = '本局平手';
         let detail = '雙方表現接近，再接再厲！';
         let scoreChange = 0;
 
-        if (userCorrect && !aiCorrect) {
+        if (userCorrect && !opponentCorrect) {
             outcome = 'win';
-            headline = '恭喜你擊敗 AI！';
-            detail = '你答對了，Rowena Bot 答錯。';
-            scoreChange = Math.floor(Math.random() * 4) + 32; // 32-35
-        } else if (!userCorrect && aiCorrect) {
+            headline = '恭喜你勝出！';
+            detail = '你答對了，對手未答對。';
+            scoreChange = Math.floor(Math.random() * 5) + 30;
+        } else if (!userCorrect && opponentCorrect) {
             outcome = 'lose';
-            headline = '很遺憾，AI 導師答對了';
-            detail = '本題 AI 正確，請再接再厲。';
-            scoreChange = -(Math.floor(Math.random() * 4) + 23); // -23 to -26
-        } else if (userCorrect && aiCorrect) {
-            if (userSec < aiSec - 0.05) {
-                outcome = 'win';
-                headline = '恭喜你擊敗 AI！';
-                detail = `雙方皆答對，你的用時 ${userSec.toFixed(1)} 秒快於 AI 的 ${aiSec.toFixed(1)} 秒。`;
-                scoreChange = Math.floor(Math.random() * 4) + 32;
-            } else if (aiSec < userSec - 0.05) {
-                outcome = 'lose';
-                headline = '很遺憾，AI 導師答題速度比你快！';
-                detail = `雙方皆答對，AI 用時 ${aiSec.toFixed(1)} 秒，你用時 ${userSec.toFixed(1)} 秒。`;
-                scoreChange = -(Math.floor(Math.random() * 4) + 23);
-            } else {
-                outcome = 'draw';
-                headline = '勢均力敵！';
-                detail = '雙方皆答對且用時相近。';
-                scoreChange = 0;
-            }
+            headline = '很遺憾，對手勝出';
+            detail = '對手答對了，本題你未答對。';
+            scoreChange = -(Math.floor(Math.random() * 5) + 23);
+        } else if (userCorrect && opponentCorrect) {
+            outcome = 'draw';
+            headline = '勢均力敵！';
+            detail = '雙方皆答對且用時相近。';
+            scoreChange = 0;
         } else {
             outcome = 'lose';
-            headline = '本局 AI 略勝一籌';
+            headline = '本局失利';
             detail = '雙方皆未答對，請複習考點後再戰。';
-            scoreChange = -(Math.floor(Math.random() * 4) + 23);
+            scoreChange = -(Math.floor(Math.random() * 5) + 23);
         }
 
-        // 計算新分數
+        // 計算新分數evaluateRoundWinner()
         let newScore = 0;
         if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
             newScore = RowenaUser.addPvpScore(scoreChange);
@@ -1371,11 +1844,11 @@ Guidelines:
             headline,
             detail,
             userCorrect,
-            aiCorrect,
+            opponentCorrect,
             userSec,
-            aiSec,
+            opponentSec,
             userAnswer: pvpUserAnswer,
-            aiAnswer: pvpAiAnswer,
+            opponentAnswer: '—',
             correct,
             scoreChange,
             newScore,
@@ -1383,14 +1856,34 @@ Guidelines:
     }
 
     function pvpTryFinalizeBattle() {
-        if (pvpMode !== 'ai') return;
-        if (!pvpUserSubmitted || !pvpAiReady) return;
-        if (pvpState === 'result') return;
+        return;
+    }
 
-        pvpClearPlayTimer();
-        pvpResultPayload = pvpComputeResult();
-        pvpState = 'result';
-        pvpRefreshUi();
+    function pvpIsFriendMatch() {
+        return Boolean(pvpRoomCode);
+    }
+
+    function updatePvpScore(outcome) {
+        if (pvpIsFriendMatch()) {
+            return { scoreChange: 0, newScore: typeof RowenaUser !== 'undefined' && typeof RowenaUser.getProfile === 'function' ? (RowenaUser.getProfile().pvpScore || 0) : 0 };
+        }
+
+        let scoreChange = 0;
+        if (outcome === 'win') {
+            scoreChange = Math.floor(Math.random() * 5) + 30;
+        } else if (outcome === 'lose') {
+            scoreChange = -(Math.floor(Math.random() * 5) + 23);
+        }
+
+        let newScore = 0;
+        if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
+            newScore = RowenaUser.addPvpScore(scoreChange);
+        } else {
+            const current = typeof RowenaUser !== 'undefined' && typeof RowenaUser.getProfile === 'function' ? RowenaUser.getProfile() : { pvpScore: 0 };
+            newScore = Math.max(0, (current.pvpScore || 0) + scoreChange);
+        }
+
+        return { scoreChange, newScore };
     }
 
     function pvpSelectAnswer(letter) {
@@ -1409,44 +1902,7 @@ Guidelines:
             pvpShowToast('請先選擇一個答案', 'amber');
             return;
         }
-        pvpUserSubmitted = true;
-        pvpUserAnswerSec = Math.max(0, (Date.now() - pvpBattleStartMs) / 1000);
-
-        if (pvpMode === 'ai') {
-            if (!pvpAiReady) {
-                pvpShowToast('已提交！等待 Rowena Bot 完成思考…', 'blue');
-            }
-            pvpTryFinalizeBattle();
-            pvpRefreshUi();
-            return;
-        }
-
-        pvpClearPlayTimer();
-        
-        // 示範對戰的計分邏輯
-        let scoreChange = pvpUserAnswer === pvpQuestion?.correct ? Math.floor(Math.random() * 4) + 32 : -(Math.floor(Math.random() * 4) + 23);
-        let newScore = 0;
-        if (typeof RowenaUser !== 'undefined' && typeof RowenaUser.addPvpScore === 'function') {
-            newScore = RowenaUser.addPvpScore(scoreChange);
-        }
-        
-        pvpResultPayload = {
-            outcome: pvpUserAnswer === pvpQuestion?.correct ? 'win' : 'lose',
-            headline: pvpUserAnswer === pvpQuestion?.correct ? '本局勝利（示範）' : '本局敗場（示範）',
-            detail: '真人配對為示範流程，請使用「挑戰 AI 智能導師」體驗完整 RAG 對戰。',
-            userCorrect: pvpUserAnswer === pvpQuestion?.correct,
-            aiCorrect: false,
-            userSec: pvpUserAnswerSec,
-            aiSec: 0,
-            userAnswer: pvpUserAnswer,
-            aiAnswer: '—',
-            correct: pvpQuestion?.correct,
-            scoreChange,
-            newScore,
-        };
-        
-        pvpState = 'result';
-        pvpRefreshUi();
+        pvpRecordMyAnswer(pvpUserAnswer);
     }
 
     function pvpShowToast(message, tone) {
@@ -1485,14 +1941,21 @@ Guidelines:
                 : r.outcome === 'lose'
                   ? 'border-joyful-amber/40 bg-joyful-amber/10'
                   : 'border-deep-blue/20 bg-off-white';
-        const scoreDiff = r.scoreChange || 0;
-        const scoreColor = scoreDiff > 0 ? 'text-calm-mint' : scoreDiff < 0 ? 'text-joyful-amber' : 'text-deep-blue';
-        const scoreLabel =
-            scoreDiff > 0
-                ? `勝利 +${scoreDiff} 分`
-                : scoreDiff < 0
-                  ? `敗場 ${scoreDiff} 分`
-                  : '平手 ±0 分';
+
+        let scoreLabel = '平手 ±0 分';
+        let scoreColor = 'text-deep-blue';
+        if (r.isFriendMatch) {
+            scoreLabel = '友誼賽不計分 ±0 分';
+            scoreColor = 'text-slate-gray';
+        } else if (r.scoreChange > 0) {
+            scoreLabel = `勝利 +${r.scoreChange} 分`;
+            scoreColor = 'text-calm-mint';
+        } else if (r.scoreChange < 0) {
+            scoreLabel = `敗場 ${r.scoreChange} 分`;
+            scoreColor = 'text-joyful-amber';
+        }
+
+        const renderRoundDetails = !r.isFinalResult;
 
         return `
             <div class="mb-4 p-4 rounded-xl border ${bannerClass} text-center animate-[fadeIn_0.4s_ease-out]">
@@ -1508,25 +1971,27 @@ Guidelines:
                     <span>你的總分</span>
                     <span class="text-lg font-medium text-deep-blue">🏆 ${r.newScore || 0}</span>
                 </div>
+                ${renderRoundDetails ? `
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
                     <div class="p-3 sayo-border rounded-lg">
                         <p class="text-slate-gray">你的答案</p>
-                        <p class="text-lg text-deep-blue mt-1">${r.userAnswer || '—'} ${r.userCorrect ? '✓' : '✗'}</p>
+                        <p class="text-lg ${r.userCorrect ? 'text-calm-mint' : 'text-joyful-amber'} mt-1">${r.userCorrect ? '正確 ✓' : '錯誤 ✗'}</p>
                     </div>
                     <div class="p-3 sayo-border rounded-lg">
-                        <p class="text-slate-gray">AI 答案</p>
-                        <p class="text-lg text-deep-blue mt-1">${r.aiAnswer || '—'} ${r.aiCorrect ? '✓' : '✗'}</p>
+                        <p class="text-slate-gray">對手答案</p>
+                        <p class="text-lg ${r.opponentCorrect ? 'text-calm-mint' : 'text-joyful-amber'} mt-1">${r.opponentCorrect ? '正確 ✓' : '錯誤 ✗'}</p>
                     </div>
                     <div class="p-3 sayo-border rounded-lg">
                         <p class="text-slate-gray">你的用時</p>
-                        <p class="text-lg text-deep-blue mt-1">${r.userSec != null ? r.userSec.toFixed(1) + 's' : '—'}</p>
+                        <p class="text-lg text-deep-blue mt-1">${r.userSec != null ? (r.userSec / 1000).toFixed(1) + 's' : '—'}</p>
                     </div>
                     <div class="p-3 sayo-border rounded-lg">
-                        <p class="text-slate-gray">AI 用時</p>
-                        <p class="text-lg text-deep-blue mt-1">${r.aiSec != null ? r.aiSec.toFixed(1) + 's' : '—'}</p>
+                        <p class="text-slate-gray">對手用時</p>
+                        <p class="text-lg text-deep-blue mt-1">${r.opponentSec != null ? (r.opponentSec / 1000).toFixed(1) + 's' : '—'}</p>
                     </div>
                 </div>
                 <p class="text-[10px] text-slate-gray text-center">正確答案：${pvpEscapeHtml(r.correct || '')}</p>
+                ` : ''}
             </div>`;
     }
 
@@ -1535,8 +2000,7 @@ Guidelines:
             return `
                 <div class="flex flex-col items-center justify-center py-16">
                     <div class="w-10 h-10 rounded-full sayo-border border-t-deep-blue animate-spin mb-4" style="border-top-width:2px"></div>
-                    <p class="text-sm text-deep-blue">Rowena 正在透過 RAG 出題中…</p>
-                    <p class="text-[10px] text-slate-gray mt-2 tracking-widest">Supabase · Gemini</p>
+                    <p class="text-sm text-deep-blue">題目生成中，請稍候…</p>
                 </div>`;
         }
         if (pvpQuestionError) {
@@ -1546,15 +2010,15 @@ Guidelines:
             return `<p class="text-sm text-slate-gray py-8 text-center">題目載入中…</p>`;
         }
 
-        const opponentLabel =
-            pvpMode === 'ai'
-                ? '你 vs <span class="text-pvp-accent font-medium">Rowena Bot · AI 導師</span>'
-                : '你 vs <span class="text-deep-blue">同級考生（示範）</span>';
-
-        const aiStatus =
-            pvpMode === 'ai'
-                ? `<span class="text-[10px] px-2 py-0.5 rounded-full sayo-border ${pvpAiReady ? 'text-calm-mint' : 'text-joyful-amber'}">${pvpAiReady ? 'AI 已作答' : 'AI 思考中…'}</span>`
-                : '';
+        const opponentLabel = '你 vs <span class="text-deep-blue">同級考生</span>';
+        const aiStatus = '';
+        const waitingText = pvpUserSubmitted ? '<p class="text-sm text-calm-mint mb-4">已作答，等待對手回覆中...</p>' : '';
+        const roundResultHtml = pvpRoundResult
+            ? `<div class="mb-4 p-3 rounded-xl border border-slate-200 bg-slate-50 text-sm text-slate-gray">
+                    <p class="font-medium text-deep-blue mb-1">${pvpEscapeHtml(pvpRoundResult.headline)}</p>
+                    <p>${pvpEscapeHtml(pvpRoundResult.detail)}</p>
+               </div>`
+            : '';
 
         const optionsHtml = ['A', 'B', 'C', 'D']
             .map(
@@ -1578,12 +2042,14 @@ Guidelines:
                     </div>
                 </div>
                 ${questionSubject ? `<p class="text-xs text-slate-gray mb-2">題目科目：${pvpEscapeHtml(questionSubject)}</p>` : ''}
+                ${roundResultHtml}
                 <p class="text-sm text-deep-blue mb-4 leading-relaxed">${pvpEscapeHtml(pvpQuestion.question)}</p>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">${optionsHtml}</div>
+                ${waitingText}
                 <button type="button" id="pvp-btn-submit"
                     class="w-full text-xs py-2.5 bg-deep-blue text-white rounded-full tracking-wider hover:bg-slate-800 transition-all disabled:opacity-50"
                     ${pvpUserSubmitted ? 'disabled' : ''}>
-                    ${pvpUserSubmitted && pvpMode === 'ai' && !pvpAiReady ? '等待 AI 完成作答…' : '提交答案'}
+                    提交答案
                 </button>
             </div>`;
     }
@@ -1594,15 +2060,17 @@ Guidelines:
         const statusMap = {
             idle: {
                 label: '待機',
-                sub: '選擇對戰模式與學科，開始挑戰',
+                sub: '選擇學科與好友房間，開始挑戰',
                 color: 'text-slate-gray',
             },
+            room: {
+                label: '房間已建立，等待好友...',
+                sub: '將房間碼分享給好友，讓他們加入你的對戰。',
+                color: 'text-pvp-accent',
+            },
             matching: {
-                label: pvpMode === 'ai' ? '準備 AI 對戰' : '配對中',
-                sub:
-                    pvpMode === 'ai'
-                        ? `Rowena Bot 正在準備 · ${PVP_SUBJECT_META[pvpCategory]?.tab || ''}題庫（RAG）…`
-                        : `正在匹配 Form ${myForm} · 綜合題庫…`,
+                label: '配對中',
+                sub: `正在為你尋找即時對手…`,
                 color: 'text-joyful-amber',
             },
             countdown: { label: '即將開始', sub: '', color: 'text-deep-blue' },
@@ -1626,7 +2094,7 @@ Guidelines:
             <header class="mb-6">
                 <p class="text-[10px] text-slate-gray tracking-widest mb-1">競技模式</p>
                 <h1 class="text-2xl text-deep-blue font-light tracking-wide">${tool.name}</h1>
-                <p class="text-sm text-slate-gray mt-2">與同級考生或 Rowena AI 導師限時答題。AI 模式將透過 RAG 檢索 DSE 官方指引後出題與作答。</p>
+                <p class="text-sm text-slate-gray mt-2">即時雙人對戰，本地標準題庫公平競賽。比拼速度與正確率，挑戰你的最佳成績。</p>
                 <p class="text-xs text-slate-gray mt-2">本局科目：${currentSubjectLabel}</p>
             </header>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -1635,17 +2103,28 @@ Guidelines:
                     <p class="text-lg font-medium ${s.color}" id="pvp-status-label">${s.label}</p>
                     <p class="text-xs text-slate-gray mt-2 text-center px-2" id="pvp-status-sub">${s.sub}</p>
                     ${pvpState === 'countdown' ? `<div class="text-5xl font-light text-deep-blue mt-4" id="pvp-countdown">${pvpCountdown}</div>` : ''}
-                    ${pvpState === 'idle' ? `
-                        <div class="flex flex-wrap gap-1.5 justify-center mt-4 mb-2">${subjectTabs}</div>
-                        <button type="button" data-pvp-start="human"
-                            class="mt-3 w-full max-w-[220px] text-xs px-5 py-2.5 sayo-border rounded-full hover:border-deep-blue transition-all">
-                            開始配對（真人 · 示範）
-                        </button>
-                        <button type="button" data-pvp-start="ai"
-                            class="mt-2 w-full max-w-[220px] text-xs px-6 py-3 bg-pvp-accent text-white rounded-full tracking-wider hover:bg-deep-blue transition-all">
-                            挑戰 AI 智能導師（Rowena Bot）
-                        </button>
+                    ${pvpState === 'room' && pvpRoomCode ? `
+                        <div class="mt-4 text-center">
+                            <p class="text-xs text-slate-gray uppercase tracking-[0.2em]">房間碼</p>
+                            <p class="mt-3 text-4xl font-semibold text-pvp-accent tracking-[0.2em]">${pvpEscapeHtml(pvpRoomCode)}</p>
+                        </div>
                     ` : ''}
+                    <div class="flex flex-wrap gap-1.5 justify-center mt-4 mb-2">${subjectTabs}</div>
+                    <button type="button" data-pvp-start="human"
+                        class="mt-3 w-full max-w-[220px] text-xs px-5 py-2.5 sayo-border rounded-full hover:border-deep-blue transition-all">
+                        ⚡ 快速隨機配對
+                    </button>
+                    <div class="w-full rounded-2xl bg-slate-50 border border-gray-100 p-4 mt-4 text-left">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-xs tracking-widest text-slate-gray">好友約戰區</span>
+                        </div>
+                        <button type="button" id="pvp-create-room" class="w-full text-xs py-2.5 bg-pvp-accent text-white rounded-full hover:bg-deep-blue transition-all">建立專屬房間</button>
+                        <div class="mt-3 flex gap-2">
+                            <input id="pvp-join-room-code" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="6" placeholder="輸入 6 位數房間碼" class="flex-1 text-xs px-3 py-2 border border-gray-200 rounded-full focus:outline-none focus:ring-2 focus:ring-pvp-accent" ${pvpState === 'room' && pvpRoomCode ? 'disabled' : ''} />
+                            <button type="button" id="pvp-join-room" class="text-xs px-4 py-2 bg-deep-blue text-white rounded-full hover:bg-slate-800 transition-all" ${pvpState === 'room' && pvpRoomCode ? 'disabled' : ''}>加入房間</button>
+                        </div>
+                        ${pvpRoomMessage ? `<p class="text-[11px] text-slate-gray mt-3">${pvpEscapeHtml(pvpRoomMessage)}</p>` : ''}
+                    </div>
                     ${pvpState === 'result' ? `
                         <button type="button" data-pvp-reset
                             class="mt-6 text-xs px-6 py-2.5 sayo-border rounded-full hover:border-deep-blue">再戰一局</button>
@@ -1657,14 +2136,12 @@ Guidelines:
                     ${pvpState === 'result' ? pvpRenderResultBanner() : ''}
                     ${pvpState !== 'playing' && pvpState !== 'result' ? `
                         <p class="text-sm text-slate-gray leading-relaxed">
-                            ${pvpMode === 'ai'
-                                ? '選擇學科後點擊「挑戰 AI 智能導師」，系統將以 RAG 生成題目；AI 會在 15~25 秒內完成思考並作答。'
-                                : '真人配對為示範流程；完整 RAG 對戰請使用 Rowena Bot 模式。'}
+                            即時雙人對戰，使用標準題庫公平出題。選擇學科或建立房間，即可與好友比拼速度與正確率。
                         </p>
                         <ul class="mt-4 text-xs text-slate-gray space-y-2">
-                            <li>· 單題限時 90 秒</li>
-                            <li>· AI 模式：Supabase 向量庫 + Gemini 2.5 Flash</li>
-                            <li>· 提交後比對正誤與答題時間</li>
+                            <li>· 即時雙人對戰</li>
+                            <li>· 本地標準題庫公平競賽</li>
+                            <li>· 比拼速度與正確率</li>
                         </ul>
                     ` : ''}
                 </div>
@@ -1688,42 +2165,7 @@ Guidelines:
         }
     }
 
-    async function pvpBeginMatch(mode) {
-        pvpMode = mode === 'ai' ? 'ai' : 'human';
-        pvpState = 'matching';
-        pvpQuestion = null;
-        pvpQuestionError = '';
-        pvpQuestionLoading = mode === 'ai';
-        pvpUserSubmitted = false;
-        pvpUserAnswer = null;
-        pvpUserAnswerSec = null;
-        pvpAiReady = false;
-        pvpAiAnswer = null;
-        pvpAiAnswerSec = null;
-        pvpResultPayload = null;
-        if (pvpAiTask?.cancel) pvpAiTask.cancel();
-        pvpRefreshUi();
-
-        try {
-            if (pvpMode === 'ai') {
-                pvpQuestion = await pvpGenerateQuestionRAG(pvpCategory);
-            } else {
-                await pvpSleep(800);
-                pvpQuestion = pvpFallbackQuestion(pvpCategory);
-            }
-        } catch (err) {
-            console.error('[Rowena PvP] question generation failed:', err);
-            pvpQuestionError = err.message || '出題失敗';
-            pvpQuestion = pvpFallbackQuestion(pvpCategory);
-        } finally {
-            pvpQuestionLoading = false;
-        }
-
-        await pvpSleep(pvpMode === 'ai' ? 600 : 1200);
-        pvpState = 'countdown';
-        pvpCountdown = 3;
-        pvpRefreshUi();
-
+    function pvpStartCountdown() {
         if (pvpTimer) clearInterval(pvpTimer);
         pvpTimer = setInterval(() => {
             pvpCountdown--;
@@ -1734,21 +2176,69 @@ Guidelines:
                 pvpTimer = null;
                 pvpState = 'playing';
                 pvpBattleStartMs = Date.now();
-                pvpRefreshUi();
-                pvpStartPlayTimer();
-                if (pvpMode === 'ai') pvpStartAiOpponent();
+                pvpStartRound();
             }
         }, 1000);
     }
 
+    async function pvpBeginMatch(mode) {
+        pvpMode = 'human';
+        pvpState = 'matching';
+        pvpRoomCode = '';
+        pvpRoomMessage = '';
+        pvpQuestion = null;
+        pvpQuestions = [];
+        pvpQuestionIndex = 0;
+        pvpMyScore = 0;
+        pvpOpponentScore = 0;
+        pvpQuestionsSent = false;
+        pvpQuestionError = '';
+        pvpQuestionLoading = true;
+        pvpUserSubmitted = false;
+        pvpUserAnswer = null;
+        pvpUserAnswerSec = null;
+        pvpHostAnswerData = null;
+        pvpClientAnswerData = null;
+        pvpRoundResult = null;
+        pvpAiReady = false;
+        pvpAiAnswer = null;
+        pvpAiAnswerSec = null;
+        pvpResultPayload = null;
+        if (pvpAiTask?.cancel) pvpAiTask.cancel();
+        pvpRefreshUi();
+
+        try {
+            await pvpSleep(800);
+            pvpQuestions = await fetchPvPQuestions(currentSubject);
+            pvpQuestionIndex = 0;
+            pvpQuestion = pvpQuestions[0] || pvpFallbackQuestion(currentSubject);
+        } catch (err) {
+            console.error('[Rowena PvP] question loading failed:', err);
+            pvpQuestionError = err.message || '題庫讀取失敗';
+            pvpQuestion = pvpFallbackQuestion(currentSubject);
+        } finally {
+            pvpQuestionLoading = false;
+        }
+
+        await pvpSleep(1200);
+        pvpState = 'countdown';
+        pvpCountdown = 3;
+        pvpRefreshUi();
+        pvpStartCountdown();
+    }
+
     function pvpReset() {
         pvpState = 'idle';
+        pvpRoomCode = '';
+        pvpJoinRoomCode = '';
+        pvpRoomMessage = '';
         pvpUserSubmitted = false;
         pvpResultPayload = null;
         if (pvpTimer) clearInterval(pvpTimer);
         pvpTimer = null;
         pvpClearPlayTimer();
         if (pvpAiTask?.cancel) pvpAiTask.cancel();
+        pvpLeaveRoom();
         pvpRefreshUi();
     }
 
@@ -1763,6 +2253,7 @@ Guidelines:
             btn.addEventListener('click', () => {
                 if (pvpState !== 'idle') return;
                 pvpCategory = btn.dataset.pvpSubject;
+                currentSubject = pvpCategory;
                 pvpRefreshUi();
             });
         });
@@ -1771,6 +2262,13 @@ Guidelines:
         });
         document.getElementById('pvp-btn-submit')?.addEventListener('click', pvpSubmitAnswer);
         document.querySelector('[data-pvp-reset]')?.addEventListener('click', pvpReset);
+        document.getElementById('pvp-create-room')?.addEventListener('click', pvpCreateRoom);
+        document.getElementById('pvp-join-room')?.addEventListener('click', pvpJoinRoom);
+        document.getElementById('pvp-join-room-code')?.addEventListener('input', (event) => {
+            const input = event.target;
+            const digits = input.value.replace(/\D/g, '').slice(0, 6);
+            if (input.value !== digits) input.value = digits;
+        });
     }
 
     function pvpMount(tool) {

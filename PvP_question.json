@@ -1,0 +1,251 @@
+{
+  "chinese": [
+    {
+      "id": "ch_001",
+      "question": "下列文句中，「意氣」的意義與其他三者**不同**的是：",
+      "options": ["慷慨「意氣」素霓生", "「意氣」風發", "一時「意氣」用事", "與君「意氣」頻相投"],
+      "answer": 2
+    },
+    {
+      "id": "ch_002",
+      "question": "「落霞與孤鶩齊飛，秋水共長天一色」描寫的是哪一個名勝？",
+      "options": ["岳陽樓", "黃鶴樓", "滕王閣", "蓬萊閣"],
+      "answer": 2
+    },
+    {
+      "id": "ch_003",
+      "question": "下列哪一個成語的字形**完全正確**？",
+      "options": ["按步就班", "川流不息", "美侖美奐", "名符其實"],
+      "answer": 1
+    },
+    {
+      "id": "ch_004",
+      "question": "諸葛亮《出師表》中「先帝不以臣卑鄙」的「卑鄙」是指：",
+      "options": ["品德低劣", "地位卑微，見識鄙陋", "狡猾奸詐", "膽小懦弱"],
+      "answer": 1
+    },
+    {
+      "id": "ch_005",
+      "question": "「桑梓」一詞在古代文學中常用來借代：",
+      "options": ["兄弟", "故鄉", "歲月", "職業"],
+      "answer": 1
+    },
+    {
+      "id": "ch_006",
+      "question": "下列哪一組詞語**不是**反義詞？",
+      "options": ["粗製濫造／精雕細琢", "雪中送炭／落井下石", "孤注一擲／背水一戰", "理直氣壯／理屈詞窮"],
+      "answer": 2
+    },
+    {
+      "id": "ch_007",
+      "question": "「枯藤老樹昏鴉，小橋流水人家」採用的主要修辭手法是：",
+      "options": ["排比", "鼎足對（對偶）", "比喻", "借代"],
+      "answer": 1
+    },
+    {
+      "id": "ch_008",
+      "question": "「青出於藍」的下一句是「而勝於藍」，這句話出自哪一位思想家？",
+      "options": ["孔子", "孟子", "荀子", "莊子"],
+      "answer": 2
+    },
+    {
+      "id": "ch_009",
+      "question": "司馬遷寫作《史記》的體裁是：",
+      "options": ["編年體", "紀傳體", "紀事本末體", "國別體"],
+      "answer": 1
+    },
+    {
+      "id": "ch_010",
+      "question": "「出淤泥而不染，濯清漣而不妖」讚美的是哪一種植物？",
+      "options": ["梅花", "菊花", "蓮花", "竹子"],
+      "answer": 2
+    }
+  ],
+  "english": [
+    {
+      "id": "en_001",
+      "question": "Choose the correct sentence to complete the conversation:\n'Did you finish the report?'\n'No, but I _______ it by tomorrow.'",
+      "options": ["will finish", "will have finished", "finished", "have finished"],
+      "answer": 1
+    },
+    {
+      "id": "en_002",
+      "question": "If you _______ hard, you would have passed the exam last week.",
+      "options": ["study", "studied", "had studied", "would study"],
+      "answer": 2
+    },
+    {
+      "id": "en_003",
+      "question": "The manager decided to _______ the meeting until next Monday due to the typhoon.",
+      "options": ["put off", "put out", "put on", "put up"],
+      "answer": 0
+    },
+    {
+      "id": "en_004",
+      "question": "Despite _______ the match, the team was praised for their excellent sportsmanship.",
+      "options": ["lose", "lost", "losing", "to lose"],
+      "answer": 2
+    },
+    {
+      "id": "en_005",
+      "question": "Which of the following words is a **synonym** of 'generous'?",
+      "options": ["stingy", "magnanimous", "selfish", "frugal"],
+      "answer": 1
+    },
+    {
+      "id": "en_006",
+      "question": "She is the student _______ project won the first prize in the national competition.",
+      "options": ["who", "whom", "whose", "which"],
+      "answer": 2
+    },
+    {
+      "id": "en_007",
+      "question": "By the time the police arrived, the thieves _______ with the jewelry.",
+      "options": ["had escaped", "escaped", "were escaping", "will escape"],
+      "answer": 0
+    },
+    {
+      "id": "en_008",
+      "question": "I look forward to _______ you at the upcoming graduation ceremony.",
+      "options": ["see", "seeing", "saw", "be seeing"],
+      "answer": 1
+    },
+    {
+      "id": "en_009",
+      "question": "Identify the word that is **spelled correctly**:",
+      "options": ["Accomodation", "Accommodation", "Acomodation", "Acommodation"],
+      "answer": 1
+    },
+    {
+      "id": "en_010",
+      "question": "The new government policy aims to _______ the gap between the rich and the poor.",
+      "options": ["bridge", "enlarge", "ignore", "prolong"],
+      "answer": 0
+    }
+  ],
+  "math_zh": [
+    {
+      "id": "mzh_001",
+      "question": "已知一個等差數列的首項為 3，公差為 5，求第 10 項的值。",
+      "options": ["45", "48", "53", "50"],
+      "answer": 1
+    },
+    {
+      "id": "mzh_002",
+      "question": "解方程：$2x - 7 = 5x + 8$。求 $x$ 的值。",
+      "options": ["-5", "-3", "5", "3"],
+      "answer": 0
+    },
+    {
+      "id": "mzh_003",
+      "question": "拋擲一枚均勻的硬幣三次，求獲得至少兩次正面的概率。",
+      "options": ["1/8", "3/8", "1/2", "3/4"],
+      "answer": 2
+    },
+    {
+      "id": "mzh_004",
+      "question": "若一個直角三角形的兩條直角邊分別為 6 cm 和 8 cm，求其斜邊的長度。",
+      "options": ["9 cm", "10 cm", "12 cm", "14 cm"],
+      "answer": 1
+    },
+    {
+      "id": "mzh_005",
+      "question": "求圓 $x^2 + y^2 - 4x + 6y - 12 = 0$ 的半徑。",
+      "options": ["3", "4", "5", "6"],
+      "answer": 2
+    },
+    {
+      "id": "mzh_006",
+      "question": "若 $\\log_2 (x + 3) = 4$，求 $x$ 的值。",
+      "options": "13",
+      "options": ["5", "9", "13", "16"],
+      "answer": 2
+    },
+    {
+      "id": "mzh_007",
+      "question": "一個正多邊形的一個內角為 $144^\\circ$，問該多邊形有多少條邊？",
+      "options": ["8", "10", "12", "15"],
+      "answer": 1
+    },
+    {
+      "id": "mzh_008",
+      "question": "簡化：$(2a^2b)^3 \\div (4ab^2)$。",
+      "options": ["$2a^5b$", "$2a^5/b$", "$2a^6b$", "$2a^5b^2$"],
+      "answer": 0
+    },
+    {
+      "id": "mzh_009",
+      "question": "已知 $y$ 隨 $x$ 反向變化。當 $x = 4$ 時，$y = 6$。當 $x = 3$ 時，$y$ 的值是多少？",
+      "options": ["8", "4.5", "12", "9"],
+      "answer": 0
+    },
+    {
+      "id": "mzh_010",
+      "question": "求等比數列 $2, 6, 18, 54, \\dots$ 的前 5 項之和。",
+      "options": ["120", "242", "243", "364"],
+      "answer": 1
+    }
+  ],
+  "math_en": [
+    {
+      "id": "men_001",
+      "question": "If $f(x) = 2x + 3$, find the value of $f(5)$.",
+      "options": ["10", "13", "15", "8"],
+      "answer": 1
+    },
+    {
+      "id": "men_002",
+      "question": "Find the slope of the line passing through the points $(2, 5)$ and $(4, 11)$.",
+      "options": ["2", "3", "4", "6"],
+      "answer": 1
+    },
+    {
+      "id": "men_003",
+      "question": "Solve the inequality: $3x - 5 > 7$.",
+      "options": ["$x > 4$", "$x < 4$", "$x > 12$", "$x < 12$"],
+      "answer": 0
+    },
+    {
+      "id": "men_004",
+      "question": "What is the maximum value of the quadratic function $y = -x^2 + 4x + 5$?",
+      "options": ["5", "7", "9", "11"],
+      "answer": 2
+    },
+    {
+      "id": "men_005",
+      "question": "A card is drawn at random from a standard deck of 52 cards. What is the probability of drawing a King?",
+      "options": ["1/13", "1/4", "1/26", "1/52"],
+      "answer": 0
+    },
+    {
+      "id": "men_006",
+      "question": "If $\\tan \\theta = 3/4$ and $\\theta$ is an acute angle, find the value of $\\cos \\theta$.",
+      "options": ["3/5", "4/5", "5/4", "5/3"],
+      "answer": 1
+    },
+    {
+      "id": "men_007",
+      "question": "Find the sum of the infinite geometric series: $12 + 4 + 4/3 + 4/9 + \\dots$",
+      "options": ["16", "18", "20", "24"],
+      "answer": 1
+    },
+    {
+      "id": "men_008",
+      "question": "Solve the system of equations: $x + y = 10$ and $x - y = 4$. What is the value of $x$?",
+      "options": ["3", "5", "7", "8"],
+      "answer": 2
+    },
+    {
+      "id": "men_009",
+      "question": "If the volume of a sphere is $36\\pi \\text{ cm}^3$, find its radius.",
+      "options": ["3 cm", "4 cm", "6 cm", "9 cm"],
+      "answer": 0
+    },
+    {
+      "id": "men_010",
+      "question": "Expand and simplify: $(2x - 3)(x + 5)$.",
+      "options": ["$2x^2 + 7x - 15$", "$2x^2 - 7x - 15$", "$2x^2 + 13x - 15$", "$2x^2 - 13x - 15$"],
+      "answer": 0
+    }
+  ]
+}
