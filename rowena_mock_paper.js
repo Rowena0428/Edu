@@ -895,6 +895,9 @@ Guidelines:
             if (!resp.ok) throw new Error('Google 伺服器訪問量過大，請稍後再試。');
             const data = await resp.json();
             const markdownText = data.text || data.result || data.markdown || data.message || '';
+            if (!markdownText || !String(markdownText).trim()) {
+                throw new Error('後端未返回任何試卷內容，請確認 API 金鑰與服務狀態。');
+            }
             renderPaperToPreview(markdownText, requestSubject);
         } catch (err) {
             console.error('[Rowena] generateMockPaper failed:', err);

@@ -169,6 +169,7 @@
         const SUPABASE_URL = 'https://zhcmekhhiilnygiayslq.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpoY21la2hoaWlsbnlnaWF5c2xxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0OTg3NzQsImV4cCI6MjA5NTA3NDc3NH0.W-XFurvr4leag2xBv2s3hFoZgmVAo_RtfUgdqRIqbWA';
         let rowenaSupabaseClient = null;
+        let profilePollingTimer = null;
 
         function initRowenaSupabase() {
             if (rowenaSupabaseClient) return rowenaSupabaseClient;
@@ -188,6 +189,7 @@
                 email: profile.email || '',
                 name: profile.name || 'Learner',
                 grade: Number.isFinite(gradeValue) ? gradeValue : 6,
+                pvp_score: Number.isFinite(Number(profile.pvpScore || 0)) ? Number(profile.pvpScore || 0) : 0,
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
@@ -226,6 +228,7 @@
                 email: profile.email || '',
                 name: profile.name || 'Learner',
                 grade: Number.isFinite(gradeValue) ? gradeValue : 6,
+                pvp_score: Number.isFinite(Number(profile.pvpScore || 0)) ? Number(profile.pvpScore || 0) : 0,
                 dse_pre_grade_zh: preGrades.chinese || '未評估',
                 dse_pre_grade_ma: preGrades.math || '未評估',
                 dse_pre_grade_en: preGrades.english || '未評估',
@@ -411,9 +414,9 @@
         function rankPanel(tool) {
             const me = typeof RowenaUser !== 'undefined' ? RowenaUser.getProfile() : { name: '你', form: 6, pvpScore: 0 };
             const opponents = [
-                { name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 7, pvpScore: 850 },
-                { name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 5, pvpScore: 720 },
-                { name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 3, pvpScore: 680 },
+                { name: 'Alex L.', form: 6, hours: '42.5h', wins: 28, streak: 35, pvpScore: 850 },
+                { name: 'Chloe W.', form: 6, hours: '38.2h', wins: 24, streak: 28, pvpScore: 720 },
+                { name: 'Matt C.', form: 5, hours: '36.0h', wins: 22, streak: 25, pvpScore: 680 },
             ];
             const allRows = [
                 ...opponents.map(o => ({ ...o, you: false })),
@@ -489,7 +492,12 @@
             void root.offsetWidth;
             root.classList.add('workspace-panel');
 
-            Array.from(root.children).forEach(child => child.classList.add('hidden'));
+            Array.from(root.children).forEach((child) => {
+                if (child.parentElement === root) {
+                    root.removeChild(child);
+                }
+            });
+
             let toolPanel = workspaceCache.get(tool.id);
             if (!toolPanel) {
                 toolPanel = document.createElement('div');
@@ -519,21 +527,21 @@
                 }
 
                 workspaceCache.set(tool.id, toolPanel);
-                root.appendChild(toolPanel);
+            }
 
-                if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
-                    RowenaMockPaper.afterMount();
-                } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
-                    RowenaPvp.afterMount();
-                } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
-                    RowenaCheckPaper.afterMount();
-                } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
-                    RowenaReportAI.afterMount();
-                } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
-                    RowenaLeaderboard.afterMount();
-                }
-            } else {
-                toolPanel.classList.remove('hidden');
+            toolPanel.classList.remove('hidden');
+            root.appendChild(toolPanel);
+
+            if (tool.category === 'mock' && typeof RowenaMockPaper !== 'undefined') {
+                RowenaMockPaper.afterMount();
+            } else if (tool.category === 'pvp' && typeof RowenaPvp !== 'undefined') {
+                RowenaPvp.afterMount();
+            } else if (tool.category === 'check' && typeof RowenaCheckPaper !== 'undefined') {
+                RowenaCheckPaper.afterMount();
+            } else if (tool.category === 'report' && typeof RowenaReportAI !== 'undefined') {
+                RowenaReportAI.afterMount();
+            } else if (tool.category === 'leaderboard' && typeof RowenaLeaderboard !== 'undefined') {
+                RowenaLeaderboard.afterMount();
             }
         }
 
@@ -579,6 +587,102 @@
             document.getElementById('btn-data-collection-leave')?.addEventListener('click', closeDataCollectionPanel);
         }
 
+        let visibilitySyncTimer = null;
+        let visibilitySyncInFlight = false;
+        let lastBackgroundProfileSyncAt = 0;
+        let lastVisibilityRestoreAt = 0;
+        let lastVisibilityState = document.visibilityState || 'visible';
+
+        async function syncProfileFromSupabaseInBackground() {
+            const client = initRowenaSupabase();
+            const now = Date.now();
+            if (!client || visibilitySyncInFlight || now - lastBackgroundProfileSyncAt < 10000) return;
+            lastBackgroundProfileSyncAt = now;
+            const profile = window.RowenaUser?.getProfile?.() || null;
+            const email = profile?.email || '';
+            if (!email) return;
+
+            visibilitySyncInFlight = true;
+            try {
+                const { data, error } = await client
+                    .from('student_profiles')
+                    .select('email,name,grade,dse_pre_grade_zh,dse_pre_grade_ma,dse_pre_grade_en,pvp_score,updated_at')
+                    .eq('email', email)
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+
+                if (error || !data) return;
+
+                const nextProfile = {
+                    ...profile,
+                    email: data.email || profile.email,
+                    name: data.name || profile.name,
+                    form: Number.isFinite(Number(data.grade)) ? Number(data.grade) : profile.form,
+                    pvpScore: Number.isFinite(Number(data.pvp_score)) ? Number(data.pvp_score) : (profile.pvpScore || 0),
+                    dsePreGrades: {
+                        chinese: data.dse_pre_grade_zh || profile.dsePreGrades?.chinese || '未評估',
+                        math: data.dse_pre_grade_ma || profile.dsePreGrades?.math || '未評估',
+                        english: data.dse_pre_grade_en || profile.dsePreGrades?.english || '未評估',
+                    },
+                    dsePreGrade: data.dse_pre_grade_zh || profile.dsePreGrades?.chinese || '未評估',
+                };
+
+                localStorage.setItem('rowena_user_profile', JSON.stringify(nextProfile));
+                window.__rowenaLastSupabaseProfile = nextProfile;
+                if (typeof window.onRowenaProfileUpdated === 'function') {
+                    window.onRowenaProfileUpdated();
+                }
+            } catch (e) {
+                console.warn('[Profile] 背景同步失敗:', e);
+            } finally {
+                visibilitySyncInFlight = false;
+            }
+        }
+
+        function attachBackgroundProfileSync() {
+            const handleVisibilityRestore = () => {
+                const nextVisibilityState = document.visibilityState || 'visible';
+                if (nextVisibilityState === 'visible' && lastVisibilityState !== 'visible') {
+                    const now = Date.now();
+                    if (now - lastVisibilityRestoreAt < 10000) {
+                        lastVisibilityState = nextVisibilityState;
+                        return;
+                    }
+                    lastVisibilityRestoreAt = now;
+                    window.clearTimeout(visibilitySyncTimer);
+                    visibilitySyncTimer = window.setTimeout(() => {
+                        void syncProfileFromSupabaseInBackground();
+                    }, 1000);
+                }
+                lastVisibilityState = nextVisibilityState;
+            };
+
+            document.addEventListener('visibilitychange', handleVisibilityRestore);
+        }
+
+        function startProfilePolling() {
+            try {
+                if (profilePollingTimer) return;
+                // Poll profile from Supabase every 30 seconds
+                profilePollingTimer = window.setInterval(() => {
+                    void syncProfileFromSupabaseInBackground();
+                }, 30000);
+            } catch (e) {
+                console.warn('[Profile] startProfilePolling failed', e);
+            }
+        }
+
+        function stopProfilePolling() {
+            try {
+                if (!profilePollingTimer) return;
+                window.clearInterval(profilePollingTimer);
+                profilePollingTimer = null;
+            } catch (e) {
+                console.warn('[Profile] stopProfilePolling failed', e);
+            }
+        }
+
         async function redirectToLoginPage() {
             window.location.href = window.location.origin + '/aura_joyful_learning.html';
         }
@@ -591,6 +695,19 @@
                 console.warn('[Auth] Supabase client not initialized');
                 redirectToLoginPage();
                 return;
+            }
+
+            if (window.RowenaUser?.hasExplicitLogout && window.RowenaUser.hasExplicitLogout()) {
+                try {
+                    if (client.auth && typeof client.auth.signOut === 'function') {
+                        await client.auth.signOut();
+                    }
+                    window.RowenaUser.clearSupabaseAuthStorage?.();
+                } catch (e) {
+                    console.warn('[Auth] explicit logout cleanup failed', e);
+                } finally {
+                    window.RowenaUser.clearExplicitLogout?.();
+                }
             }
 
             let authUser = null;
@@ -608,6 +725,9 @@
 
             // Render user header after successful auth
             RowenaUser.init('#rowena-header-user');
+            attachBackgroundProfileSync();
+            // Start periodic profile polling so updates from other devices appear here
+            startProfilePolling();
 
             // Merge authenticated user info into local profile and persist
             try {
@@ -633,10 +753,26 @@
                 console.error('[Auth] merge profile failed', e);
             }
 
-            // Optional: react to auth state changes (e.g., after redirect)
-            client.auth.onAuthStateChange((event, session) => {
-                if (event === 'SIGNED_IN') {
-                    window.location.href = window.location.origin + '/aura_workspace.html';
+            // Keep auth updates non-disruptive so switching tabs or restoring focus does not trigger a full page reload.
+            client.auth.onAuthStateChange((event) => {
+                if (event === 'SIGNED_OUT') {
+                    try {
+                        localStorage.removeItem('rowena_user_profile');
+                        localStorage.removeItem('rowena_pre_grades');
+                    } catch (e) {
+                        console.warn('[Auth] failed to clear local profile after sign out', e);
+                    }
+                    stopProfilePolling();
+                    window.location.href = window.location.origin + '/aura_joyful_learning.html';
+                    return;
+                }
+                if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
+                    if (window.RowenaUser?.init) {
+                        RowenaUser.init('#rowena-header-user');
+                    }
+                    // ensure polling is running to pick up cross-device changes
+                    startProfilePolling();
+                    void syncProfileFromSupabaseInBackground();
                 }
             });
 

@@ -22,6 +22,8 @@
         math: '未評估',
     };
 
+    const LOGOUT_FLAG_KEY = 'rowena_explicit_logout';
+
     function normalizePreGrades(value) {
         const base = { ...DEFAULT_PRE_GRADES };
         if (!value || typeof value !== 'object') return base;
@@ -71,6 +73,46 @@
         normalized.dsePreGrade = normalized.dsePreGrades.chinese;
         savePreGrades(normalized.dsePreGrades);
         localStorage.setItem(PROFILE_KEY, JSON.stringify(normalized));
+    }
+
+    function clearSupabaseAuthStorage() {
+        try {
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (typeof key !== 'string') continue;
+                if (key.startsWith('supabase.auth.') || key.includes('supabase.auth') || key.startsWith('supabase') || key.startsWith('sb-')) {
+                    keysToRemove.push(key);
+                }
+            }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+        } catch (e) {
+            console.warn('[Auth] clearSupabaseAuthStorage failed', e);
+        }
+    }
+
+    function markExplicitLogout() {
+        try {
+            localStorage.setItem(LOGOUT_FLAG_KEY, '1');
+        } catch (e) {
+            console.warn('[Auth] markExplicitLogout failed', e);
+        }
+    }
+
+    function clearExplicitLogout() {
+        try {
+            localStorage.removeItem(LOGOUT_FLAG_KEY);
+        } catch (e) {
+            console.warn('[Auth] clearExplicitLogout failed', e);
+        }
+    }
+
+    function hasExplicitLogout() {
+        try {
+            return localStorage.getItem(LOGOUT_FLAG_KEY) === '1';
+        } catch (e) {
+            return false;
+        }
     }
 
     function isCJK(ch) {
@@ -126,16 +168,42 @@
         const formLabel = `Form ${profile.form}`;
         const isWorkspacePage = window.location.pathname.endsWith('/aura_workspace.html') || window.location.href.includes('aura_workspace.html');
         container.innerHTML = `
-            <span class="hidden md:inline text-xs text-slate-gray">${escapeHtml(formLabel)} · 🏆 <span data-rowena-pvp-score>${profile.pvpScore || 0}</span> · 今日已學 <span class="text-deep-blue font-medium">1h 12m</span></span>
+            <span class="hidden md:inline text-xs text-slate-gray">${escapeHtml(formLabel)} · 🏆 <span data-rowena-pvp-score>${profile.pvpScore || 0}</span></span>
             ${isWorkspacePage ? `
-            <button type="button" id="rowena-user-btn" class="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-off-white transition-colors sayo-border border-transparent hover:border-gray-200" aria-label="開啟個人主頁">
-                ${avatarHtml(profile, 'w-8 h-8')}
-                <span class="text-xs text-deep-blue font-medium max-w-[96px] truncate hidden sm:inline" id="rowena-user-name">${escapeHtml(profile.name)}</span>
-            </button>
-            ` : ''}
-        `;
+                <div class="flex items-center gap-2">
+                    <button type="button" id="rowena-user-btn" class="flex items-center gap-2 pl-2 pr-1 py-1 rounded-full hover:bg-off-white transition-colors sayo-border border-transparent hover:border-gray-200" aria-label="開啟個人主頁">
+                        ${avatarHtml(profile, 'w-8 h-8')}
+                        <span class="text-xs text-deep-blue font-medium max-w-[96px] truncate hidden sm:inline" id="rowena-user-name">${escapeHtml(profile.name)}</span>
+                    </button>
+                    <button type="button" id="rowena-logout-btn" class="text-[11px] px-2 py-1 rounded-full bg-off-white hover:bg-slate-100 text-slate-gray border border-transparent">登出</button>
+                </div>
+                ` : ''}
+            `;
         if (isWorkspacePage) {
             container.querySelector('#rowena-user-btn')?.addEventListener('click', openProfileModal);
+            container.querySelector('#rowena-logout-btn')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try {
+                    // Prefer using global initRowenaSupabase if available
+                    const client = (typeof initRowenaSupabase === 'function') ? initRowenaSupabase() : (window.RowenaSupabase && window.RowenaSupabase.getClient ? window.RowenaSupabase.getClient() : null);
+                    if (client && client.auth && typeof client.auth.signOut === 'function') {
+                        await client.auth.signOut();
+                    } else if (window.RowenaSupabase && typeof window.RowenaSupabase.init === 'function') {
+                        const c = window.RowenaSupabase.init();
+                        if (c && c.auth && typeof c.auth.signOut === 'function') await c.auth.signOut();
+                    }
+                } catch (err) {
+                    console.warn('[Auth] signOut failed', err);
+                }
+                try {
+                    localStorage.removeItem('rowena_user_profile');
+                    localStorage.removeItem('rowena_pre_grades');
+                    markExplicitLogout();
+                    clearSupabaseAuthStorage();
+                } catch (e) { /* ignore */ }
+                // Redirect to landing page after logout
+                window.location.href = window.location.origin + '/aura_joyful_learning.html';
+            });
         }
     }
 
@@ -459,11 +527,23 @@
                 current.pvpScore = newScore;
                 saveProfile(current);
                 syncAllHeaders();
+                // Try to persist updated pvpScore to server if RowenaSupabase is available
+                try {
+                    if (typeof window.RowenaSupabase?.persistProfileToSupabase === 'function') {
+                        // fire-and-forget; do not block UI
+                        window.RowenaSupabase.persistProfileToSupabase(current).catch(err => console.warn('[Supabase] persist pvpScore failed', err));
+                    }
+                } catch (e) {
+                    console.warn('[Supabase] persist pvpScore call failed', e);
+                }
                 return newScore;
             } catch (e) {
                 console.error('Error adding PvP score:', e);
                 return (loadProfile().pvpScore || 0);
             }
         },
+        hasExplicitLogout: hasExplicitLogout,
+        clearExplicitLogout: clearExplicitLogout,
+        clearSupabaseAuthStorage: clearSupabaseAuthStorage,
     };
 })(window);

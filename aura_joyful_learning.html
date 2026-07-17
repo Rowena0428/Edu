@@ -369,12 +369,30 @@
         }
 
         async function handleWorkspaceEntry(showDataCollection = false) {
+            const explicitLogout = window.RowenaUser?.hasExplicitLogout && window.RowenaUser.hasExplicitLogout();
+            if (explicitLogout) {
+                try {
+                    const client = initRowenaSupabase();
+                    if (client && client.auth && typeof client.auth.signOut === 'function') {
+                        await client.auth.signOut();
+                    }
+                    window.RowenaUser.clearSupabaseAuthStorage?.();
+                } catch (e) {
+                    console.warn('[Auth] failed to complete explicit logout cleanup', e);
+                }
+            }
+
             const authUser = await getAuthUser();
-            if (authUser) {
+            if (authUser && !explicitLogout) {
                 if (showDataCollection) localStorage.removeItem('rowena_data_collection_closed');
                 window.location.href = `aura_workspace.html${showDataCollection ? '?showDataCollection=1' : ''}`;
                 return;
             }
+
+            if (explicitLogout) {
+                window.RowenaUser.clearExplicitLogout?.();
+            }
+
             const client = initRowenaSupabase();
             if (!client) {
                 showModal('無法登入', 'Supabase 未正確初始化，請稍後再試。');
@@ -383,7 +401,10 @@
             try {
                 const { error } = await client.auth.signInWithOAuth({
                     provider: 'google',
-                    options: { redirectTo: window.location.origin + '/aura_workspace.html' }
+                    options: {
+                        redirectTo: window.location.origin + '/aura_workspace.html',
+                        queryParams: { prompt: 'select_account' }
+                    }
                 });
                 if (error) console.error('[OAuth] signIn error', error);
             } catch (e) {
@@ -416,7 +437,14 @@
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
-            if (typeof RowenaUser !== 'undefined') RowenaUser.init('#rowena-header-user');
+            try {
+                const authUser = await getAuthUser();
+                if (authUser && typeof RowenaUser !== 'undefined') {
+                    RowenaUser.init('#rowena-header-user');
+                }
+            } catch (e) {
+                console.warn('[Auth] check on DOMContentLoaded failed', e);
+            }
             bindLoginButtons();
             setTimeout(() => {
                 document.getElementById('hero-title').classList.remove('opacity-0');

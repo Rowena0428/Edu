@@ -36,7 +36,6 @@
 </head>
 <body class="font-sans antialiased min-h-screen">
 
-    <!-- 頂部導航欄 -->
     <header class="bg-pure-white sayo-border border-t-0 border-l-0 border-r-0 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
         <div>
             <p class="text-[10px] tracking-widest text-slate-gray mb-0.5">PROGRESS</p>
@@ -50,8 +49,6 @@
                     </button>
                     <div id="subject-dropdown-menu" class="hidden absolute left-0 mt-2 w-32 rounded-2xl bg-pure-white sayo-border shadow-xl py-2 z-50">
                         <button type="button" onclick="changeSubjectById('chinese')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">中文科</button>
-                        <button type="button" onclick="changeSubjectById('english')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">英文科</button>
-                        <button type="button" onclick="changeSubjectById('math')" class="w-full text-left block px-4 py-2.5 text-sm font-medium text-slate-gray hover:bg-off-white hover:text-deep-blue transition-colors">數學科</button>
                     </div>
                 </div>
                 <span id="subtitle-separator" class="text-lg font-semibold text-gray-300 mx-2">|</span>
@@ -69,14 +66,12 @@
         </div>
     </header>
 
-    <!-- 主要內容區 -->
     <main class="max-w-[1440px] mx-auto px-4 md:px-6 py-8 grid grid-cols-1 lg:grid-cols-[240px,1fr,280px] xl:grid-cols-[260px,1fr,320px] gap-6 xl:gap-8 items-start">
         
-        <!-- 左欄：章節導覽 -->
         <aside class="space-y-6 sticky top-24 z-10 order-1">
             <div class="bg-pure-white rounded-3xl p-6 sayo-border shadow-sm">
                 <h2 class="text-sm font-semibold text-deep-blue mb-4">章節導覽</h2>
-                <div id="guide-list" class="space-y-2"></div>
+                <div id="guide-list" class="space-y-2 relative"></div>
             </div>
             <div class="bg-deep-blue rounded-3xl p-6 text-white shadow-md">
                 <p class="text-xs text-blue-200 mb-2">💡 今日小貼士</p>
@@ -84,16 +79,14 @@
             </div>
         </aside>
 
-        <!-- 中欄：隨堂測驗題目與 AI 按鈕區 -->
         <section class="rounded-3xl flex flex-col z-10 order-3 lg:order-2 space-y-6">
             <div class="bg-pure-white rounded-3xl p-6 md:p-10 sayo-border shadow-sm">
                 <div class="mb-8 border-b border-gray-100 pb-6">
                     <span class="inline-block text-[10px] tracking-wider font-semibold text-joyful-amber bg-yellow-50 border border-yellow-100 px-3 py-1 rounded-full mb-3">測驗進行中</span>
                     <h2 class="text-2xl md:text-3xl font-semibold text-deep-blue" id="main-title">內容載入中...</h2>
-                    <p class="text-sm text-slate-gray mt-2" id="main-author"></p>
+                    <p class="text-sm text-soft-red font-medium mt-2" id="main-author"></p>
                 </div>
 
-                <!-- ✨ 新增：動態文章閱讀區塊 (Passage Component) -->
                 <div id="passage-wrapper" class="hidden mb-8 p-6 bg-slate-50 border border-gray-200 rounded-2xl">
                     <div class="flex items-center gap-2 mb-3">
                         <span class="w-1.5 h-4 bg-indigo-500 rounded-full"></span>
@@ -102,12 +95,10 @@
                     <div id="passage-content" class="text-sm text-deep-blue leading-relaxed font-normal space-y-3"></div>
                 </div>
 
-                <!-- 題目核心區塊 -->
                 <div class="space-y-8" id="questions-area">
                     <div id="questions-list" class="space-y-8"></div>
                 </div>
 
-                <!-- 提交按鈕區 -->
                 <div class="mt-12 pt-8 border-t border-gray-100 flex flex-col items-center justify-center">
                     <p class="text-xs text-slate-gray mb-3">答完整卷了？提交給 AI 進行全方位深度點評</p>
                     <button id="ai-grade-btn" type="button" class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white font-semibold rounded-2xl shadow-md transition-all active:scale-95">
@@ -121,7 +112,6 @@
             </div>
         </section>
 
-        <!-- 右欄：答題進度面板 -->
         <aside class="sticky top-24 z-10 order-2 lg:order-3 w-full">
             <div class="bg-pure-white rounded-3xl p-6 md:p-8 sayo-border shadow-sm">
                 <div class="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
@@ -137,30 +127,98 @@
         let allSubjects = [];
         let currentSubject = null;
         let currentSubjectId = '';
-        // API base - change if your backend runs on a different host/port
+        let currentChapterIndex = 1;
+        let currentChinesePage = '《師說》';
         const API_BASE = 'http://localhost:3000';
         let currentTotalQuestions = 0;
         let scrollSpyObserver;
         let isManualScrolling = false;
-        let answerDebounceTimers = {};
         let savedAnswers = {};
+
+        const extraTrainingPages = [
+            '《師說》',
+            '《論仁、論孝、論君子》',
+            '《廉頗藺相如列傳》',
+            '《岳陽樓記》',
+            '《始得西山宴遊記》',
+            '《出師表》',
+            '《登樓》',
+            '《山居秋暝》',
+            '《月下獨酌》',
+            '《青玉案．元夕》',
+            '《聲聲慢．秋情》',
+            
+            '《念奴嬌．赤壁懷古》'
+        ];
+
+        // 測試用的假資料 (Mock Data)
+        const mockData = [
+            {
+                id: 'chinese',
+                name: '中文科',
+                subtitle: '十二篇範文 (測試模式)',
+                title: '閱讀理解測驗',
+                author: '後端連線失敗，目前顯示為 UI 測試資料',
+                passage: '<p>這是一段用於測試介面的文章段落。如果您看到這段文字，代表您的前端無法成功從 localhost:3000/api/subjects 取得資料。</p>',
+                chapters: ["《魚我所欲也》", "《勸學》（節錄）", "《六國論》", "《逍遙遊》"],
+                questions: [
+                    { id: 'q1', text: '請問《魚我所欲也》的主旨是什麼？', tips: '思考孟子對於義與生的抉擇。' },
+                    { id: 'q2', text: '《勸學》中用了哪些比喻？', tips: '木受繩則直...' },
+                    { id: 'q3', text: '六國破滅的原因為何？', tips: '弊在賂秦。' },
+                    { id: 'q4', text: '《逍遙遊》中的大鵬鳥象徵什麼？', tips: '絕對的自由境界。' }
+                ]
+            },
+            {
+                id: 'english',
+                name: '英文科',
+                subtitle: '閱讀理解',
+                title: 'Global Warming & Climate Change',
+                author: 'Dept: Environmental Science',
+                passage: '<p>Global warming remains one of the most defining challenges of the 21st century. Driven primarily by human activities, the excessive burning of fossil fuels has released unprecedented amounts of greenhouse gases into the atmosphere. These gases act like a greenhouse blanket, trapping thermal radiation and causing global average temperatures to spike significantly.</p><p>The direct consequences of this warming trend are already visible worldwide: melting polar ice caps, rapidly shifting weather patterns, and more frequent occurrences of extreme weather events. Beyond the immediate environmental toll, climate change poses severe socioeconomic threats to coastal economies due to rising sea levels, which put valuable infrastructure and local tourism at critical risk.</p><p>To combat this existential threat, international cooperation is vital. Global frameworks, such as the Paris Agreement, play a pivotal role by legally binding nations to carbon reduction targets, forcing global industries to accelerate their transition toward sustainable, renewable energy alternatives before reaching a point of no return.</p>',
+                chapters: ['1. Introduction', '2. Causes of Warming', '3. Environmental Impact', '4. Future Solutions', '5. Socioeconomic Toll', '6. Policy Frameworks'],
+                questions: [
+                    { id: 'en-1', text: 'What is identified as the primary driver of climate change?', tips: 'Tip: Scan the opening sentences for keywords like "human activities" and specific types of non-renewable energy resources.' },
+                    { id: 'en-2', text: 'According to the text, what are the direct consequences of greenhouse gases?', tips: 'Tip: Look closely at what happens when these gases "trap heat" inside the Earth\'s atmosphere and how that impacts daily weather.' },
+                    { id: 'en-3', text: 'Explain the meaning of the word "shifts" (or shifting) as used in the paragraph.', tips: 'Tip: Consider contextual synonyms that represent long-term changes, variations, or movements away from standard environmental conditions.' },
+                    { id: 'en-4', text: 'Suggest one individual action that can help reduce carbon emissions.', tips: 'Tip: Think about practical everyday habits related to personal transportation, domestic energy consumption, or green lifestyle choices.' },
+                    { id: 'en-5', text: 'How do rising sea levels specifically threaten coastal economies according to recent observations?', tips: 'Tip: Think about infrastructure damage, relocation costs, and the loss of tourism or agricultural lands near coastlines.' },
+                    { id: 'en-6', text: 'What role do international treaties (like the Paris Agreement) play in regulating global industries?', tips: 'Tip: Focus on how legally binding carbon limits force large corporations to transition to greener alternatives.' }
+                ]
+            },
+            {
+                id: 'mathematics',
+                name: 'Mathematics',
+                subtitle: 'Algebra Practice',
+                title: 'Quadratic Equation Solving',
+                author: 'Unit: Mathematics',
+                passage: '',
+                chapters: ['1. Quadratic Basics', '2. Factoring Techniques', '3. Completing the Square', '4. Formula and Discriminant', '5. Root-Coefficient Relationships', '6. Applied Quadratic Problems'],
+                questions: [
+                    { id: 'math-1', text: 'When the discriminant Δ is less than 0, what can you say about the real roots of the quadratic equation?', tips: 'Hint: If Δ is negative, the square root part in the quadratic formula is not real. Consider whether the equation has real solutions.' },
+                    { id: 'math-2', text: 'Solve the quadratic equation: x² - 5x + 6 = 0.', tips: 'Hint: Factor the quadratic expression into two binomials. Look for numbers that multiply to 6 and add to -5.' },
+                    { id: 'math-3', text: 'When is factoring a better method than the quadratic formula?', tips: 'Hint: Factoring is usually easier when the coefficients are small integers and the expression factors nicely.' },
+                    { id: 'math-4', text: 'If a quadratic equation has a repeated root, what should the discriminant equal?', tips: 'Hint: A repeated root means the plus/minus part of the quadratic formula is zero.' },
+                    { id: 'math-5', text: 'For ax² + bx + c = 0 with roots α and β, write Vieta’s formulas linking the roots and coefficients.', tips: 'Hint: α + β = -b/a and αβ = c/a.' },
+                    { id: 'math-6', text: 'A rectangle’s length is 3m longer than its width and its area is 40 m². Write the quadratic equation to solve for the width.', tips: 'Hint: Let width = x and length = x + 3, then use area = length × width.' }
+                ]
+            }
+        ];
 
         async function initApp() {
             try {
                 const response = await fetch(`${API_BASE}/api/subjects`);
+                if (!response.ok) throw new Error('伺服器回傳 404，找不到資料');
+                
                 const data = await response.json();
                 allSubjects = data.subjects || [];
-                if (!allSubjects.length) {
-                    throw new Error('No subjects returned from API');
-                }
-
-                renderSubjectMenu(allSubjects);
-                await changeSubjectById(allSubjects[0].id);
+                if (!allSubjects.length) throw new Error('資料庫為空');
             } catch (error) {
-                console.error(error);
-                document.getElementById('main-title').textContent = '資料載入失敗';
-                document.getElementById('main-author').textContent = '請確認後端服務已啟動。';
+                console.warn("⚠️ 後端連線失敗，自動啟用本地測試資料，以便預覽 UI：", error);
+                allSubjects = mockData; // 載入假資料
             }
+
+            renderSubjectMenu(allSubjects);
+            await changeSubjectById(allSubjects[0].id);
         }
 
         function renderSubjectMenu(subjects) {
@@ -187,110 +245,249 @@
 
             document.getElementById('current-subject-name').textContent = subject.name;
             const subtitleEl = document.getElementById('chapter-subtitle');
-            const separator = document.getElementById('subtitle-separator');
-
+            
             subtitleEl.textContent = subject.subtitle;
             subtitleEl.style.display = 'block';
-            separator.style.display = 'inline-block';
 
             document.getElementById('main-title').textContent = subject.title;
-            document.getElementById('main-author').textContent = subject.author;
+            // 如果是假資料，把作者欄位變成紅字提醒
+            const authorEl = document.getElementById('main-author');
+            authorEl.textContent = subject.author;
+            if (subject.author.includes('失敗')) authorEl.classList.add('text-soft-red');
 
             const passageWrapper = document.getElementById('passage-wrapper');
             const passageContent = document.getElementById('passage-content');
-            if (subject.passage && subject.passage.trim() !== '') {
+            if (subject.passage) {
                 passageContent.innerHTML = subject.passage;
                 passageWrapper.classList.remove('hidden');
-            } else {
-                passageWrapper.classList.add('hidden');
-                passageContent.innerHTML = '';
             }
 
             currentTotalQuestions = subject.questions.length;
             document.getElementById('total-questions-count').textContent = `共 ${currentTotalQuestions} 題`;
+            currentChapterIndex = 1;
 
-            await loadProgressForSubject(subject.id);
-            renderGuide(subject.chapters);
-            renderQuestions(subject.questions, subject.chapters);
-            renderBulbs(currentTotalQuestions);
+            renderGuideSelect(subject.chapters); // 這裡改為渲染下拉選單
+            if (subject.id === 'chinese') {
+                currentChinesePage = extraTrainingPages[0];
+                switchTrainingPage(extraTrainingPages[0]);
+            } else {
+                renderChapterQuestions(currentChapterIndex);
+            }
+            renderBulbs(1);
             updateOverallProgress();
             setupScrollSpy();
             closeMenu();
         }
 
-        async function loadProgressForSubject(subjectId) {
-            try {
-                const response = await fetch(`${API_BASE}/api/progress/${subjectId}`);
-                const data = await response.json();
-                savedAnswers = data.answers || {};
-            } catch (error) {
-                console.error(error);
-                savedAnswers = {};
-            }
-        }
-
-        function renderGuide(chapters) {
+        // 🌟 新增的渲染下拉選單邏輯
+        function renderGuideSelect(chapters) {
             const container = document.getElementById('guide-list');
-            container.innerHTML = '';
-            chapters.forEach((chapter, index) => {
-                const num = index + 1;
-                const isActive = index === 0;
-                container.innerHTML += `
-                    <button id="guide-btn-${num}" onclick="scrollToQuestion(${num})" class="chapter-nav-btn w-full flex items-center justify-between px-3 py-2 text-sm rounded-xl transition-colors ${isActive ? 'bg-off-white text-deep-blue font-semibold' : 'text-slate-gray hover:bg-off-white hover:text-deep-blue'}">
-                        <span class="truncate pr-2">${chapter}</span>
-                        <span id="guide-check-${num}" class="hidden shrink-0 text-calm-mint text-xs bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded-md font-bold">✓</span>
-                    </button>
-                `;
-            });
+            
+            let optionsHtml = '';
+            if (currentSubject?.id === 'chinese') {
+                optionsHtml = extraTrainingPages.map((pageTitle) => {
+                    return `<option value="page:${pageTitle}">${pageTitle}</option>`;
+                }).join('');
+            } else {
+                optionsHtml = chapters.map((chapter) => {
+                    return `<option value="chapter:${chapter}">${chapter}</option>`;
+                }).join('');
+            }
+
+            container.innerHTML = `
+                <div class="relative">
+                    <select id="chapter-select" onchange="handleChapterSelection(this.value)" class="w-full appearance-none bg-off-white border border-gray-200 text-deep-blue text-sm rounded-xl px-4 py-3 pr-8 focus:outline-none focus:ring-2 focus:ring-calm-mint transition-colors cursor-pointer font-medium">
+                        ${optionsHtml}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-gray">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                </div>
+            `;
+
+            const select = document.getElementById('chapter-select');
+            if (select && currentSubject) {
+                if (currentSubject.id === 'chinese') {
+                    const selectedPage = currentChinesePage || extraTrainingPages[0];
+                    select.value = `page:${selectedPage}`;
+                } else {
+                    const currentChapter = currentSubject.chapters[currentChapterIndex - 1];
+                    select.value = `chapter:${currentChapter}`;
+                }
+            }
         }
 
-        function scrollToQuestion(num) {
-            const targetBlock = document.getElementById(`q-box-${num}`);
-            if (targetBlock) {
-                isManualScrolling = true;
-                targetBlock.scrollIntoView({ behavior: 'smooth' });
-                highlightGuide(num);
-
-                setTimeout(() => {
-                    isManualScrolling = false;
-                }, 800);
+        function handleChapterSelection(value) {
+            if (typeof value !== 'string') return;
+            if (value.startsWith('chapter:')) {
+                const chapterTitle = value.slice(8);
+                const chapterIndex = currentSubject?.chapters?.indexOf(chapterTitle);
+                if (chapterIndex >= 0) {
+                    currentChapterIndex = chapterIndex + 1;
+                    renderChapterQuestions(currentChapterIndex);
+                }
+                return;
             }
+            if (value.startsWith('page:')) {
+                const pageTitle = value.slice(5);
+                currentChinesePage = pageTitle;
+                switchTrainingPage(pageTitle);
+            }
+        }
+
+        function findSubjectByPageTitle(pageTitle) {
+            const normalized = pageTitle.trim().toLowerCase();
+            if (!allSubjects?.length) return null;
+
+            const directMatch = allSubjects.find(item => item.name === pageTitle || item.id === pageTitle || item.name.toLowerCase() === normalized || item.id.toLowerCase() === normalized);
+            if (directMatch) return directMatch;
+
+            const aliasMap = {
+                '中文科': 'chinese',
+                'chinese': 'chinese',
+                '英文科': 'english',
+                '英文': 'english',
+                'english': 'english',
+                '數學科': 'mathematics',
+                '數學': 'mathematics',
+                'mathematics': 'mathematics',
+                'math': 'mathematics'
+            };
+            const targetId = aliasMap[normalized];
+            if (targetId) {
+                return allSubjects.find(item => item.id === targetId || item.name.toLowerCase() === normalized);
+            }
+
+            return null;
         }
 
         function highlightGuide(num) {
-            const buttons = document.querySelectorAll('.chapter-nav-btn');
-            buttons.forEach(btn => {
-                btn.classList.remove('bg-off-white', 'text-deep-blue', 'font-semibold');
-                btn.classList.add('text-slate-gray', 'hover:bg-off-white', 'hover:text-deep-blue');
-            });
-            const activeBtn = document.getElementById(`guide-btn-${num}`);
-            if (activeBtn) {
-                activeBtn.classList.remove('text-slate-gray', 'hover:bg-off-white', 'hover:text-deep-blue');
-                activeBtn.classList.add('bg-off-white', 'text-deep-blue', 'font-semibold');
+            const select = document.getElementById('chapter-select');
+            const chapterTitle = currentSubject?.chapters?.[num - 1];
+            if (select && chapterTitle) {
+                select.value = `chapter:${chapterTitle}`;
             }
+        }
+
+        function switchTrainingPage(pageTitle) {
+            if (currentSubject?.id === 'chinese') {
+                currentChinesePage = pageTitle;
+                renderChinesePage(pageTitle);
+                return;
+            }
+
+            const pageSubjectIndex = currentSubject?.chapters?.indexOf(pageTitle);
+            if (pageSubjectIndex !== undefined && pageSubjectIndex >= 0) {
+                renderChapterQuestions(pageSubjectIndex + 1);
+                return;
+            }
+
+            const targetSubject = findSubjectByPageTitle(pageTitle);
+            if (targetSubject) {
+                changeSubjectById(targetSubject.id);
+                return;
+            }
+
+            document.getElementById('current-subject-name').textContent = currentSubject?.name || '中文科';
+            document.getElementById('chapter-subtitle').textContent = pageTitle;
+            document.getElementById('main-title').textContent = pageTitle;
+            document.getElementById('main-author').textContent = '請選擇章節以查看內容';
+            document.getElementById('passage-wrapper').classList.add('hidden');
+            document.getElementById('questions-list').innerHTML = `
+                <div class="p-6 rounded-2xl border border-dashed border-gray-300 text-sm text-slate-gray bg-gray-50">
+                    目前已切換至 ${pageTitle}。此頁面內容可進一步擴展為對應練習題與學習材料。
+                </div>
+            `;
+            document.getElementById('total-questions-count').textContent = '共 0 題';
+            document.getElementById('bulb-container').innerHTML = '';
+            document.getElementById('progress-text').textContent = '學習進度：0%';
+            document.getElementById('progress-bar').style.width = '0%';
+            currentSubjectId = pageTitle;
+            currentTotalQuestions = 0;
+        }
+
+        function renderChinesePage(pageTitle) {
+            const pageIndex = extraTrainingPages.indexOf(pageTitle);
+            const chapterTitle = pageTitle;
+            document.getElementById('current-subject-name').textContent = currentSubject?.name || '中文科';
+            document.getElementById('chapter-subtitle').textContent = pageTitle;
+            document.getElementById('main-title').textContent = pageTitle;
+            document.getElementById('main-author').textContent = currentSubject?.author || '';
+            document.getElementById('passage-wrapper').classList.add('hidden');
+            document.getElementById('questions-list').innerHTML = `
+                <div class="p-6 rounded-2xl border border-dashed border-gray-300 text-sm text-slate-gray bg-gray-50">
+                    目前已切換至 ${pageTitle}。請選擇內容章節以查看對應練習題。
+                </div>
+            `;
+            document.getElementById('total-questions-count').textContent = '共 0 題';
+            document.getElementById('bulb-container').innerHTML = '';
+            document.getElementById('progress-text').textContent = '學習進度：0%';
+            document.getElementById('progress-bar').style.width = '0%';
+            currentSubjectId = currentSubject?.id || 'chinese';
+            currentTotalQuestions = 0;
+
+            const select = document.getElementById('chapter-select');
+            if (select) {
+                select.value = `page:${pageTitle}`;
+            }
+        }
+
+        function renderChapterQuestions(chapterNumber) {
+            const chapterTitle = currentSubject?.chapters?.[chapterNumber - 1] || `第 ${chapterNumber} 章`;
+            const question = currentSubject?.questions?.[chapterNumber - 1];
+            const author = currentSubject?.author || '';
+
+            document.getElementById('current-subject-name').textContent = currentSubject?.name || '文言名篇';
+            document.getElementById('chapter-subtitle').textContent = chapterTitle;
+            document.getElementById('main-title').textContent = chapterTitle;
+            document.getElementById('main-author').textContent = author;
+
+            const passageWrapper = document.getElementById('passage-wrapper');
+            const passageContent = document.getElementById('passage-content');
+            if (currentSubject?.passage) {
+                passageContent.innerHTML = currentSubject.passage;
+                passageWrapper.classList.remove('hidden');
+            } else {
+                passageWrapper.classList.add('hidden');
+            }
+
+            const select = document.getElementById('chapter-select');
+            if (select && currentSubject) {
+                select.value = `chapter:${chapterTitle}`;
+            }
+
+            document.getElementById('questions-list').innerHTML = question ? `
+                <div class="question-card-block bg-pure-white rounded-2xl p-6 border border-gray-100 shadow-sm scroll-mt-28 transition-all" id="q-box-1">
+                    <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
+                        <span class="question-card-block-title text-xs font-bold text-indigo-500 uppercase tracking-wider">${chapterTitle}</span>
+                        <span class="text-xs bg-amber-50 text-joyful-amber font-semibold px-2.5 py-0.5 rounded-md">Q1</span>
+                    </div>
+                    <p class="question-card-block-text text-base font-medium text-deep-blue mb-4">${question.text}</p>
+                    <textarea id="input-1" data-question-id="${question.id}" onfocus="highlightGuide(1)" oninput="handleInput(1, this.value, '${question.id}')" class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-joyful-amber outline-none text-sm transition-all resize-none custom-scrollbar">${savedAnswers[question.id]?.content || ''}</textarea>
+                </div>
+            ` : `
+                <div class="p-6 rounded-2xl border border-dashed border-gray-300 text-sm text-slate-gray bg-gray-50">
+                    目前已切換至 ${chapterTitle}。此頁面內容可進一步擴展為對應練習題與學習材料。
+                </div>
+            `;
+
+            currentTotalQuestions = question ? 1 : 0;
+            document.getElementById('total-questions-count').textContent = `共 ${currentTotalQuestions} 題`;
+            document.getElementById('bulb-container').innerHTML = question ? `<div id="bulb-1" class="w-8 h-8 rounded-full bg-calm-mint border border-transparent flex items-center justify-center text-white text-xs font-bold">1</div>` : '';
+            updateOverallProgress();
+            setupScrollSpy();
         }
 
         function setupScrollSpy() {
             if (scrollSpyObserver) scrollSpyObserver.disconnect();
-
-            const options = {
-                root: null,
-                rootMargin: '-25% 0px -60% 0px',
-                threshold: 0
-            };
-
+            const options = { root: null, rootMargin: '-25% 0px -60% 0px', threshold: 0 };
             scrollSpyObserver = new IntersectionObserver((entries) => {
                 if (isManualScrolling) return;
-
-                if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 60) {
-                    highlightGuide(currentTotalQuestions);
-                    return;
-                }
-
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        const id = entry.target.id;
-                        const num = id.split('-').pop();
+                        const num = entry.target.id.split('-').pop();
                         highlightGuide(parseInt(num));
                     }
                 });
@@ -298,48 +495,6 @@
 
             document.querySelectorAll('.question-card-block').forEach(section => {
                 scrollSpyObserver.observe(section);
-            });
-        }
-
-        function renderQuestions(questionsArray, chaptersArray) {
-            const container = document.getElementById('questions-list');
-            container.innerHTML = '';
-            questionsArray.forEach((q, i) => {
-                const qNum = i + 1;
-                const chapterTag = chaptersArray[i] || '';
-                container.insertAdjacentHTML('beforeend', `
-                    <div class="question-card-block bg-pure-white rounded-2xl p-6 border border-gray-100 shadow-sm scroll-mt-28 transition-all" id="q-box-${qNum}">
-                        <div class="flex items-center justify-between mb-3 pb-2 border-b border-gray-50">
-                            <span class="text-xs font-bold text-indigo-500 uppercase tracking-wider">${chapterTag}</span>
-                            <span class="text-xs bg-amber-50 text-joyful-amber font-semibold px-2.5 py-0.5 rounded-md">Q${qNum}</span>
-                        </div>
-                        <p class="text-base font-medium text-deep-blue mb-4">${q.text}</p>
-                        <textarea
-                            id="input-${qNum}"
-                            data-question-id="${q.id}"
-                            onfocus="highlightGuide(${qNum})"
-                            oninput="handleInput(${qNum}, this.value, '${q.id}')"
-                            class="w-full p-4 border border-gray-200 rounded-xl focus:ring-2 focus:ring-joyful-amber outline-none text-sm transition-all resize-none custom-scrollbar"
-                            rows="4"
-                            placeholder="請在此處輸入您的作答答案..."></textarea>
-
-                        <div class="mt-4 flex justify-end items-center">
-                            <button type="button" onclick="toggleTips(${qNum})" class="text-xs px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-deep-blue font-semibold rounded-xl transition-all shadow-sm">
-                                答題提示
-                            </button>
-                        </div>
-
-                        <div id="tips-panel-${qNum}" class="hidden mt-4 p-4 bg-indigo-50/60 border border-indigo-100 rounded-2xl">
-                            <p class="text-xs font-bold text-indigo-500 mb-1.5">💡 思路引導 (Tips)：</p>
-                            <p class="text-sm text-deep-blue leading-relaxed">${q.tips}</p>
-                        </div>
-                    </div>
-                `);
-
-                const textarea = document.getElementById(`input-${qNum}`);
-                if (textarea && savedAnswers[q.id]?.content) {
-                    textarea.value = savedAnswers[q.id].content;
-                }
             });
         }
 
@@ -356,249 +511,33 @@
             }
         }
 
-        function handleInput(index, value, questionId) {
+        function handleInput(index, value) {
             const bulb = document.getElementById(`bulb-${index}`);
-            const checkTag = document.getElementById(`guide-check-${index}`);
-
             highlightGuide(index);
-
             if (value.trim() === '') {
-                if (bulb) {
-                    bulb.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
-                    bulb.classList.add('bg-gray-100', 'text-slate-gray', 'border-gray-200');
-                }
-                if (checkTag) {
-                    checkTag.classList.add('hidden');
-                }
+                bulb?.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
+                bulb?.classList.add('bg-gray-100', 'text-slate-gray', 'border-gray-200');
             } else {
-                if (bulb) {
-                    bulb.classList.remove('bg-gray-100', 'text-slate-gray', 'border-gray-200');
-                    bulb.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
-                }
-                if (checkTag) {
-                    checkTag.classList.remove('hidden');
-                }
+                bulb?.classList.remove('bg-gray-100', 'text-slate-gray', 'border-gray-200');
+                bulb?.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
             }
-
             updateOverallProgress();
-            debounceSaveAnswer(questionId, value);
-        }
-
-        function debounceSaveAnswer(questionId, content) {
-            if (!questionId) return;
-            if (answerDebounceTimers[questionId]) {
-                clearTimeout(answerDebounceTimers[questionId]);
-            }
-            answerDebounceTimers[questionId] = setTimeout(() => {
-                saveAnswer(questionId, content);
-            }, 1000);
-        }
-
-        async function saveAnswer(questionId, content) {
-            if (!currentSubjectId || !questionId) return;
-            try {
-                await fetch(`${API_BASE}/api/answers/save`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ questionId, content, subjectId: currentSubjectId })
-                });
-            } catch (error) {
-                console.error(error);
-            }
-        }
-
-        function toggleTips(index) {
-            const panelEl = document.getElementById('tips-panel-' + index);
-            if (panelEl) {
-                panelEl.classList.toggle('hidden');
-            }
         }
 
         function updateOverallProgress() {
             if (currentTotalQuestions === 0) return;
             const textareas = document.querySelectorAll('#questions-list textarea');
             let answeredCount = 0;
-            textareas.forEach(ta => {
-                const isAnswered = ta.value.trim() !== '';
-                if (isAnswered) answeredCount++;
-
-                const index = parseInt(ta.id.replace('input-', ''), 10);
-                const bulb = document.getElementById(`bulb-${index}`);
-                const checkTag = document.getElementById(`guide-check-${index}`);
-                if (isAnswered) {
-                    bulb?.classList.remove('bg-gray-100', 'text-slate-gray', 'border-gray-200');
-                    bulb?.classList.add('bg-calm-mint', 'text-white', 'border-transparent');
-                    checkTag?.classList.remove('hidden');
-                } else {
-                    bulb?.classList.remove('bg-calm-mint', 'text-white', 'border-transparent');
-                    bulb?.classList.add('bg-gray-100', 'text-slate-gray', 'border-gray-200');
-                    checkTag?.classList.add('hidden');
-                }
-            });
-
+            textareas.forEach(ta => { if (ta.value.trim() !== '') answeredCount++; });
             const percent = Math.round((answeredCount / currentTotalQuestions) * 100);
             document.getElementById('progress-text').textContent = `學習進度：${percent}%`;
             document.getElementById('progress-bar').style.width = `${percent}%`;
-        }
-
-        function escapeHtml(value) {
-            return String(value)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/\"/g, '&quot;')
-                .replace(/'/g, '&#39;');
-        }
-
-        function stripHtml(value) {
-            return String(value || '')
-                .replace(/<br\s*\/?>/gi, '\n')
-                .replace(/<p[^>]*>/gi, '')
-                .replace(/<\/p>/gi, '\n')
-                .replace(/<[^>]+>/g, '')
-                .replace(/&nbsp;/gi, ' ')
-                .replace(/&amp;/gi, '&')
-                .replace(/&lt;/gi, '<')
-                .replace(/&gt;/gi, '>')
-                .replace(/&quot;/gi, '"')
-                .replace(/&#39;/gi, "'");
-        }
-
-        function buildGradePrompt() {
-            if (!currentSubject) return '';
-
-            const questionBlocks = currentSubject.questions.map((question, index) => {
-                const textarea = document.getElementById(`input-${index + 1}`);
-                const answer = textarea ? textarea.value : '';
-                return `---\nQ${index + 1}. ${question.text}\n學生作答：${answer || '（空白）'}\n`;
-            }).join('\n');
-
-            const passageText = stripHtml(currentSubject.passage || '').trim();
-            return [
-                `【當前測驗科目】：${currentSubject.name || '未知科目'}`,
-                `【科目副標題】：${currentSubject.subtitle || ''}`,
-                `【閱讀文章】：`,
-                passageText || '（無閱讀文章）',
-                '',
-                questionBlocks.trim()
-            ].join('\n');
-        }
-
-        function renderMarkdownToHtml(markdown) {
-            const lines = String(markdown || '').split(/\n/);
-            const html = [];
-            let inList = false;
-
-            const flushList = () => {
-                if (inList) {
-                    html.push('</ul>');
-                    inList = false;
-                }
-            };
-
-            lines.forEach((line) => {
-                const trimmed = line.trim();
-                if (!trimmed) {
-                    flushList();
-                    html.push('<div class="h-2"></div>');
-                    return;
-                }
-
-                if (/^###\s+/.test(trimmed)) {
-                    flushList();
-                    html.push(`<h3 class="mt-4 mb-2 text-base font-semibold text-deep-blue">${escapeHtml(trimmed.replace(/^###\s+/, ''))}</h3>`);
-                    return;
-                }
-
-                if (/^[-*]\s+/.test(trimmed)) {
-                    if (!inList) {
-                        html.push('<ul class="ml-5 list-disc space-y-1 text-sm leading-7">');
-                        inList = true;
-                    }
-                    html.push(`<li>${escapeHtml(trimmed.replace(/^[-*]\s+/, ''))}</li>`);
-                    return;
-                }
-
-                flushList();
-                const paragraph = escapeHtml(trimmed)
-                    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                    .replace(/\*(.*?)\*/g, '<em>$1</em>');
-                html.push(`<p class="text-sm leading-7 text-deep-blue">${paragraph}</p>`);
-            });
-
-            flushList();
-            return html.join('');
-        }
-
-        async function handleGrade() {
-            const button = document.getElementById('ai-grade-btn');
-            const panel = document.getElementById('ai-feedback-panel');
-            if (!button || !panel) return;
-
-            button.disabled = true;
-            button.classList.add('opacity-70', 'cursor-not-allowed');
-            panel.classList.remove('hidden');
-            panel.innerHTML = `
-                <div class="flex items-center gap-3 text-sm font-semibold">
-                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"></path>
-                    </svg>
-                    <span>AI 正在批改您的整份作答，請稍候...</span>
-                </div>`;
-
-            try {
-                const answers = {};
-                document.querySelectorAll('#questions-list textarea').forEach((textarea) => {
-                    const questionId = textarea.dataset.questionId;
-                    if (questionId) {
-                        answers[questionId] = textarea.value;
-                    }
-                });
-
-                // Use process.js (generic AI endpoint) with 'generate' action
-                const payload = {
-                    action: 'generate',
-                    chatRoomId: 'grader',
-                    subject: currentSubject?.name || '',
-                    subjectId: currentSubjectId,
-                    text: buildGradePrompt(),
-                    answers
-                };
-
-                const response = await fetch(`${API_BASE}/api/process`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!response.ok) {
-                    throw new Error('AI grading request failed');
-                }
-
-                const data = await response.json();
-                // process.js returns generated content in `text` field for generate requests
-                const report = data.text || data.report || '暫無評語';
-                panel.innerHTML = `<div class="space-y-3">${renderMarkdownToHtml(report)}</div>`;
-            } catch (error) {
-                console.error(error);
-                panel.innerHTML = '<div class="text-sm text-soft-red">AI 批改暫時失敗，請稍後再試。</div>';
-            } finally {
-                button.disabled = false;
-                button.classList.remove('opacity-70', 'cursor-not-allowed');
-            }
         }
 
         function closeMenu() {
             document.getElementById('subject-dropdown-menu').classList.add('hidden');
             document.getElementById('subject-dropdown-arrow').style.transform = 'rotate(0deg)';
         }
-
-        window.addEventListener('scroll', () => {
-            if (isManualScrolling) return;
-            if ((window.innerHeight + window.scrollY) >= document.documentElement.scrollHeight - 20) {
-                highlightGuide(currentTotalQuestions);
-            }
-        });
 
         document.getElementById('subject-dropdown-btn').addEventListener('click', (e) => {
             e.stopPropagation();
@@ -609,9 +548,9 @@
         });
 
         document.addEventListener('click', closeMenu);
-        document.getElementById('ai-grade-btn').addEventListener('click', handleGrade);
 
+        // 啟動應用程式
         initApp();
     </script>
 </body>
-</html>
+</html> 

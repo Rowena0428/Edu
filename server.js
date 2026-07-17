@@ -3,6 +3,7 @@ import cors from 'cors';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { buildFallbackMockPaper } from './mockPaperFallback.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -30,6 +31,108 @@ function ensureDataFiles() {
   if (!fs.existsSync(answersFilePath)) {
     fs.writeFileSync(answersFilePath, JSON.stringify({}, null, 2));
   }
+}
+
+function loadLocalEnv() {
+  const envFiles = [path.join(__dirname, '.env.local'), path.join(__dirname, '.env')];
+  for (const envFile of envFiles) {
+    if (!fs.existsSync(envFile)) continue;
+    const content = fs.readFileSync(envFile, 'utf8');
+    for (const rawLine of content.split(/\r?\n/)) {
+      const line = rawLine.trim();
+      if (!line || line.startsWith('#')) continue;
+      const separatorIndex = line.indexOf('=');
+      if (separatorIndex === -1) continue;
+      const key = line.slice(0, separatorIndex).trim();
+      let value = line.slice(separatorIndex + 1).trim();
+      if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+        value = value.slice(1, -1);
+      }
+      if (!process.env[key] && value) {
+        process.env[key] = value;
+      }
+    }
+  }
+}
+
+loadLocalEnv();
+
+function getGeminiApiKey(body = {}) {
+  return body.apiKey || process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.API_KEY || '';
+}
+
+function buildServicePrompt(action, body, fallbackText) {
+  const subject = String(body.chatRoomId || body.subjectId || body.subject || 'general').toLowerCase();
+  const userText = body.text || body.prompt || fallbackText || '';
+
+  const subjectLabels = {
+    chinese: '香港 DSE 中國語文',
+    zh: '香港 DSE 中國語文',
+    english: '香港 DSE 英文',
+    en: '香港 DSE 英文',
+    math_ch: '香港 DSE 數學（中文版）',
+    math_en: '香港 DSE Mathematics (English)',
+    math_ch_mc: '香港 DSE 數學 MC（中文版）',
+    math_en_mc: '香港 DSE Mathematics MC (English)',
+  };
+
+  const subjectLabel = subjectLabels[subject] || subject;
+
+  if (action === 'mock-paper') {
+    switch (subject) {
+      case 'english':
+        return `You are an expert HKDSE English Language paper setter. Generate a fully English mock paper for HKDSE English Language. Use Reading and Writing sections, realistic numbering, clear instructions, and exam-style prompts. Do not include answers or marking schemes. Output only the mock paper content in Markdown.\n\nRequirement: ${userText || 'Generate a complete English mock paper.'}`;
+      case 'math_ch':
+        return `你是一位香港 DSE 數學科出卷專家。請生成一份全中文的數學模擬試卷，內容必須以「傳統問答題」形式呈現，包含完整題目與解題步驟。請嚴格遵守 DSE 數學必修部分的題型與格式，不要生成選擇題。請以 Markdown 輸出。\n\n要求：${userText || '生成一份完整的中文數學模擬試卷。'}`;
+      case 'math_en':
+        return `You are an expert HKDSE Mathematics paper setter. Generate a fully English mathematics mock paper in traditional written-question format, including complete questions and worked solution steps. Follow HKDSE Mathematics Compulsory Part style and do not include multiple-choice questions. Output only the mock paper in Markdown.\n\nRequirement: ${userText || 'Generate a complete English mathematics mock paper.'}`;
+      case 'math_ch_mc':
+        return `你是一位香港 DSE 數學科出卷專家。請生成一份中文數學多項選擇題模擬試卷，包含 20 至 30 題，並提供 A、B、C、D 四個選項。題目要符合 DSE 數學必修部分風格，請只輸出試卷內容，不要提供答案。請以 Markdown 輸出。\n\n要求：${userText || '生成一份完整的中文數學 MC 模擬試卷。'}`;
+      case 'math_en_mc':
+        return `You are an expert HKDSE Mathematics paper setter. Generate a fully English multiple-choice mathematics mock paper with 20 to 30 questions and clear A, B, C, D options. Follow HKDSE Mathematics Compulsory Part style and output only the mock paper content without answers.\n\nRequirement: ${userText || 'Generate a complete English mathematics MC mock paper.'}`;
+      default:
+        return `你是一位香港 DSE 模擬試卷出卷專家，擅長根據最新的官方考試指引生成高質量、符合 HKEAA 標準的試卷。\n\n科目：${subjectLabel}\n動作：生成完整的 Mock Paper\n\n要求：${userText || '請生成一份完整、具有真實 DSE 難度的模擬試卷。'}`;
+    }
+  }
+
+  if (action === 'pvp') {
+    return `你是一位香港 DSE AI 對戰題庫出題員。請根據科目要求生成一道高質量的單項選擇題。\n科目：${subjectLabel}\n動作：生成對戰題目\n\n要求：${userText || '請生成一道符合 DSE 難度的選擇題。'}`;
+  }
+
+  return `你是 Rowena，一位香港 DSE 學習助理。請以繁體中文或英文（根據科目語言）回答使用者問題。\n科目：${subjectLabel}\n\n使用者問題：${userText}`;
+}
+
+async function callGemini({ prompt, apiKey, temperature = 0.7, maxOutputTokens = 1800 }) {
+  if (!apiKey) {
+    throw new Error('未設定 Gemini API 金鑰，請在後端環境變數中配置 GEMINI_API_KEY。');
+  }
+
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(apiKey)}`;
+  const payload = {
+    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature,
+      maxOutputTokens,
+    },
+  };
+
+  const response = await fetch(endpoint, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text().catch(() => '');
+    throw new Error(`Gemini API 錯誤 ${response.status}: ${errorText}`);
+  }
+
+  const data = await response.json();
+  const text = data?.candidates?.[0]?.content?.parts?.map((part) => part.text || '').join('\n') || data?.text || '';
+  if (!text) {
+    throw new Error('Gemini 回傳內容為空。');
+  }
+  return text;
 }
 
 function seedData() {
@@ -77,20 +180,20 @@ function seedData() {
         ]
       },
       {
-        id: 'math',
-        name: '數學科',
-        subtitle: '代數運算',
-        title: '二次方程求解',
-        author: '單元：Mathematics Unit',
+        id: 'mathematics',
+        name: 'Mathematics',
+        subtitle: 'Algebra Practice',
+        title: 'Quadratic Equation Solving',
+        author: 'Unit: Mathematics',
         passage: '',
-        chapters: ['1. 二次方程定義', '2. 因式分解法解題', '3. 配方法精講', '4. 公式法與判別式', '5. 根與係數的關係', '6. 二次方程應用題'],
+        chapters: ['1. Quadratic Basics', '2. Factoring Techniques', '3. Completing the Square', '4. Formula and Discriminant', '5. Root-Coefficient Relationships', '6. Applied Quadratic Problems'],
         questions: [
-          { id: 'math-1', text: '當判別式 Δ 小於 0 時，該二次方程的實數根有何特徵？', tips: '提示：想一想如果判別式小於 0，在求根公式的根號內會出現負數，這在「實數範圍」內是否允許？有沒有實數解？' },
-          { id: 'math-2', text: '試求解二次方程：x² - 5x + 6 = 0。', tips: '提示：常數項是 6，一次項係數是 -5。試著將 6 分解成兩個負數的乘積（例如 -2 與 -3），然後運用十字相乘法進行因式分解。' },
-          { id: 'math-3', text: '什麼情況下最適合使用因式分解法而非公式法？', tips: '提示：從計算效率和數字特徵來看，當常數項與一次項係數很容易被肉眼分解為整數乘積優於公式法。' },
-          { id: 'math-4', text: '若一組二次方程有重根，其判別式的值應該是多少？', tips: '提示：重根代表方程有兩個相等的實數解。在求根公式中，加減號後面的部分必須變成多少才能讓兩個解完全相同？' },
-          { id: 'math-5', text: '若二次方程 ax² + bx + c = 0 的兩根為 α 和 β，請寫出其韋達定理（根與係數關係）的表達式。', tips: '提示：兩根之和 α + β 等於負的二次項係數分之一次項係數；兩根之積 αβ 等於二次項係數分之常數項。' },
-          { id: 'math-6', text: '一個矩形的花園，長比寬多 3 米，面積為 40 平方米，請列出求寬度的二次方程。', tips: '提示：提示：設寬度為 x 米，則長度為 (x + 3) 米。利用面積公式「長 × 寬 = 面積」展開並整理成標準一般式。' }
+          { id: 'math-1', text: 'When the discriminant Δ is less than 0, what can you say about the real roots of the quadratic equation?', tips: 'Hint: If Δ is negative, the square root part in the quadratic formula is not real. Consider whether the equation has real solutions.' },
+          { id: 'math-2', text: 'Solve the quadratic equation: x² - 5x + 6 = 0.', tips: 'Hint: Factor the quadratic expression into two binomials. Look for numbers that multiply to 6 and add to -5.' },
+          { id: 'math-3', text: 'When is factoring a better method than the quadratic formula?', tips: 'Hint: Factoring is usually easier when the coefficients are small integers and the expression factors nicely.' },
+          { id: 'math-4', text: 'If a quadratic equation has a repeated root, what should the discriminant equal?', tips: 'Hint: A repeated root means the plus/minus part of the quadratic formula is zero.' },
+          { id: 'math-5', text: 'For ax² + bx + c = 0 with roots α and β, write Vieta’s formulas linking the roots and coefficients.', tips: 'Hint: α + β = -b/a and αβ = c/a.' },
+          { id: 'math-6', text: 'A rectangle’s length is 3m longer than its width and its area is 40 m². Write the quadratic equation to solve for the width.', tips: 'Hint: Let width = x and length = x + 3, then use area = length × width.' }
         ]
       }
     ]
@@ -165,8 +268,9 @@ app.post('/api/answers/save', (req, res) => {
   }
 });
 
-app.post('/api/ai/grade', (req, res) => {
+function handleAiGrade(req, res) {
   try {
+    console.log('[API] /api/process called with body:', JSON.stringify(req.body).slice(0,1000));
     const { subjectId, answers } = req.body;
     const data = loadData();
     const subject = data.subjects.find((item) => item.id === subjectId) || data.subjects[0];
@@ -178,19 +282,62 @@ app.post('/api/ai/grade', (req, res) => {
 
     const prompt = `你是一位資深的香港 DSE 教學與評卷專家。請根據以下題目與學生答案，給出一份詳細、鼓勵且有建設性的評語。\n\n科目：${subject.name}\n\n閱讀文章：\n${subject.passage || '（無閱讀文章）'}\n\n題目與答案：\n${formattedAnswers}\n\n請以繁體中文輸出，包含：\n1. 整體表現總結\n2. 優點\n3. 可改善之處\n4. 建議下一步\n5. 最後給出一段溫和且鼓勵的總結。`;
 
-    const report = `# AI 評語報告\n\n${prompt}\n\n---\n\n> 這份評語由本地示範後端生成，內容已包含題目與學生回答，適合用來驗證流程。`;
+    const report = `# AI 評語報告\n\n${prompt}\n\n---\n\n> 這份評語由本地示範後端生成，內容已包含題目與學生回答，適合用來驗證流程.`;
 
-    res.json({ report, prompt });
+    res.json({ success: true, text: report, prompt });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Failed to grade answers' });
+    console.error('[API] /api/process failed:', error && error.stack ? error.stack : error);
+    res.status(500).json({ success: false, error: 'Failed to grade answers' });
   }
-});
+}
+
+async function handleProcess(req, res) {
+  try {
+    const body = req.body || {};
+    const action = body.action || 'chat';
+    const apiKey = getGeminiApiKey(body);
+    const prompt = buildServicePrompt(action, body, body.text || '');
+
+    if (action === 'grade' || action === 'grading') {
+      return handleAiGrade(req, res);
+    }
+
+    try {
+      const result = await callGemini({
+        prompt,
+        apiKey,
+        temperature: action === 'pvp' ? 0.2 : 0.7,
+        maxOutputTokens: action === 'mock-paper' ? 2600 : 1400,
+      });
+
+      res.json({ success: true, text: result, result, message: result, subject: String(body.chatRoomId || body.subjectId || body.subject || 'general').toLowerCase() });
+    } catch (error) {
+      const subjectKey = String(body.chatRoomId || body.subjectId || body.subject || 'chinese').toLowerCase();
+      const fallbackText = buildFallbackMockPaper(subjectKey, body.text || '');
+      console.warn('[API] Gemini unavailable, returning fallback mock paper:', error.message || error);
+      res.json({ success: true, text: fallbackText, result: fallbackText, message: fallbackText, fallback: true });
+    }
+  } catch (error) {
+    console.error('[API] /api/process failed:', error);
+    res.status(500).json({ success: false, error: error.message || 'Failed to process request' });
+  }
+}
+
+app.post('/api/ai/grade', handleProcess);
+app.post('/api/process', handleProcess);
+app.post('/api/mock-paper', handleProcess);
 
 app.get('/', (req, res) => {
   res.send('AURA learning training backend is running');
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
-});
+let server;
+
+if (process.env.NODE_ENV !== 'test' && process.argv[1] && path.resolve(process.argv[1]) === __filename) {
+  server = app.listen(PORT, () => {
+    console.log(`Server listening on http://localhost:${PORT}`);
+  });
+}
+
+export { app, server };
